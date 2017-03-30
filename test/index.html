@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>vue-authenticate</title>
+  <style>
+    *, html, body {
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      font-size: 14px;
+      line-height: 1.5;
+
+    }
+
+    button {
+      background-color: transparent;
+      border: 1px solid #ddd;
+      border-radius: 3px;
+      font-size: inherit;
+      font-weight: 700;
+      line-height: 2rem;
+      padding: 0 2rem;
+    }
+
+    button:hover {
+      cursor: pointer;
+    }
+
+    .button--github     { color: #4078c0; border: 1px solid #4078c0; }
+    .button--facebook   { color: #3b5998; border: 1px solid #3b5998; }
+    .button--google     { color: #ea4335; border: 1px solid #ea4335; }
+    .button--twitter    { color: #1da1f2; border: 1px solid #1da1f2; }
+
+    hr {
+      border: 0;
+      border-bottom: 1px solid #ddd;
+      margin: 2rem 0;
+    }
+
+    #app {
+      margin: 32px auto;
+      max-width: 640px;
+      word-break: break-all;
+    }
+  </style>
+</head>
+<body>
+  <div id="app">
+    <router-view></router-view>
+  </div><!-- /#app -->
+
+  <script src="/index.bundle.js"></script>
+</body>
+</html>

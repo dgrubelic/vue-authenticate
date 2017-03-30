@@ -1,0 +1,68 @@
+{
+  "name": "vue-authenticate",
+  "version": "1.0.0",
+  "description": "Authentication library for Vue.js",
+  "main": "src/index.js",
+  "scripts": {
+    "dev": "parallelshell \"node-dev ./test/server.js\" \"gulp dev\""
+  },
+  "keywords": [
+    "vue",
+    "vuejs",
+    "auth"
+  ],
+  "author": { 
+    "name": "Davor Grubelic",
+    "email": "davor.grubelic@gmail.com",
+    "url": "https://dgrubelic.me"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/dgrubelic/vue-authenticate.git"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "promise-polyfill": "^6.0.2",
+    "vue": "^2.2.5",
+    "vue-resource": "^1.2.1"
+  },
+  "devDependencies": {
+    "axios": "^0.15.3",
+    "babel-core": "^6.24.0",
+    "babel-loader": "^6.4.1",
+    "body-parser": "^1.17.1",
+    "connect-history-api-fallback": "^1.3.0",
+    "cors": "^2.8.1",
+    "express": "^4.15.2",
+    "gulp": "^3.9.1",
+    "gulp-connect": "^5.0.0",
+    "gulp-webpack": "^1.5.0",
+    "node-dev": "^3.1.3",
+    "oauth": "^0.9.15",
+    "oauth-signature": "^1.3.1",
+    "parallelshell": "^2.0.0",
+    "request": "^2.81.0",
+    "unix-timestamp": "^0.2.0",
+    "vue-axios": "^2.0.1",
+    "vue-router": "^2.3.0",
+    "webpack": "^2.3.2",
+    "webpack-dev-server": "^2.4.2"
+  },
+  "tags": [
+    "auth",
+    "authentication",
+    "login",
+    "registration",
+    "jwt",
+    "token",
+    "vuejs",
+    "vue.js",
+    "github",
+    "facebook",
+    "google",
+    "twitter",
+    "oauth",
+    "oauth 1.0",
+    "oauth 2.0"
+  ]
+}
