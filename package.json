@@ -16,7 +16,7 @@
     "email": "davor.grubelic@gmail.com",
     "url": "https://dgrubelic.me"
   },
-  "repository": {
+  "repository": {
     "type": "git",
     "url": "https://github.com/dgrubelic/vue-authenticate.git"
   },
