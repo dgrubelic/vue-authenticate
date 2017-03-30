@@ -23,7 +23,7 @@
   "license": "MIT",
   "dependencies": {
     "promise-polyfill": "^6.0.2",
-    "vue": "^2.2.5",
+    "vue": "^2.2.5"
   },
   "devDependencies": {
     "axios": "^0.15.3",
