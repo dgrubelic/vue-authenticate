@@ -153,6 +153,6 @@ const router = new VueRouter({
 })
 
 const app = new Vue({
-  router,
-  store
+  router
+  // , store
 }).$mount('#app')
