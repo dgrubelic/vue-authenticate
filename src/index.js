@@ -8,7 +8,7 @@ import VueAuthenticate from './auth.js'
  */
 function plugin(Vue, options) {
   if (plugin.installed) {
-    return;
+    return
   }
 
   Object.defineProperties(Vue.prototype, {
@@ -22,7 +22,8 @@ function plugin(Vue, options) {
         return new VueAuthenticate(this.$http, options)
       }
     }
-  });
+  })
 }
 
-export default plugin;
+export default plugin
+export { VueAuthenticate }

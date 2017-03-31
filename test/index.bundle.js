@@ -9914,6 +9914,7 @@ class OAuthPopup {
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__utils_js__ = __webpack_require__(0);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__promise_js__ = __webpack_require__(1);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__auth_js__ = __webpack_require__(9);
+/* unused harmony reexport VueAuthenticate */
 
 
 
@@ -9942,6 +9943,7 @@ function plugin(Vue, options) {
 }
 
 /* harmony default export */ __webpack_exports__["a"] = (plugin);
+
 
 /***/ }),
 /* 7 */
@@ -14552,14 +14554,24 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 // import axios from 'axios' // Uncomment for axios example
 // import VueAxios from 'vue-axios' // Uncomment for axios example
 
-
-
 __WEBPACK_IMPORTED_MODULE_0_vue___default.a.use(__WEBPACK_IMPORTED_MODULE_1_vue_router__["a" /* default */]);
 __WEBPACK_IMPORTED_MODULE_0_vue___default.a.use(__WEBPACK_IMPORTED_MODULE_2_vue_resource___default.a); // Comment for axios example
+__WEBPACK_IMPORTED_MODULE_0_vue___default.a.http.options.root = 'http://localhost:3000';
 
 // Vue.use(VueAxios, axios) // Uncomment for axios example
 
-__WEBPACK_IMPORTED_MODULE_0_vue___default.a.use(__WEBPACK_IMPORTED_MODULE_3__src_index_js__["a" /* default */], {});
+
+// import store from './store.js'
+
+__WEBPACK_IMPORTED_MODULE_0_vue___default.a.use(__WEBPACK_IMPORTED_MODULE_3__src_index_js__["a" /* default */], {
+  baseUrl: 'http://localhost:4000',
+  providers: {
+    github: {
+      clientId: '91b3c6a5b8411640e1b3',
+      redirectUri: 'http://localhost:8080/auth/callback'
+    }
+  }
+});
 
 const router = new __WEBPACK_IMPORTED_MODULE_1_vue_router__["a" /* default */]({
   mode: 'history',
@@ -14572,9 +14584,15 @@ const router = new __WEBPACK_IMPORTED_MODULE_1_vue_router__["a" /* default */]({
           response: null
         };
       },
+      computed: {
+        // isVuexAuthenticated: function () {
+        //   return this.$store.state.isAuthenticated
+        // }
+      },
       template: `
           <div class="index-component">
             <button @click="authLogin()">Login</button>
+            <!-- <button @click="authLoginVuex()">Login (Vuex)</button> -->
             <button @click="authRegister()">Register</button>
             <button @click="authLogout()">Logout</button>
             <hr />
@@ -14583,10 +14601,26 @@ const router = new __WEBPACK_IMPORTED_MODULE_1_vue_router__["a" /* default */]({
             <button @click="auth('google')" class="button--google">Auth google</button>
             <button @click="auth('twitter')" class="button--twitter">Auth twitter</button>
 
+            <div class="vuex-auth" v-if="isVuexAuthenticated">
+              <p><strong>Hooray! Vuex authentication was successful!</strong></p>
+              <p>Don't worry, this message will dissappear in 3 seconds.</p>
+            </div>
+
             <pre class="response" v-if="response !== null">{{JSON.stringify(response, null, 2)}}</pre>
           </div>
         `,
       methods: {
+
+        // authLoginVuex: function () {
+        //   this.response = null
+        //   let user = {
+        //     email: 'john.doe@domain.com', 
+        //     password: 'pass123456'
+        //   };
+
+        //   this.$store.dispatch('login', user)
+        // },
+
         authLogin: function () {
           let user = {
             email: 'john.doe@domain.com',
@@ -14599,8 +14633,6 @@ const router = new __WEBPACK_IMPORTED_MODULE_1_vue_router__["a" /* default */]({
 
           this.$auth.login(user).then(response => {
             this.response = response;
-            console.log(this.$auth.isAuthenticated());
-            console.log(this.$auth.getPayload());
           });
         },
 
@@ -14617,8 +14649,6 @@ const router = new __WEBPACK_IMPORTED_MODULE_1_vue_router__["a" /* default */]({
 
           this.$auth.register(user).then(response => {
             this.response = response;
-            console.log(this.$auth.isAuthenticated());
-            console.log(this.$auth.getPayload());
           });
         },
 
@@ -14626,8 +14656,6 @@ const router = new __WEBPACK_IMPORTED_MODULE_1_vue_router__["a" /* default */]({
           this.$auth.logout().then(() => {
             if (!this.$auth.isAuthenticated()) {
               this.response = null;
-            } else {
-              console.log(this.$auth.isAuthenticated());
             }
           });
         },
@@ -14635,8 +14663,6 @@ const router = new __WEBPACK_IMPORTED_MODULE_1_vue_router__["a" /* default */]({
         auth: function (provider) {
           this.$auth.logout();
           this.response = null;
-
-          console.log('User authenticated: ', this.$auth.isAuthenticated());
 
           this.$auth.authenticate(provider).then(authResponse => {
             if (provider === 'github') {
@@ -14670,7 +14696,8 @@ const router = new __WEBPACK_IMPORTED_MODULE_1_vue_router__["a" /* default */]({
 });
 
 const app = new __WEBPACK_IMPORTED_MODULE_0_vue___default.a({
-  router
+  router,
+  store
 }).$mount('#app');
 
 /***/ }),

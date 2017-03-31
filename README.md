@@ -1,5 +1,5 @@
 # vue-authenticate
-`vue-authenticate` is easily configurable solution for *Vue.js* that provides local login/registration as well as Social login using Github, Facebook, Google and Twitter OAuth providers.
+**vue-authenticate** is easily configurable solution for *Vue.js* that provides local login/registration as well as Social login using Github, Facebook, Google and Twitter OAuth providers.
 
 The best part about this library is that it is not strictly coupled to one request handling library like `vue-resource`. You will be able to use it with different libraries. 
 
@@ -7,25 +7,33 @@ For now it is tested to work with  `vue-resource` and `axios` (using `vue-axios`
 
 This library was inspired by well known authentication library for Angular called [Satellizer](https://github.com/sahat/satellizer) developed by [Sahat Yalkabov](http://sahatyalkabov.com). They share almost identical configuration and API so you can easily switch from Angular to Vue.js project.
 
+**DISCLAIMER**
+
+For now, this package only supports ES6 import usage, but soon will have standalone ES5 build.
+
+
+
+*DEMO app comming soon...*
+
 ## Instalation
-`npm install vue-authenticate`
+```bash
+npm install vue-authenticate
+```
 
 ## Usage
 ```javascript
 import Vue from 'vue'
 import VueResource from 'vue-resource'
-import VueAuthenticate from '../src/index.js'
+import VueAuthenticate from 'vue-authenticate'
 
-Vue.use(VueRouter)
 Vue.use(VueResource)
-
 Vue.use(VueAuthenticate, {
-  baseUrl: 'http://localhost:4000',
+  baseUrl: 'http://localhost:3000', // Your API domain
   
   providers: {
     github: {
-      clientId: '91b3c6a5b8411640e1b3',
-      redirectUri: 'http://localhost:8080/auth/callback'
+      clientId: '',
+      redirectUri: 'http://localhost:8080/auth/callback' // Your client app URL
     }
   }
 }
@@ -50,6 +58,11 @@ new Vue({
 })
 ```
 
+```html
+<button @click="login()">Login</button>
+<button @click="register()">Register</button>
+```
+
 ### Social authentication
 
 ```javascript
@@ -69,6 +82,91 @@ new Vue({
 <button @click="authenticate('facebook')">auth Facebook</button>
 <button @click="authenticate('google')">auth Google</button>
 <button @click="authenticate('twitter')">auth Twitter</button>
+```
+
+### Vuex authentication
+
+#### Import and initialize all required libraries
+
+```javascript
+import Vue from 'vue'
+import Vuex from 'vuex'
+import VueResource from 'vue-resource'
+import { VueAuthenticate } 'vue-authenticate'
+
+Vue.use(Vuex)
+Vue.use(VueResource)
+```
+
+Create instance of VueAuthenticate class used with Vuex
+
+```javascript
+const vueAuth = new VueAuthenticate(Vue.http, {
+  baseUrl: 'http://localhost:4000'
+})
+```
+
+Once you have created VueAuthenticate instance, you can use it in Vuex store like this:
+
+```javascript
+export default new Vuex.Store({
+  
+  // You can use it as state property
+  state: {
+    isAuthenticated: false
+  },
+
+  // You can use it as a state getter function (probably the best solution)
+  getters: {
+    isAuthenticated () {
+      return vueAuth.isAuthenticated()
+    }
+  },
+
+  // Mutation for when you use it as state property
+  mutations: {
+    isAuthenticated (state, payload) {
+      state.isAuthenticated = payload.isAuthenticated
+    }
+  },
+
+  actions: {
+
+    // Perform VueAuthenticate login using Vuex actions
+    login (context, payload) {
+
+      vueAuth.login(payload.user, payload.requestOptions).then((response) => {
+        context.commit('isAuthenticated', {
+          isAuthenticated: vueAuth.isAuthenticated()
+        })
+      })
+
+    }
+  }
+})
+```
+
+Later in Vue component, you can dispatch Vuex state action like this
+
+```javascript
+// You define your state logic here
+import state from './state.js'
+
+new Vue({
+  state,
+
+  computed: {
+    isAuthenticated: function () {
+      return this.$state.getters.isAuthenticated()
+    }
+  },
+
+  methods: {
+    login () {
+      this.$state.dispatch('login', { user, requestOptions })
+    }
+  }
+})
 ```
 
 ## License

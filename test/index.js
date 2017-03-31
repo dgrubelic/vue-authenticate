@@ -5,14 +5,24 @@ import VueResource from 'vue-resource' // Comment for axios example
 // import axios from 'axios' // Uncomment for axios example
 // import VueAxios from 'vue-axios' // Uncomment for axios example
 
-import VueAuthenticate from '../src/index.js'
-
 Vue.use(VueRouter)
 Vue.use(VueResource) // Comment for axios example
+Vue.http.options.root = 'http://localhost:3000';
 
 // Vue.use(VueAxios, axios) // Uncomment for axios example
 
-Vue.use(VueAuthenticate, {})
+import VueAuthenticate from '../src/index.js'
+// import store from './store.js'
+
+Vue.use(VueAuthenticate, {
+  baseUrl: 'http://localhost:4000',
+  providers: {
+    github: {
+      clientId: '91b3c6a5b8411640e1b3',
+      redirectUri: 'http://localhost:8080/auth/callback'
+    }
+  }
+})
 
 const router = new VueRouter({
   mode: 'history',
@@ -26,9 +36,15 @@ const router = new VueRouter({
             response: null
           }
         },
+        computed: {
+          // isVuexAuthenticated: function () {
+          //   return this.$store.state.isAuthenticated
+          // }
+        },
         template: `
           <div class="index-component">
             <button @click="authLogin()">Login</button>
+            <!-- <button @click="authLoginVuex()">Login (Vuex)</button> -->
             <button @click="authRegister()">Register</button>
             <button @click="authLogout()">Logout</button>
             <hr />
@@ -37,10 +53,26 @@ const router = new VueRouter({
             <button @click="auth('google')" class="button--google">Auth google</button>
             <button @click="auth('twitter')" class="button--twitter">Auth twitter</button>
 
+            <div class="vuex-auth" v-if="isVuexAuthenticated">
+              <p><strong>Hooray! Vuex authentication was successful!</strong></p>
+              <p>Don't worry, this message will dissappear in 3 seconds.</p>
+            </div>
+
             <pre class="response" v-if="response !== null">{{JSON.stringify(response, null, 2)}}</pre>
           </div>
         `,
         methods: {
+
+          // authLoginVuex: function () {
+          //   this.response = null
+          //   let user = {
+          //     email: 'john.doe@domain.com', 
+          //     password: 'pass123456'
+          //   };
+
+          //   this.$store.dispatch('login', user)
+          // },
+
           authLogin: function() {
             let user = {
               email: 'john.doe@domain.com', 
@@ -53,8 +85,6 @@ const router = new VueRouter({
 
             this.$auth.login(user).then((response) => {
               this.response = response
-              console.log(this.$auth.isAuthenticated())
-              console.log(this.$auth.getPayload())
             })
           },
 
@@ -71,8 +101,6 @@ const router = new VueRouter({
             
             this.$auth.register(user).then((response) => {
               this.response = response
-              console.log(this.$auth.isAuthenticated())
-              console.log(this.$auth.getPayload())
             })
           },
 
@@ -80,8 +108,6 @@ const router = new VueRouter({
             this.$auth.logout().then(() => {
               if (!this.$auth.isAuthenticated()) {
                 this.response = null
-              } else {
-                console.log(this.$auth.isAuthenticated())
               }
             })
           },
@@ -89,8 +115,6 @@ const router = new VueRouter({
           auth: function(provider) {
             this.$auth.logout()
             this.response = null
-
-            console.log('User authenticated: ', this.$auth.isAuthenticated())
 
             this.$auth.authenticate(provider).then((authResponse) => {
               if (provider === 'github') {
@@ -129,5 +153,6 @@ const router = new VueRouter({
 })
 
 const app = new Vue({
-  router
+  router,
+  store
 }).$mount('#app')
