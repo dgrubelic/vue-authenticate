@@ -169,6 +169,37 @@ new Vue({
 })
 ```
 
+### Custom request and response interceptors
+
+You can easily setup custom request and response interceptors if you use different request handling library.
+Fro example, if you use **axios** in your app, request and response interceptors would look something like this:
+
+**Important**: You must set both `request` and `response` interceptors if your uses request handling library other than `vue-resource` (default library).
+
+```javascript
+
+bindRequestInterceptor: function () {
+  this.$http.interceptors.request.use((config) => {
+    if (this.isAuthenticated()) {
+      config.headers['Authorization'] = [
+        this.options.tokenType, this.getToken()
+      ].join(' ')
+    } else {
+      delete config.headers['Authorization']
+    }
+    return config
+  })
+},
+
+bindResponseInterceptor: function () {
+  this.$http.interceptors.response.use((response) => {
+    this.setToken(response)
+    return response
+  })
+}
+
+```
+
 ## License
 
 The MIT License (MIT)

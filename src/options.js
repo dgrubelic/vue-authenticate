@@ -16,6 +16,8 @@ export default {
   storageNamespace: 'vue-authenticate',
   requestDataKey: 'body',
   responseDataKey: 'body',
+  bindRequestInterceptor: null,
+  bindResponseInterceptor: null,
 
   providers: {
     facebook: {

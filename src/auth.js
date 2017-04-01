@@ -43,11 +43,11 @@ export default class VueAuthenticate {
     })
 
     // Setup request interceptors
-    if (this.options.requestInterceptor && isFunction(this.options.requestInterceptor)) {
-      this.options.requestInterceptor.call(this)
+    if (this.options.bindRequestInterceptor && isFunction(this.options.bindRequestInterceptor)) {
+      this.options.bindRequestInterceptor.call(this)
 
-      if (this.options.responseInterceptor && isFunction(this.options.responseInterceptor)) {
-        this.options.responseInterceptor.call(this)
+      if (this.options.bindResponseInterceptor && isFunction(this.options.bindResponseInterceptor)) {
+        this.options.bindResponseInterceptor.call(this)
       }
     } else {
       // By default, insert request interceptor for vue-resource
@@ -60,8 +60,8 @@ export default class VueAuthenticate {
           request.headers.delete('Authorization')
         }
         
-        if (this.options.responseInterceptor && isFunction(this.options.responseInterceptor)) {
-          this.options.responseInterceptor.call(this)
+        if (this.options.bindResponseInterceptor && isFunction(this.options.bindResponseInterceptor)) {
+          this.options.bindResponseInterceptor.call(this)
         } else {
           next((response) => {
             try {
