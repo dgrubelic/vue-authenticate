@@ -3,7 +3,7 @@
 
 The best part about this library is that it is not strictly coupled to one request handling library like [vue-resource](https://github.com/pagekit/vue-resource). You will be able to use it with different libraries. 
 
-For now it is tested to work with  [vue-resource](https://github.com/pagekit/vue-resource) and [axios](https://github.com/mzabriskie/axios) (using [vue-axios](https://github.com/imcvampire/vue-axios) wrapper).
+For now it is tested to work with  [vue-resource](https://github.com/pagekit/vue-resource) (default library) and [axios](https://github.com/mzabriskie/axios) (using [vue-axios](https://github.com/imcvampire/vue-axios) wrapper).
 
 This library was inspired by well known authentication library for Angular called [Satellizer](https://github.com/sahat/satellizer) developed by [Sahat Yalkabov](http://sahatyalkabov.com). They share almost identical configuration and API so you can easily switch from Angular to Vue.js project.
 
