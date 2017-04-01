@@ -16,7 +16,7 @@ function plugin(Vue, options) {
       get() {
         // vue-resource module not found, throw error
         if (!this.$http) {
-          throw new Error('vue-resource instance not found')
+          throw new Error('Request handler instance not found')
         }
 
         return new VueAuthenticate(this.$http, options)
