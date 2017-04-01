@@ -51,7 +51,7 @@ export default class VueAuthenticate {
       }
     } else {
       // By default, insert request interceptor for vue-resource
-      Vue.http.interceptors.push((request, next) => {
+      this.$http.interceptors.push((request, next) => {
         if (this.isAuthenticated()) {
           request.headers.set('Authorization', [
             this.options.tokenType, this.getToken()
