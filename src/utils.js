@@ -24,7 +24,7 @@ if (typeof Object.assign != 'function') {
 }
 
 export function camelCase(name) {
-  return name.replace(/([\:\-\_]+(.))/g, (_, separator, letter, offset) => {
+  return name.replace(/([\:\-\_]+(.))/g, function (_, separator, letter, offset) {
     return offset ? letter.toUpperCase() : letter;
   });
 }
