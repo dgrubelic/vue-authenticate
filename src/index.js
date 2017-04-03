@@ -10,16 +10,21 @@ function plugin(Vue, options) {
   if (plugin.installed) {
     return
   }
+  plugin.installed = true
 
+  let vueAuthInstance = null;
   Object.defineProperties(Vue.prototype, {
     $auth: {
       get() {
-        // vue-resource module not found, throw error
-        if (!this.$http) {
-          throw new Error('Request handler instance not found')
-        }
+        if (!vueAuthInstance) {
+          // vue-resource module not found, throw error
+          if (!this.$http) {
+            throw new Error('Request handler instance not found')
+          }
 
-        return new VueAuthenticate(this.$http, options)
+          vueAuthInstance = new VueAuthenticate(this.$http, options)
+        }
+        return vueAuthInstance
       }
     }
   })
