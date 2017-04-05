@@ -31,6 +31,9 @@ app.post('/auth/:provider', function(req, res){
     case 'twitter':
       twitterAuth(req, res)
       break
+    case 'instagram':
+      instagramAuth(req, res)
+      break
     case 'login':
       loginAuth(req, res)
       break
@@ -115,6 +118,34 @@ function googleAuth(req, res) {
       code: req.body.code,
       client_id: config.auth.google.clientId,
       client_secret: config.auth.google.clientSecret,
+      redirect_uri: req.body.redirectUri,
+      grant_type: 'authorization_code'
+    },
+    headers: {
+      'content-type': 'application/x-www-form-urlencoded'
+    }
+  }, function (err, response, body) {
+    try {
+      if (!err && response.statusCode === 200) {
+        var responseJson = JSON.parse(body)
+        res.json(responseJson)
+      } else {
+        res.status(response.statusCode).json(err)
+      }
+    } catch (e) {
+      res.status(500).json(err || e)
+    }
+  })
+}
+
+function instagramAuth(req, res) {
+  Request({
+    method: 'post',
+    url: 'https://api.instagram.com/oauth/access_token',
+    form: {
+      code: req.body.code,
+      client_id: config.auth.instagram.clientId,
+      client_secret: config.auth.instagram.clientSecret,
       redirect_uri: req.body.redirectUri,
       grant_type: 'authorization_code'
     },

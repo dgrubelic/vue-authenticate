@@ -1,26 +1,16 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
-import VueResource from 'vue-resource' // Comment for axios example
-
-// import axios from 'axios' // Uncomment for axios example
-// import VueAxios from 'vue-axios' // Uncomment for axios example
+import VueResource from 'vue-resource'
+import VueAuthenticate from '../src/index.js'
+import store from './store.js'
 
 Vue.use(VueRouter)
-Vue.use(VueResource) // Comment for axios example
+Vue.use(VueResource)
 Vue.http.options.root = 'http://localhost:3000';
-
-// Vue.use(VueAxios, axios) // Uncomment for axios example
-
-import VueAuthenticate from '../src/index.js'
-// import store from './store.js'
-
 Vue.use(VueAuthenticate, {
-  baseUrl: 'http://localhost:4000',
+  baseUrl: 'http://localhost:4000',  
   providers: {
-    github: {
-      clientId: '91b3c6a5b8411640e1b3',
-      redirectUri: 'http://localhost:8080/auth/callback'
-    }
+    // Define OAuth providers config
   }
 })
 
@@ -37,21 +27,29 @@ const router = new VueRouter({
           }
         },
         computed: {
-          // isVuexAuthenticated: function () {
-          //   return this.$store.state.isAuthenticated
-          // }
+
+          isVuexAuthenticated: function () {
+            return this.$store.state.isAuthenticated
+          }
+          
         },
         template: `
           <div class="index-component">
             <button @click="authLogin()">Login</button>
-            <!-- <button @click="authLoginVuex()">Login (Vuex)</button> -->
+            <button @click="authLoginVuex()">Login (Vuex)</button>
             <button @click="authRegister()">Register</button>
             <button @click="authLogout()">Logout</button>
+            
             <hr />
+
             <button @click="auth('github')" class="button--github">Auth github</button>
             <button @click="auth('facebook')" class="button--facebook">Auth facebook</button>
             <button @click="auth('google')" class="button--google">Auth google</button>
             <button @click="auth('twitter')" class="button--twitter">Auth twitter</button>
+
+            <hr />
+            
+            <button @click="auth('instagram')" class="button--instagram">Auth instagram</button>
 
             <div class="vuex-auth" v-if="isVuexAuthenticated">
               <p><strong>Hooray! Vuex authentication was successful!</strong></p>
@@ -63,15 +61,15 @@ const router = new VueRouter({
         `,
         methods: {
 
-          // authLoginVuex: function () {
-          //   this.response = null
-          //   let user = {
-          //     email: 'john.doe@domain.com', 
-          //     password: 'pass123456'
-          //   };
+          authLoginVuex: function () {
+            this.response = null
+            let user = {
+              email: 'john.doe@domain.com', 
+              password: 'pass123456'
+            };
 
-          //   this.$store.dispatch('login', user)
-          // },
+            this.$store.dispatch('login', user)
+          },
 
           authLogin: function() {
             let user = {
@@ -133,7 +131,11 @@ const router = new VueRouter({
                 })
               } else if (provider === 'twitter') {
                 this.response = authResponse.body.profile
+              } else if (provider === 'instagram') {
+                this.response = authResponse
               }
+            }).catch((err) => {
+              this.response = err
             })
           }
         }
@@ -143,16 +145,13 @@ const router = new VueRouter({
     {
       path: '/auth/callback',
       component: {
-        template: '<div class="auth-component"></div>',
-        mounted: function () {
-
-        }
+        template: '<div class="auth-component"></div>'
       }
     }
   ]
 })
 
 const app = new Vue({
-  router
-  // , store
+  router,
+  store
 }).$mount('#app')

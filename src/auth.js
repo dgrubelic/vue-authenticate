@@ -69,8 +69,10 @@ export default class VueAuthenticate {
               if (responseJson[this.options.tokenName]) {
                 this.setToken(responseJson)
                 delete responseJson[this.options.tokenName]
+                return responseJson
               }
             } catch(e) {}
+            return response
           })
         }
       })
