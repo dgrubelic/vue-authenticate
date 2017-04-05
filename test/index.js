@@ -50,6 +50,7 @@ const router = new VueRouter({
             <hr />
             
             <button @click="auth('instagram')" class="button--instagram">Auth instagram</button>
+            <button @click="auth('bitbucket')" class="button--bitbucket">Auth bitbucket</button>
 
             <div class="vuex-auth" v-if="isVuexAuthenticated">
               <p><strong>Hooray! Vuex authentication was successful!</strong></p>
@@ -133,6 +134,10 @@ const router = new VueRouter({
                 this.response = authResponse.body.profile
               } else if (provider === 'instagram') {
                 this.response = authResponse
+              } else if (provider === 'bitbucket') {
+                this.$http.get('https://api.bitbucket.org/2.0/user').then((response) => {
+                  this.response = response
+                })
               }
             }).catch((err) => {
               this.response = err

@@ -78,6 +78,18 @@ export default {
       redirectUri: null,
       oauthType: '1.0',
       popupOptions: { width: 495, height: 645 }
+    },
+
+    bitbucket: {
+      name: 'bitbucket',
+      url: '/auth/bitbucket',
+      authorizationEndpoint: 'https://bitbucket.org/site/oauth2/authorize',
+      redirectUri: null,
+      optionalUrlParams: ['scope'],
+      scope: ['email'],
+      scopeDelimiter: ' ',
+      oauthType: '2.0',
+      popupOptions: { width: 1020, height: 618 }
     }
   }
 }
