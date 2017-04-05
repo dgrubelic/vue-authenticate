@@ -60,6 +60,17 @@ export default {
       popupOptions: { width: 1020, height: 618 }
     },
 
+    instagram: {
+      name: 'instagram',
+      url: '/auth/instagram',
+      authorizationEndpoint: 'https://api.instagram.com/oauth/authorize',
+      redirectUri: null,
+      requiredUrlParams: ['scope'],
+      scope: ['basic'],
+      scopeDelimiter: '+',
+      oauthType: '2.0'
+    },
+
     twitter: {
       name: 'twitter',
       url: '/auth/twitter',
