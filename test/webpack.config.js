@@ -1,3 +1,5 @@
+const webpack = require('webpack')
+
 module.exports = {
   entry: __dirname + '/index.js',
   output: {
@@ -10,7 +12,10 @@ module.exports = {
         test: /\.js$/,
         exclude: /(node_modules|bower_components)/,
         use: {
-          loader: 'babel-loader'
+          loader: 'babel-loader',
+          options: {
+            presets: ['es2015']
+          }
         }
       }
     ]
@@ -19,5 +24,8 @@ module.exports = {
     alias: {
       vue: 'vue/dist/vue.common.js'
     }
-  }
+  },
+  plugins: [
+    new webpack.optimize.UglifyJsPlugin()
+  ]
 };

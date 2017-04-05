@@ -1,3 +1,5 @@
+const webpack = require('webpack')
+
 module.exports = {
   entry: __dirname + '/src/index.js',
   output: {
@@ -10,9 +12,15 @@ module.exports = {
         test: /\.js$/,
         exclude: /(node_modules|bower_components)/,
         use: {
-          loader: 'babel-loader'
+          loader: 'babel-loader',
+          options: {
+            presets: ['es2015']
+          }
         }
       }
     ]
-  }
+  },
+  plugins: [
+    new webpack.optimize.UglifyJsPlugin()
+  ]
 };
