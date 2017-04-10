@@ -1,7 +1,5 @@
 /**
- * @author Sahat Yalkabov <https://github.com/sahat>
- * @copyright Configuration taken from https://github.com/sahat/satellizer
- * and extended to fit vue-authenticate library
+ * Default configuration
  */
 export default {
   baseUrl: null,

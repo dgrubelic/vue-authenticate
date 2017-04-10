@@ -1,10 +1,11 @@
 import './utils.js'
 import Promise from './promise.js'
-import VueAuthenticate from './auth.js'
+import VueAuthenticate from './authenticate.js'
 
 /**
  * VueAuthenticate plugin
  * @param {Object} Vue
+ * @param {Object} options
  */
 function plugin(Vue, options) {
   if (plugin.installed) {
@@ -17,7 +18,7 @@ function plugin(Vue, options) {
     $auth: {
       get() {
         if (!vueAuthInstance) {
-          // vue-resource module not found, throw error
+          // Request handler library not found, throw error
           if (!this.$http) {
             throw new Error('Request handler instance not found')
           }
