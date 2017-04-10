@@ -1,4 +1,3 @@
-import Vue from 'vue'
 import Promise from './promise.js'
 import { objectExtend, isString, isObject, isFunction, joinUrl, decodeBase64 } from './utils.js'
 import defaultOptions from './options.js'
