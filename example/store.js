@@ -1,7 +1,7 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
 import VueResource from 'vue-resource'
-import VueAuthenticate from '../src/auth.js'
+import VueAuthenticate from '../src/authenticate.js'
 
 Vue.use(Vuex)
 Vue.use(VueResource)

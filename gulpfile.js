@@ -1,22 +1,22 @@
 var gulp = require('gulp'),
-    connect = require('gulp-connect')
+    connect = require('gulp-connect'),
     webpack = require('webpack'),
-    gulpWebpack = require('gulp-webpack')
+    gulpWebpack = require('gulp-webpack'),
     history = require('connect-history-api-fallback')
 
 gulp.task('compile', function () {
-  var webpackConfig = require('./test/webpack.config.js')
-  return gulp.src('./test/index.js')
+  var webpackConfig = require('./example/webpack.config.js')
+  return gulp.src('./example/index.js')
     .pipe(gulpWebpack(webpackConfig, webpack))
-    .pipe(gulp.dest('./test'))
+    .pipe(gulp.dest('./example'))
     .pipe(connect.reload())
 })
 
 gulp.task('server', function () {
   connect.server({
     name: 'VueAuthentication',
-    root: './test',
-    base: 'test',
+    root: './example',
+    base: 'example',
     port: 8080,
     livereload: true,
     verbose: true,
@@ -27,7 +27,7 @@ gulp.task('server', function () {
 })
 
 gulp.task('watch', function () {
-  gulp.watch(['./test/index.js', './src/**/*.js'], ['compile'])
+  gulp.watch(['./example/index.js', './src/**/*.js'], ['compile'])
 })
 
 gulp.task('dev', ['compile', 'server', 'watch'])

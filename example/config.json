@@ -15,6 +15,14 @@
     "twitter": {
       "clientId": "",
       "clientSecret": ""
+    },
+    "instagram": {
+      "clientId": "",
+      "clientSecret": ""
+    },
+    "bitbucket": {
+      "clientId": "",
+      "clientSecret": ""
     }
   }
 }
