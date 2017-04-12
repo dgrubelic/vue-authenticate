@@ -1,9 +1,3 @@
-import Vue from 'vue'
-import VueRouter from 'vue-router'
-import VueResource from 'vue-resource'
-import VueAuthenticate from '../src/index.js'
-import store from './store.js'
-
 Vue.use(VueRouter)
 Vue.use(VueResource)
 Vue.http.options.root = 'http://localhost:3000';
@@ -14,8 +8,7 @@ Vue.use(VueAuthenticate, {
   }
 })
 
-const router = new VueRouter({
-  mode: 'history',
+var router = new VueRouter({
   routes: [
     { 
       path: '/',
@@ -26,17 +19,9 @@ const router = new VueRouter({
             response: null
           }
         },
-        computed: {
-
-          isVuexAuthenticated: function () {
-            return this.$store.state.isAuthenticated
-          }
-          
-        },
         template: `
           <div class="index-component">
             <button @click="authLogin()">Login</button>
-            <button @click="authLoginVuex()">Login (Vuex)</button>
             <button @click="authRegister()">Register</button>
             <button @click="authLogout()">Logout</button>
             
@@ -52,25 +37,10 @@ const router = new VueRouter({
             <button @click="auth('instagram')" class="button--instagram">Auth instagram</button>
             <button @click="auth('bitbucket')" class="button--bitbucket">Auth bitbucket</button>
 
-            <div class="vuex-auth" v-if="isVuexAuthenticated">
-              <p><strong>Hooray! Vuex authentication was successful!</strong></p>
-              <p>Don't worry, this message will dissappear in 3 seconds.</p>
-            </div>
-
             <pre class="response" v-if="response !== null">{{JSON.stringify(response, null, 2)}}</pre>
           </div>
         `,
         methods: {
-
-          authLoginVuex: function () {
-            this.response = null
-            let user = {
-              email: 'john.doe@domain.com', 
-              password: 'pass123456'
-            };
-
-            this.$store.dispatch('login', user)
-          },
 
           authLogin: function() {
             let user = {
@@ -82,7 +52,7 @@ const router = new VueRouter({
               this.$auth.logout()  
             }
 
-            this.$auth.login(user).then((response) => {
+            this.$auth.login(user).then(function (response) {
               this.response = response
             })
           },
@@ -98,7 +68,7 @@ const router = new VueRouter({
               this.$auth.logout()  
             }
             
-            this.$auth.register(user).then((response) => {
+            this.$auth.register(user).then(function (response) {
               this.response = response
             })
           },
@@ -115,32 +85,33 @@ const router = new VueRouter({
             this.$auth.logout()
             this.response = null
 
-            this.$auth.authenticate(provider).then((authResponse) => {
+            var this_ = this;
+            this.$auth.authenticate(provider).then(function (authResponse) {
               if (provider === 'github') {
-                this.$http.get('https://api.github.com/user').then((response) => {
-                  this.response = response
+                this_.$http.get('https://api.github.com/user').then(function (response) {
+                  this_.response = response
                 })
               } else if (provider === 'facebook') {
-                this.$http.get('https://graph.facebook.com/v2.5/me', {
-                  params: { access_token: this.$auth.getToken() }
-                }).then((response) => {
-                  this.response = response
+                this_.$http.get('https://graph.facebook.com/v2.5/me', {
+                  params: { access_token: this_.$auth.getToken() }
+                }).then(function (response) {
+                  this_.response = response
                 })
               } else if (provider === 'google') {
-                this.$http.get('https://www.googleapis.com/plus/v1/people/me/openIdConnect').then((response) => {
-                  this.response = response
+                this_.$http.get('https://www.googleapis.com/plus/v1/people/me/openIdConnect').then(function (response) {
+                  this_.response = response
                 })
               } else if (provider === 'twitter') {
-                this.response = authResponse.body.profile
+                this_.response = authResponse.body.profile
               } else if (provider === 'instagram') {
-                this.response = authResponse
+                this_.response = authResponse
               } else if (provider === 'bitbucket') {
-                this.$http.get('https://api.bitbucket.org/2.0/user').then((response) => {
-                  this.response = response
+                this_.$http.get('https://api.bitbucket.org/2.0/user').then(function (response) {
+                  this_.response = response
                 })
               }
-            }).catch((err) => {
-              this.response = err
+            }).catch(function (err) {
+              this_.response = err
             })
           }
         }
@@ -156,7 +127,6 @@ const router = new VueRouter({
   ]
 })
 
-const app = new Vue({
-  router,
-  store
+var app = new Vue({
+  router: router
 }).$mount('#app')

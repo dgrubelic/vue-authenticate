@@ -92,7 +92,7 @@ new Vue({
 import Vue from 'vue'
 import Vuex from 'vuex'
 import VueResource from 'vue-resource'
-import { VueAuthenticate } 'vue-authenticate'
+import VueAuthenticate from 'vue-authenticate'
 
 Vue.use(Vuex)
 Vue.use(VueResource)
@@ -101,7 +101,7 @@ Vue.use(VueResource)
 Create instance of VueAuthenticate class used with Vuex
 
 ```javascript
-const vueAuth = new VueAuthenticate(Vue.http, {
+const vueAuth = VueAuthenticate.factory(Vue.http, {
   baseUrl: 'http://localhost:4000'
 })
 ```

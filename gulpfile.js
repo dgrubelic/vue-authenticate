@@ -15,8 +15,8 @@ gulp.task('compile', function () {
 gulp.task('server', function () {
   connect.server({
     name: 'VueAuthentication',
-    root: './example',
-    base: 'example',
+    root: './',
+    base: '',
     port: 8080,
     livereload: true,
     verbose: true,
@@ -30,4 +30,4 @@ gulp.task('watch', function () {
   gulp.watch(['./example/index.js', './src/**/*.js'], ['compile'])
 })
 
-gulp.task('dev', ['compile', 'server', 'watch'])
+gulp.task('dev', ['server'])
