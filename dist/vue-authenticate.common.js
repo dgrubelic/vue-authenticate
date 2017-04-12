@@ -1,5 +1,5 @@
 /*!
- * vue-authenticate v1.2.1
+ * vue-authenticate v1.2.2
  * https://github.com/dgrubelic/vue-authenticate
  * Released under the MIT License.
  */
@@ -1246,9 +1246,6 @@ function plugin(Vue, options) {
     return
   }
   plugin.installed = true;
-  plugin.factory = function ($http, options) {
-    return new VueAuthenticate($http, options)
-  };
 
   var vueAuthInstance = null;
   Object.defineProperties(Vue.prototype, {
@@ -1267,5 +1264,15 @@ function plugin(Vue, options) {
     }
   });
 }
+
+/**
+ * External factory helper for ES5 and CommonJS
+ * @param  {Object} $http     Instance of request handling library
+ * @param  {Object} options   Configuration object
+ * @return {VueAuthenticate}  VueAuthenticate instance
+ */
+plugin.factory = function ($http, options) {
+  return new VueAuthenticate($http, options)
+};
 
 module.exports = plugin;
