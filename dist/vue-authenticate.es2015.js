@@ -4,12 +4,6 @@
  * Released under the MIT License.
  */
 
-(function (global, factory) {
-	typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
-	typeof define === 'function' && define.amd ? define(factory) :
-	(global.VueAuthenticate = factory());
-}(this, (function () { 'use strict';
-
 if (typeof Object.assign != 'function') {
   Object.assign = function(target, varArgs) {
     'use strict';
@@ -1272,6 +1266,5 @@ function plugin(Vue, options) {
   });
 }
 
-return plugin;
-
-})));
+export default plugin;
+export { VueAuthenticate };
