@@ -89,19 +89,32 @@ new Vue({
 #### Import and initialize all required libraries
 
 ```javascript
+// ES6 example
 import Vue from 'vue'
 import Vuex from 'vuex'
 import VueResource from 'vue-resource'
-import VueAuthenticate from 'vue-authenticate'
+import { VueAuthenticate } from 'vue-authenticate'
 
 Vue.use(Vuex)
 Vue.use(VueResource)
+
+const vueAuth = new VueAuthenticate(Vue.http, {
+  baseUrl: 'http://localhost:4000'
+})
 ```
 
-Create instance of VueAuthenticate class used with Vuex
-
 ```javascript
-const vueAuth = VueAuthenticate.factory(Vue.http, {
+// CommonJS example
+var Vue = require('vue')
+var Vuex = require('vuex')
+var VueResource = require('vue-resource')
+var VueAuthenticate = require('vue-authenticate')
+
+Vue.use(Vuex)
+Vue.use(VueResource)
+
+// ES5, CommonJS example
+var vueAuth = VueAuthenticate.factory(Vue.http, {
   baseUrl: 'http://localhost:4000'
 })
 ```
