@@ -42,15 +42,19 @@ export default class VueAuthenticate {
     })
 
     // Setup request interceptors
-    if (this.options.bindRequestInterceptor && isFunction(this.options.bindRequestInterceptor)) {
-      this.options.bindRequestInterceptor.call(this)
+    if (this.options.bindRequestInterceptor && isFunction(this.options.bindRequestInterceptor) &&
+        this.options.bindResponseInterceptor && isFunction(this.options.bindResponseInterceptor)) {
 
-      if (this.options.bindResponseInterceptor && isFunction(this.options.bindResponseInterceptor)) {
-        this.options.bindResponseInterceptor.call(this)
-      }
+      this.options.bindRequestInterceptor.call(this)
+      this.options.bindResponseInterceptor.call(this)
     } else {
-      // By default, insert request interceptor for vue-resource
-      this.$http.interceptors.push((request, next) => {
+      // Check if vue-resource is found
+      if (!Vue && !Vue.http && !Vue.http.interceptors) {
+        throw new Error('vue-resource library not found')
+      }
+
+      // By default, request and response interceptors are for vue-resource
+      Vue.http.interceptors.push((request, next) => {
         if (this.isAuthenticated()) {
           request.headers.set('Authorization', [
             this.options.tokenType, this.getToken()
@@ -59,21 +63,17 @@ export default class VueAuthenticate {
           request.headers.delete('Authorization')
         }
         
-        if (this.options.bindResponseInterceptor && isFunction(this.options.bindResponseInterceptor)) {
-          this.options.bindResponseInterceptor.call(this)
-        } else {
-          next((response) => {
-            try {
-              var responseJson = JSON.parse(response[this.options.responseDataKey])
-              if (responseJson[this.options.tokenName]) {
-                this.setToken(responseJson)
-                delete responseJson[this.options.tokenName]
-                return responseJson
-              }
-            } catch(e) {}
-            return response
-          })
-        }
+        next((response) => {
+          try {
+            var responseJson = JSON.parse(response[this.options.responseDataKey])
+            if (responseJson[this.options.tokenName]) {
+              this.setToken(responseJson)
+              delete responseJson[this.options.tokenName]
+              return responseJson
+            }
+          } catch(e) {}
+          return response
+        })
       })
     }
   }
