@@ -1,13 +1,13 @@
 {
   "name": "vue-authenticate",
-  "version": "1.2.2",
+  "version": "1.2.3",
   "description": "Authentication library for Vue.js",
   "main": "dist/vue-authenticate.js",
   "module": "dist/vue-authenticate.es2015.js",
   "unpkg": "dist/vue-authenticate.js",
   "scripts": {
     "dev": "parallelshell \"node-dev ./example/server.js\" \"gulp dev\"",
-    "build": "node build/build.js"
+    "build": "node build/build.js && cp ./dist/vue-authenticate.js ./example/"
   },
   "keywords": [
     "vue",

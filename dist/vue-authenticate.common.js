@@ -1,5 +1,5 @@
 /*!
- * vue-authenticate v1.2.2
+ * vue-authenticate v1.2.3
  * https://github.com/dgrubelic/vue-authenticate
  * Released under the MIT License.
  */
@@ -1011,15 +1011,19 @@ var VueAuthenticate = function VueAuthenticate($http, overrideOptions) {
   });
 
   // Setup request interceptors
-  if (this.options.bindRequestInterceptor && isFunction(this.options.bindRequestInterceptor)) {
-    this.options.bindRequestInterceptor.call(this);
+  if (this.options.bindRequestInterceptor && isFunction(this.options.bindRequestInterceptor) &&
+      this.options.bindResponseInterceptor && isFunction(this.options.bindResponseInterceptor)) {
 
-    if (this.options.bindResponseInterceptor && isFunction(this.options.bindResponseInterceptor)) {
-      this.options.bindResponseInterceptor.call(this);
-    }
+    this.options.bindRequestInterceptor.call(this);
+    this.options.bindResponseInterceptor.call(this);
   } else {
-    // By default, insert request interceptor for vue-resource
-    this.$http.interceptors.push(function (request, next) {
+    // Check if vue-resource is found
+    if (!Vue && !Vue.http && !Vue.http.interceptors) {
+      throw new Error('vue-resource library not found')
+    }
+
+    // By default, request and response interceptors are for vue-resource
+    Vue.http.interceptors.push(function (request, next) {
       if (this$1.isAuthenticated()) {
         request.headers.set('Authorization', [
           this$1.options.tokenType, this$1.getToken()
@@ -1028,21 +1032,17 @@ var VueAuthenticate = function VueAuthenticate($http, overrideOptions) {
         request.headers.delete('Authorization');
       }
         
-      if (this$1.options.bindResponseInterceptor && isFunction(this$1.options.bindResponseInterceptor)) {
-        this$1.options.bindResponseInterceptor.call(this$1);
-      } else {
-        next(function (response) {
-          try {
-            var responseJson = JSON.parse(response[this$1.options.responseDataKey]);
-            if (responseJson[this$1.options.tokenName]) {
-              this$1.setToken(responseJson);
-              delete responseJson[this$1.options.tokenName];
-              return responseJson
-            }
-          } catch(e) {}
-          return response
-        });
-      }
+      next(function (response) {
+        try {
+          var responseJson = JSON.parse(response[this$1.options.responseDataKey]);
+          if (responseJson[this$1.options.tokenName]) {
+            this$1.setToken(responseJson);
+            delete responseJson[this$1.options.tokenName];
+            return responseJson
+          }
+        } catch(e) {}
+        return response
+      });
     });
   }
 };
