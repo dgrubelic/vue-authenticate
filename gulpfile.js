@@ -15,8 +15,8 @@ gulp.task('compile', function () {
 gulp.task('server', function () {
   connect.server({
     name: 'VueAuthentication',
-    root: './',
-    base: '',
+    root: './example',
+    base: 'example',
     port: 8080,
     livereload: true,
     verbose: true,
