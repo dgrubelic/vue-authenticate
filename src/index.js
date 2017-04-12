@@ -12,6 +12,9 @@ function plugin(Vue, options) {
     return
   }
   plugin.installed = true
+  plugin.factory = function ($http, options) {
+    return new VueAuthenticate($http, options)
+  }
 
   let vueAuthInstance = null;
   Object.defineProperties(Vue.prototype, {
@@ -32,4 +35,3 @@ function plugin(Vue, options) {
 }
 
 export default plugin
-export { VueAuthenticate }
