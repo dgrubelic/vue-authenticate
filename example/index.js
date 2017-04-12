@@ -1,14 +1,16 @@
+Vue.http.options.root = 'http://localhost:3000';
+
 Vue.use(VueRouter)
 Vue.use(VueResource)
-Vue.http.options.root = 'http://localhost:3000';
 Vue.use(VueAuthenticate, {
-  baseUrl: 'http://localhost:4000',  
+  baseUrl: 'http://localhost:4000', 
   providers: {
     // Define OAuth providers config
   }
 })
 
 var router = new VueRouter({
+  mode: 'history',
   routes: [
     { 
       path: '/',
@@ -54,6 +56,8 @@ var router = new VueRouter({
 
             this.$auth.login(user).then(function (response) {
               this.response = response
+
+              console.log(this.$auth.isAuthenticated())
             })
           },
 
@@ -70,6 +74,8 @@ var router = new VueRouter({
             
             this.$auth.register(user).then(function (response) {
               this.response = response
+
+              console.log(this.$auth.isAuthenticated())
             })
           },
 
@@ -87,6 +93,10 @@ var router = new VueRouter({
 
             var this_ = this;
             this.$auth.authenticate(provider).then(function (authResponse) {
+              console.log(authResponse)
+
+              console.log(this_.$auth.isAuthenticated())
+
               if (provider === 'github') {
                 this_.$http.get('https://api.github.com/user').then(function (response) {
                   this_.response = response
