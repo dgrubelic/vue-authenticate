@@ -149,21 +149,21 @@ export default new Vuex.Store({
 Later in Vue component, you can dispatch Vuex state action like this
 
 ```javascript
-// You define your state logic here
-import state from './state.js'
+// You define your store logic here
+import store from './store.js'
 
 new Vue({
-  state,
+  store,
 
   computed: {
     isAuthenticated: function () {
-      return this.$state.getters.isAuthenticated()
+      return this.$store.getters.isAuthenticated()
     }
   },
 
   methods: {
     login () {
-      this.$state.dispatch('login', { user, requestOptions })
+      this.$store.dispatch('login', { user, requestOptions })
     }
   }
 })
