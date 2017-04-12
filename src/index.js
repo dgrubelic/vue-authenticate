@@ -12,9 +12,6 @@ function plugin(Vue, options) {
     return
   }
   plugin.installed = true
-  plugin.factory = function ($http, options) {
-    return new VueAuthenticate($http, options)
-  }
 
   let vueAuthInstance = null;
   Object.defineProperties(Vue.prototype, {
@@ -32,6 +29,16 @@ function plugin(Vue, options) {
       }
     }
   })
+}
+
+/**
+ * External factory helper for ES5 and CommonJS
+ * @param  {Object} $http     Instance of request handling library
+ * @param  {Object} options   Configuration object
+ * @return {VueAuthenticate}  VueAuthenticate instance
+ */
+plugin.factory = function ($http, options) {
+  return new VueAuthenticate($http, options)
 }
 
 export default plugin
