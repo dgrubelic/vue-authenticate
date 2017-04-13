@@ -1,6 +1,7 @@
 # vue-authenticate
 
 [![Join the chat at https://gitter.im/vue-authenticate/Lobby](https://badges.gitter.im/vue-authenticate/Lobby.svg)](https://gitter.im/vue-authenticate/Lobby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
 **vue-authenticate** is easily configurable solution for [Vue.js](https://vuejs.org/) that provides local login/registration as well as Social login using Github, Facebook, Google and Twitter OAuth providers (only those 4 tested for now).
 
 The best part about this library is that it is not strictly coupled to one request handling library like [vue-resource](https://github.com/pagekit/vue-resource). You will be able to use it with different libraries. 
