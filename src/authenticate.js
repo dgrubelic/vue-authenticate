@@ -48,13 +48,8 @@ export default class VueAuthenticate {
       this.options.bindRequestInterceptor.call(this)
       this.options.bindResponseInterceptor.call(this)
     } else {
-      // Check if vue-resource is found
-      if (!Vue && !Vue.http && !Vue.http.interceptors) {
-        throw new Error('vue-resource library not found')
-      }
-
       // By default, request and response interceptors are for vue-resource
-      Vue.http.interceptors.push((request, next) => {
+      this.$http.interceptors.push((request, next) => {
         if (this.isAuthenticated()) {
           request.headers.set('Authorization', [
             this.options.tokenType, this.getToken()
