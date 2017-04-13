@@ -1,5 +1,5 @@
 /*!
- * vue-authenticate v1.2.3
+ * vue-authenticate v1.2.4
  * https://github.com/dgrubelic/vue-authenticate
  * Released under the MIT License.
  */
@@ -1017,13 +1017,8 @@ var VueAuthenticate = function VueAuthenticate($http, overrideOptions) {
     this.options.bindRequestInterceptor.call(this);
     this.options.bindResponseInterceptor.call(this);
   } else {
-    // Check if vue-resource is found
-    if (!Vue && !Vue.http && !Vue.http.interceptors) {
-      throw new Error('vue-resource library not found')
-    }
-
     // By default, request and response interceptors are for vue-resource
-    Vue.http.interceptors.push(function (request, next) {
+    this.$http.interceptors.push(function (request, next) {
       if (this$1.isAuthenticated()) {
         request.headers.set('Authorization', [
           this$1.options.tokenType, this$1.getToken()
