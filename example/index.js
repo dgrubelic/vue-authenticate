@@ -34,10 +34,16 @@ var router = new VueRouter({
             <button @click="auth('google')" class="button--google">Auth google</button>
             <button @click="auth('twitter')" class="button--twitter">Auth twitter</button>
 
-            <hr />
+            <br /><br />
             
             <button @click="auth('instagram')" class="button--instagram">Auth instagram</button>
             <button @click="auth('bitbucket')" class="button--bitbucket">Auth bitbucket</button>
+  
+            <hr />
+
+            <button @click="auth('auth0')" class="button--auth0">Auth0</button>
+
+            <hr />
 
             <pre class="response" v-if="response !== null">{{JSON.stringify(response, null, 2)}}</pre>
           </div>
@@ -74,7 +80,6 @@ var router = new VueRouter({
             
             this.$auth.register(user).then(function (response) {
               this.response = response
-
               console.log(this.$auth.isAuthenticated())
             })
           },
@@ -94,7 +99,6 @@ var router = new VueRouter({
             var this_ = this;
             this.$auth.authenticate(provider).then(function (authResponse) {
               console.log(authResponse)
-
               console.log(this_.$auth.isAuthenticated())
 
               if (provider === 'github') {
@@ -119,8 +123,11 @@ var router = new VueRouter({
                 this_.$http.get('https://api.bitbucket.org/2.0/user').then(function (response) {
                   this_.response = response
                 })
+              } else if (provider === 'auth0') {
+                this_.response = authResponse
               }
             }).catch(function (err) {
+              console.log(err)
               this_.response = err
             })
           }

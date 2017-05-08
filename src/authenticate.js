@@ -4,6 +4,7 @@ import defaultOptions from './options.js'
 import StorageFactory from './storage.js'
 import OAuth1 from './oauth/oauth1.js'
 import OAuth2 from './oauth/oauth2.js'
+import Auth0 from './oauth/auth0.js'
 
 export default class VueAuthenticate {
   constructor($http, overrideOptions) {
@@ -235,6 +236,9 @@ export default class VueAuthenticate {
           break
         case '2.0':
           providerInstance = new OAuth2(this.$http, this.storage, providerConfig, this.options)
+          break
+        case 'auth0':
+          providerInstance = new Auth0(providerConfig, this.options)
           break
         default:
           return reject(new Error('Invalid OAuth type'))

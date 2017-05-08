@@ -88,6 +88,16 @@ export default {
       scopeDelimiter: ' ',
       oauthType: '2.0',
       popupOptions: { width: 1020, height: 618 }
+    },
+
+    auth0: {
+      name: 'auth0',
+      oauthType: 'auth0',
+      autoclose: true,
+      auth: {
+        redirect: false,
+        responseType: 'token'
+      }
     }
   }
 }
