@@ -23,6 +23,10 @@
     "bitbucket": {
       "clientId": "",
       "clientSecret": ""
+    },
+    "linkedin": {
+      "clientId": "",
+      "clientSecret": ""
     }
   }
 }
