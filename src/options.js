@@ -101,6 +101,19 @@ export default {
       state: 'STATE',
       oauthType: '2.0',
       popupOptions: { width: 527, height: 582 }
+    },
+
+    live: {
+      name: 'live',
+      url: '/auth/live',
+      authorizationEndpoint: 'https://login.live.com/oauth20_authorize.srf',
+      redirectUri: null,
+      requiredUrlParams: ['display', 'scope'],
+      scope: ['wl.emails'],
+      scopeDelimiter: ' ',
+      display: 'popup',
+      oauthType: '2.0',
+      popupOptions: { width: 500, height: 560 }
     }
   }
 }

@@ -40,6 +40,9 @@ app.post('/auth/:provider', function(req, res){
     case 'linkedin':
       linkedinAuth(req, res)
       break
+    case 'live':
+      liveAuth(req, res)
+      break
     case 'login':
       loginAuth(req, res)
       break
@@ -213,6 +216,34 @@ function linkedinAuth(req, res) {
     },
     headers: {
       'content-type': 'application/x-www-form-urlencoded'
+    }
+  }, function (err, response, body) {
+    try {
+      if (!err && response.statusCode === 200) {
+        var responseJson = JSON.parse(body)
+        res.json(responseJson)
+      } else {
+        res.status(response.statusCode).json(err)
+      }
+    } catch (e) {
+      res.status(500).json(err || e)
+    }
+  })
+}
+
+function liveAuth(req, res) {
+  Request({
+    method: 'post',
+    url: 'https://login.live.com/oauth20_token.srf',
+    form: {
+      code: req.body.code,
+      client_id: config.auth.live.clientId,
+      client_secret: config.auth.live.clientSecret,
+      redirect_uri: req.body.redirectUri,
+      grant_type: 'authorization_code'
+    },
+    headers: {
+      'content-type': 'application/json'
     }
   }, function (err, response, body) {
     try {
