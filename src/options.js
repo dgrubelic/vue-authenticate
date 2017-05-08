@@ -114,6 +114,15 @@ export default {
       display: 'popup',
       oauthType: '2.0',
       popupOptions: { width: 500, height: 560 }
+    },
+
+    oauth1: {
+      name: null,
+      url: '/auth/oauth1',
+      authorizationEndpoint: null,
+      redirectUri: null,
+      oauthType: '1.0',
+      popupOptions: null
     }
   }
 }
