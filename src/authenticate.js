@@ -113,13 +113,13 @@ export default class VueAuthenticate {
    * @param {String|Object} token
    */
   setToken(response) {
-    if (response[this.options.requestDataKey]) {
-      response = response[this.options.requestDataKey];
+    if (response[this.options.responseDataKey]) {
+      response = response[this.options.responseDataKey];
     }
-
+    
     let token;
     if (response.access_token) {
-      if (isObject(response.access_token) && isObject(response.access_token[this.options.requestDataKey])) {
+      if (isObject(response.access_token) && isObject(response.access_token[this.options.responseDataKey])) {
         response = response.access_token
       } else if (isString(response.access_token)) {
         token = response.access_token
@@ -143,12 +143,10 @@ export default class VueAuthenticate {
         const base64Url = token.split('.')[1];
         const base64 = base64Url.replace('-', '+').replace('_', '/');
         return JSON.parse(decodeBase64(base64));
-      } catch (e) {
-        console.log(e)
-      }
+      } catch (e) {}
     }
   }
-
+  
   /**
    * Login user using email and password
    * @param  {Object} user           User data
@@ -243,6 +241,7 @@ export default class VueAuthenticate {
 
       return providerInstance.init(userData).then((response) => {
         this.setToken(response)
+
         if (this.isAuthenticated()) {
           return resolve(response)
         } else {
