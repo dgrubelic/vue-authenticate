@@ -27,6 +27,10 @@
     "linkedin": {
       "clientId": "",
       "clientSecret": ""
+    },
+    "live": {
+      "clientId": "",
+      "clientSecret": ""
     }
   }
 }

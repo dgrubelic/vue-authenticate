@@ -39,6 +39,7 @@ var router = new VueRouter({
             <button @click="auth('instagram')" class="button--instagram">Auth instagram</button>
             <button @click="auth('bitbucket')" class="button--bitbucket">Auth bitbucket</button>
             <button @click="auth('linkedin')" class="button--linkedin">Auth LinkedIn</button>
+            <button @click="auth('live')" class="button--live">Auth Live</button>
 
             <pre class="response" v-if="response !== null">{{JSON.stringify(response, null, 2)}}</pre>
           </div>
@@ -124,9 +125,10 @@ var router = new VueRouter({
                 })
               } else if (provider === 'linkedin') {
                 this_.response = authResponse
+              } else if (provider === 'live') {
+                this_.response = authResponse
               }
             }).catch(function (err) {
-              console.log(err)
               this_.response = err
             })
           }
