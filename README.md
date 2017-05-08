@@ -194,25 +194,27 @@ Fro example, if you use **axios** in your app, request and response interceptors
 
 ```javascript
 
-bindRequestInterceptor: function () {
-  this.$http.interceptors.request.use((config) => {
-    if (this.isAuthenticated()) {
-      config.headers['Authorization'] = [
-        this.options.tokenType, this.getToken()
-      ].join(' ')
-    } else {
-      delete config.headers['Authorization']
-    }
-    return config
-  })
-},
+Vue.use(VueAuthenticate, {
+  bindRequestInterceptor: function () {
+    this.$http.interceptors.request.use((config) => {
+      if (this.isAuthenticated()) {
+        config.headers['Authorization'] = [
+          this.options.tokenType, this.getToken()
+        ].join(' ')
+      } else {
+        delete config.headers['Authorization']
+      }
+      return config
+    })
+  },
 
-bindResponseInterceptor: function () {
-  this.$http.interceptors.response.use((response) => {
-    this.setToken(response)
-    return response
-  })
-}
+  bindResponseInterceptor: function () {
+    this.$http.interceptors.response.use((response) => {
+      this.setToken(response)
+      return response
+    })
+  }
+})
 
 ```
 
