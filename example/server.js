@@ -37,6 +37,9 @@ app.post('/auth/:provider', function(req, res){
     case 'bitbucket':
       bitbucketAuth(req, res)
       break
+    case 'linkedin':
+      linkedinAuth(req, res)
+      break
     case 'login':
       loginAuth(req, res)
       break
@@ -177,6 +180,34 @@ function bitbucketAuth(req, res) {
       code: req.body.code,
       client_id: config.auth.bitbucket.clientId,
       client_secret: config.auth.bitbucket.clientSecret,
+      redirect_uri: req.body.redirectUri,
+      grant_type: 'authorization_code'
+    },
+    headers: {
+      'content-type': 'application/x-www-form-urlencoded'
+    }
+  }, function (err, response, body) {
+    try {
+      if (!err && response.statusCode === 200) {
+        var responseJson = JSON.parse(body)
+        res.json(responseJson)
+      } else {
+        res.status(response.statusCode).json(err)
+      }
+    } catch (e) {
+      res.status(500).json(err || e)
+    }
+  })
+}
+
+function linkedinAuth(req, res) {
+  Request({
+    method: 'post',
+    url: 'https://www.linkedin.com/oauth/v2/accessToken',
+    form: {
+      code: req.body.code,
+      client_id: config.auth.linkedin.clientId,
+      client_secret: config.auth.linkedin.clientSecret,
       redirect_uri: req.body.redirectUri,
       grant_type: 'authorization_code'
     },

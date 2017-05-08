@@ -37,7 +37,7 @@ export default class OAuth2 {
   }
 
   init(userData) {
-    let stateName = this.providerConfig.name
+    let stateName = this.providerConfig.name + '_state';
     if (isFunction(this.providerConfig.state)) {
       this.storage.setItem(stateName, this.providerConfig.state())
     } else if (isString(this.providerConfig.state)) {
@@ -133,7 +133,7 @@ export default class OAuth2 {
         if (paramName === 'redirect_uri' && !paramValue) return
 
         if (paramName === 'state') {
-          const stateName = this.defaults.name + '_state';
+          let stateName = this.providerConfig.name + '_state';
           paramValue = encodeURIComponent(this.storage.getItem(stateName));
         }
         if (paramName === 'scope' && Array.isArray(paramValue)) {

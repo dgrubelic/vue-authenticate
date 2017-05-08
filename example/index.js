@@ -38,6 +38,7 @@ var router = new VueRouter({
             
             <button @click="auth('instagram')" class="button--instagram">Auth instagram</button>
             <button @click="auth('bitbucket')" class="button--bitbucket">Auth bitbucket</button>
+            <button @click="auth('linkedin')" class="button--linkedin">Auth LinkedIn</button>
 
             <pre class="response" v-if="response !== null">{{JSON.stringify(response, null, 2)}}</pre>
           </div>
@@ -88,13 +89,15 @@ var router = new VueRouter({
           },
 
           auth: function(provider) {
-            this.$auth.logout()
+            if (this.$auth.isAuthenticated()) {
+              this.$auth.logout()
+            }
+
             this.response = null
 
             var this_ = this;
             this.$auth.authenticate(provider).then(function (authResponse) {
               console.log(authResponse)
-
               console.log(this_.$auth.isAuthenticated())
 
               if (provider === 'github') {
@@ -119,8 +122,11 @@ var router = new VueRouter({
                 this_.$http.get('https://api.bitbucket.org/2.0/user').then(function (response) {
                   this_.response = response
                 })
+              } else if (provider === 'linkedin') {
+                this_.response = authResponse
               }
             }).catch(function (err) {
+              console.log(err)
               this_.response = err
             })
           }

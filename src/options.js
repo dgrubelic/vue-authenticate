@@ -88,6 +88,19 @@ export default {
       scopeDelimiter: ' ',
       oauthType: '2.0',
       popupOptions: { width: 1020, height: 618 }
+    },
+
+    linkedin: {
+      name: 'linkedin',
+      url: '/auth/linkedin',
+      authorizationEndpoint: 'https://www.linkedin.com/uas/oauth2/authorization',
+      redirectUri: null,
+      requiredUrlParams: ['state'],
+      scope: ['r_emailaddress'],
+      scopeDelimiter: ' ',
+      state: 'STATE',
+      oauthType: '2.0',
+      popupOptions: { width: 527, height: 582 }
     }
   }
 }
