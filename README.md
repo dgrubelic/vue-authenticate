@@ -39,7 +39,7 @@ Vue.use(VueAuthenticate, {
       redirectUri: 'http://localhost:8080/auth/callback' // Your client app URL
     }
   }
-}
+})
 ```
 
 ### Email & password login and registration
