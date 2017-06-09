@@ -1,5 +1,5 @@
 /*!
- * vue-authenticate v1.2.4
+ * vue-authenticate v1.2.5
  * https://github.com/dgrubelic/vue-authenticate
  * Released under the MIT License.
  */
@@ -531,6 +531,64 @@ var defaultOptions = {
       scopeDelimiter: ' ',
       oauthType: '2.0',
       popupOptions: { width: 1020, height: 618 }
+    },
+
+    linkedin: {
+      name: 'linkedin',
+      url: '/auth/linkedin',
+      authorizationEndpoint: 'https://www.linkedin.com/oauth/v2/authorization',
+      redirectUri: null,
+      requiredUrlParams: ['state'],
+      scope: ['r_emailaddress'],
+      scopeDelimiter: ' ',
+      state: 'STATE',
+      oauthType: '2.0',
+      popupOptions: { width: 527, height: 582 }
+    },
+
+    live: {
+      name: 'live',
+      url: '/auth/live',
+      authorizationEndpoint: 'https://login.live.com/oauth20_authorize.srf',
+      redirectUri: null,
+      requiredUrlParams: ['display', 'scope'],
+      scope: ['wl.emails'],
+      scopeDelimiter: ' ',
+      display: 'popup',
+      oauthType: '2.0',
+      popupOptions: { width: 500, height: 560 }
+    },
+
+    oauth1: {
+      name: null,
+      url: '/auth/oauth1',
+      authorizationEndpoint: null,
+      redirectUri: null,
+      oauthType: '1.0',
+      popupOptions: null
+    },
+
+    oauth2: {
+      name: null,
+      url: '/auth/oauth2',
+      clientId: null,
+      redirectUri: null,
+      authorizationEndpoint: null,
+      defaultUrlParams: ['response_type', 'client_id', 'redirect_uri'],
+      requiredUrlParams: null,
+      optionalUrlParams: null,
+      scope: null,
+      scopePrefix: null,
+      scopeDelimiter: null,
+      state: null,
+      oauthType: '2.0',
+      popupOptions: null,
+      responseType: 'code',
+      responseParams: {
+        code: 'code',
+        clientId: 'clientId',
+        redirectUri: 'redirectUri'
+      }
     }
   }
 };
@@ -858,7 +916,7 @@ var OAuth2 = function OAuth2($http, storage, providerConfig, options) {
 OAuth2.prototype.init = function init (userData) {
     var this$1 = this;
 
-  var stateName = this.providerConfig.name;
+  var stateName = this.providerConfig.name + '_state';
   if (isFunction(this.providerConfig.state)) {
     this.storage.setItem(stateName, this.providerConfig.state());
   } else if (isString(this.providerConfig.state)) {
@@ -958,7 +1016,7 @@ OAuth2.prototype._stringifyRequestParams = function _stringifyRequestParams () {
       if (paramName === 'redirect_uri' && !paramValue) { return }
 
       if (paramName === 'state') {
-        var stateName = this$1.defaults.name + '_state';
+        var stateName = this$1.providerConfig.name + '_state';
         paramValue = encodeURIComponent(this$1.storage.getItem(stateName));
       }
       if (paramName === 'scope' && Array.isArray(paramValue)) {
@@ -1086,13 +1144,13 @@ VueAuthenticate.prototype.getToken = function getToken () {
  * @param {String|Object} token
  */
 VueAuthenticate.prototype.setToken = function setToken (response) {
-  if (response[this.options.requestDataKey]) {
-    response = response[this.options.requestDataKey];
+  if (response[this.options.responseDataKey]) {
+    response = response[this.options.responseDataKey];
   }
-
+    
   var token;
   if (response.access_token) {
-    if (isObject(response.access_token) && isObject(response.access_token[this.options.requestDataKey])) {
+    if (isObject(response.access_token) && isObject(response.access_token[this.options.responseDataKey])) {
       response = response.access_token;
     } else if (isString(response.access_token)) {
       token = response.access_token;
@@ -1116,12 +1174,10 @@ VueAuthenticate.prototype.getPayload = function getPayload () {
       var base64Url = token.split('.')[1];
       var base64 = base64Url.replace('-', '+').replace('_', '/');
       return JSON.parse(decodeBase64(base64));
-    } catch (e) {
-      console.log(e);
-    }
+    } catch (e) {}
   }
 };
-
+  
 /**
  * Login user using email and password
  * @param{Object} user         User data
@@ -1224,6 +1280,7 @@ VueAuthenticate.prototype.authenticate = function authenticate (provider, userDa
 
     return providerInstance.init(userData).then(function (response) {
       this$1.setToken(response);
+
       if (this$1.isAuthenticated()) {
         return resolve(response)
       } else {
