@@ -1,5 +1,5 @@
 /*!
- * vue-authenticate v1.2.5
+ * vue-authenticate v1.2.7
  * https://github.com/dgrubelic/vue-authenticate
  * Released under the MIT License.
  */
@@ -1076,8 +1076,8 @@ var VueAuthenticate = function VueAuthenticate($http, overrideOptions) {
   if (this.options.bindRequestInterceptor && isFunction(this.options.bindRequestInterceptor) &&
       this.options.bindResponseInterceptor && isFunction(this.options.bindResponseInterceptor)) {
 
-    this.options.bindRequestInterceptor.call(this);
-    this.options.bindResponseInterceptor.call(this);
+    this.options.bindRequestInterceptor.call(this, this);
+    this.options.bindResponseInterceptor.call(this, this);
   } else {
     // By default, request and response interceptors are for vue-resource
     this.$http.interceptors.push(function (request, next) {
