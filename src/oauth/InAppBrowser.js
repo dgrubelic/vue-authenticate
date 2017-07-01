@@ -34,15 +34,13 @@ export default class InAppBrowser {
             console.log(parsedResponse)
             resolve(parsedResponse);
           } else {
-            reject("Problem authenticating with Facebook");
+            reject("Problem authenticating");
           }
         }
       });
       browserRef.addEventListener("exit", function(event) {
-        reject("The Facebook sign in flow was canceled");
+        reject("The sign in flow was canceled");
       });
-
     })
-
   }
 }
