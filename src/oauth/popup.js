@@ -1,11 +1,11 @@
 import Promise from '../promise.js'
-import { objectExtend, parseQueryString, getFullUrlPath } from '../utils.js'
+import { stringifyOptions, objectExtend, parseQueryString, getFullUrlPath } from '../utils.js'
 
 /**
  * OAuth2 popup management class
- * 
+ *
  * @author Sahat Yalkabov <https://github.com/sahat>
- * @copyright Class mostly taken from https://github.com/sahat/satellizer 
+ * @copyright Class mostly taken from https://github.com/sahat/satellizer
  * and adjusted to fit vue-authenticate library
  */
 export default class OAuthPopup {
@@ -18,7 +18,7 @@ export default class OAuthPopup {
 
   open(redirectUri, skipPooling) {
     try {
-      this.popup = window.open(this.url, this.name, this._stringifyOptions())
+      this.popup = window.open(this.url, this.name, stringifyOptions(this.popupOptions))
       if (this.popup && this.popup.focus) {
         this.popup.focus()
       }
@@ -74,13 +74,5 @@ export default class OAuthPopup {
         }
       }, 250)
     })
-  }
-
-  _stringifyOptions() {
-    let options = []
-    for (var optionKey in this.popupOptions) {
-      options.push(`${optionKey}=${this.popupOptions[optionKey]}`)
-    }
-    return options.join(',')
   }
 }

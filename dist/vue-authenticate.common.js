@@ -7,36 +7,63 @@
 'use strict';
 
 if (typeof Object.assign != 'function') {
-  Object.assign = function(target, varArgs) {
-    'use strict';
-    var arguments$1 = arguments;
+    Object.assign = function(target, varArgs) {
+        'use strict';
+        var arguments$1 = arguments;
 
-    if (target == null) {
-      throw new TypeError('Cannot convert undefined or null to object');
-    }
-
-    var to = Object(target);
-
-    for (var index = 1; index < arguments.length; index++) {
-      var nextSource = arguments$1[index];
-
-      if (nextSource != null) { // Skip over if undefined or null
-        for (var nextKey in nextSource) {
-          // Avoid bugs when hasOwnProperty is shadowed
-          if (Object.prototype.hasOwnProperty.call(nextSource, nextKey)) {
-            to[nextKey] = nextSource[nextKey];
-          }
+        if (target == null) {
+            throw new TypeError('Cannot convert undefined or null to object');
         }
-      }
+
+        var to = Object(target);
+
+        for (var index = 1; index < arguments.length; index++) {
+            var nextSource = arguments$1[index];
+
+            if (nextSource != null) { // Skip over if undefined or null
+                for (var nextKey in nextSource) {
+                    // Avoid bugs when hasOwnProperty is shadowed
+                    if (Object.prototype.hasOwnProperty.call(nextSource, nextKey)) {
+                        to[nextKey] = nextSource[nextKey];
+                    }
+                }
+            }
+        }
+        return to;
+    };
+}
+
+/*
+* Check to see if the mandatory InAppBrowser plugin is installed
+*
+* @param
+* @return   boolean
+*/
+function isInAppBrowserInstalled() {
+    var cordovaPluginList = window.cordova.require("cordova/plugin_list");
+    console.log(cordovaPluginList);
+    var inAppBrowserNames = ["cordova-plugin-inappbrowser", "cordova-plugin-inappbrowser.inappbrowser", "org.apache.cordova.inappbrowser"];
+
+    if (Object.keys(cordovaPluginList.metadata).length === 0) {
+        var formatedPluginList = cordovaPluginList.map(
+            function(plugin) {
+                return plugin.id || plugin.pluginId;
+            });
+
+        return inAppBrowserNames.some(function(name) {
+            return formatedPluginList.indexOf(name) != -1 ? true : false;
+        });
+    } else {
+        return inAppBrowserNames.some(function(name) {
+            return cordovaPluginList.metadata.hasOwnProperty(name);
+        });
     }
-    return to;
-  };
 }
 
 function camelCase(name) {
-  return name.replace(/([\:\-\_]+(.))/g, function (_, separator, letter, offset) {
-    return offset ? letter.toUpperCase() : letter;
-  });
+    return name.replace(/([\:\-\_]+(.))/g, function (_, separator, letter, offset) {
+        return offset ? letter.toUpperCase() : letter;
+    });
 }
 
 
@@ -44,173 +71,186 @@ function camelCase(name) {
 
 
 function isObject(value) {
-  return value !== null && typeof value === 'object'
+    return value !== null && typeof value === 'object'
 }
 
 function isString(value) {
-  return typeof value === 'string'
+    return typeof value === 'string'
 }
 
 
 
 function isFunction(value) {
-  return typeof value === 'function'
+    return typeof value === 'function'
 }
 
 function objectExtend(a, b) {
 
-  // Don't touch 'null' or 'undefined' objects.
-  if (a == null || b == null) {
-    return a;
-  }
-
-  Object.keys(b).forEach(function (key) {
-    if (Object.prototype.toString.call(b[key]) == '[object Object]') {
-      if (Object.prototype.toString.call(a[key]) != '[object Object]') {
-        a[key] = b[key];
-      } else {
-        a[key] = objectExtend(a[key], b[key]);
-      }
-    } else {
-      a[key] = b[key];
+    // Don't touch 'null' or 'undefined' objects.
+    if (a == null || b == null) {
+        return a;
     }
-  });
 
-  return a;
+    Object.keys(b).forEach(function (key) {
+        if (Object.prototype.toString.call(b[key]) == '[object Object]') {
+            if (Object.prototype.toString.call(a[key]) != '[object Object]') {
+                a[key] = b[key];
+            } else {
+                a[key] = objectExtend(a[key], b[key]);
+            }
+        } else {
+            a[key] = b[key];
+        }
+    });
+
+    return a;
 }
 
 /**
  * Assemble url from two segments
- * 
+ *
  * @author Sahat Yalkabov <https://github.com/sahat>
  * @copyright Method taken from https://github.com/sahat/satellizer
- * 
+ *
  * @param  {String} baseUrl Base url
  * @param  {String} url     URI
  * @return {String}
  */
 function joinUrl(baseUrl, url) {
-  if (/^(?:[a-z]+:)?\/\//i.test(url)) {
-    return url;
-  }
-  var joined = [baseUrl, url].join('/');
-  var normalize = function (str) {
-    return str
-      .replace(/[\/]+/g, '/')
-      .replace(/\/\?/g, '?')
-      .replace(/\/\#/g, '#')
-      .replace(/\:\//g, '://');
-  };
-  return normalize(joined);
+    if (/^(?:[a-z]+:)?\/\//i.test(url)) {
+        return url;
+    }
+    var joined = [baseUrl, url].join('/');
+    var normalize = function (str) {
+        return str
+            .replace(/[\/]+/g, '/')
+            .replace(/\/\?/g, '?')
+            .replace(/\/\#/g, '#')
+            .replace(/\:\//g, '://');
+    };
+    return normalize(joined);
 }
 
 /**
  * Get full path based on current location
- * 
+ *
  * @author Sahat Yalkabov <https://github.com/sahat>
  * @copyright Method taken from https://github.com/sahat/satellizer
- * 
+ *
  * @param  {Location} location
  * @return {String}
  */
 function getFullUrlPath(location) {
-  var isHttps = location.protocol === 'https:';
-  return location.protocol + '//' + location.hostname +
-    ':' + (location.port || (isHttps ? '443' : '80')) +
-    (/^\//.test(location.pathname) ? location.pathname : '/' + location.pathname);
+    var isHttps = location.protocol === 'https:';
+    return location.protocol + '//' + location.hostname +
+        ':' + (location.port || (isHttps ? '443' : '80')) +
+        (/^\//.test(location.pathname) ? location.pathname : '/' + location.pathname);
 }
 
 /**
  * Parse query string variables
- * 
+ *
  * @author Sahat Yalkabov <https://github.com/sahat>
  * @copyright Method taken from https://github.com/sahat/satellizer
- * 
+ *
  * @param  {String} Query string
  * @return {String}
  */
 function parseQueryString(str) {
-  var obj = {};
-  var key;
-  var value;
-  (str || '').split('&').forEach(function (keyValue) {
-    if (keyValue) {
-      value = keyValue.split('=');
-      key = decodeURIComponent(value[0]);
-      obj[key] = (!!value[1]) ? decodeURIComponent(value[1]) : true;
-    }
-  });
-  return obj;
+    var obj = {};
+    var key;
+    var value;
+    (str || '').split('&').forEach(function (keyValue) {
+        if (keyValue) {
+            value = keyValue.split('=');
+            key = decodeURIComponent(value[0]);
+            obj[key] = (!!value[1]) ? decodeURIComponent(value[1]) : true;
+        }
+    });
+    return obj;
+}
+
+/**
+ * return options as string
+ * @param options
+ * @returns {string}
+ */
+function stringifyOptions(options) {
+  var optionsString = [];
+  for (var optionKey in options) {
+    optionsString.push((optionKey + "=" + (options[optionKey])));
+  }
+  return optionsString.join(',')
 }
 
 /**
  * Decode base64 string
  * @author Sahat Yalkabov <https://github.com/sahat>
  * @copyright Method taken from https://github.com/sahat/satellizer
- * 
+ *
  * @param  {String} str base64 encoded string
  * @return {Object}
  */
 function decodeBase64(str) {
-  var buffer;
-  if (typeof module !== 'undefined' && module.exports) {
-    try {
-      buffer = require('buffer').Buffer;
-    } catch (err) {
-      // noop
+    var buffer;
+    if (typeof module !== 'undefined' && module.exports) {
+        try {
+            buffer = require('buffer').Buffer;
+        } catch (err) {
+            // noop
+        }
     }
-  }
 
-  var fromCharCode = String.fromCharCode;
+    var fromCharCode = String.fromCharCode;
 
-  var re_btou = new RegExp([
-    '[\xC0-\xDF][\x80-\xBF]',
-    '[\xE0-\xEF][\x80-\xBF]{2}',
-    '[\xF0-\xF7][\x80-\xBF]{3}'
-  ].join('|'), 'g');
+    var re_btou = new RegExp([
+        '[\xC0-\xDF][\x80-\xBF]',
+        '[\xE0-\xEF][\x80-\xBF]{2}',
+        '[\xF0-\xF7][\x80-\xBF]{3}'
+    ].join('|'), 'g');
 
-  var cb_btou = function (cccc) {
-    switch (cccc.length) {
-      case 4:
-        var cp = ((0x07 & cccc.charCodeAt(0)) << 18)
-          | ((0x3f & cccc.charCodeAt(1)) << 12)
-          | ((0x3f & cccc.charCodeAt(2)) << 6)
-          | (0x3f & cccc.charCodeAt(3));
-        var offset = cp - 0x10000;
-        return (fromCharCode((offset >>> 10) + 0xD800)
-        + fromCharCode((offset & 0x3FF) + 0xDC00));
-      case 3:
-        return fromCharCode(
-          ((0x0f & cccc.charCodeAt(0)) << 12)
-          | ((0x3f & cccc.charCodeAt(1)) << 6)
-          | (0x3f & cccc.charCodeAt(2))
-        );
-      default:
-        return fromCharCode(
-          ((0x1f & cccc.charCodeAt(0)) << 6)
-          | (0x3f & cccc.charCodeAt(1))
-        );
-    }
-  };
+    var cb_btou = function (cccc) {
+        switch (cccc.length) {
+            case 4:
+                var cp = ((0x07 & cccc.charCodeAt(0)) << 18)
+                    | ((0x3f & cccc.charCodeAt(1)) << 12)
+                    | ((0x3f & cccc.charCodeAt(2)) << 6)
+                    | (0x3f & cccc.charCodeAt(3));
+                var offset = cp - 0x10000;
+                return (fromCharCode((offset >>> 10) + 0xD800)
+                    + fromCharCode((offset & 0x3FF) + 0xDC00));
+            case 3:
+                return fromCharCode(
+                    ((0x0f & cccc.charCodeAt(0)) << 12)
+                    | ((0x3f & cccc.charCodeAt(1)) << 6)
+                    | (0x3f & cccc.charCodeAt(2))
+                );
+            default:
+                return fromCharCode(
+                    ((0x1f & cccc.charCodeAt(0)) << 6)
+                    | (0x3f & cccc.charCodeAt(1))
+                );
+        }
+    };
 
-  var btou = function (b) {
-    return b.replace(re_btou, cb_btou);
-  };
+    var btou = function (b) {
+        return b.replace(re_btou, cb_btou);
+    };
 
-  var _decode = buffer ? function (a) {
-    return (a.constructor === buffer.constructor
-      ? a : new buffer(a, 'base64')).toString();
-  }
-    : function (a) {
-    return btou(atob(a));
-  };
+    var _decode = buffer ? function (a) {
+            return (a.constructor === buffer.constructor
+                ? a : new buffer(a, 'base64')).toString();
+        }
+        : function (a) {
+            return btou(atob(a));
+        };
 
-  return _decode(
-    String(str).replace(/[-_]/g, function (m0) {
-      return m0 === '-' ? '+' : '/';
-    })
-      .replace(/[^A-Za-z0-9\+\/]/g, '')
-  );
+    return _decode(
+        String(str).replace(/[-_]/g, function (m0) {
+            return m0 === '-' ? '+' : '/';
+        })
+            .replace(/[^A-Za-z0-9\+\/]/g, '')
+    );
 }
 
 // Store setTimeout reference so promise-polyfill will be unaffected by
@@ -684,9 +724,9 @@ function StorageFactory(options) {
 
 /**
  * OAuth2 popup management class
- * 
+ *
  * @author Sahat Yalkabov <https://github.com/sahat>
- * @copyright Class mostly taken from https://github.com/sahat/satellizer 
+ * @copyright Class mostly taken from https://github.com/sahat/satellizer
  * and adjusted to fit vue-authenticate library
  */
 var OAuthPopup = function OAuthPopup(url, name, popupOptions) {
@@ -698,7 +738,7 @@ var OAuthPopup = function OAuthPopup(url, name, popupOptions) {
 
 OAuthPopup.prototype.open = function open (redirectUri, skipPooling) {
   try {
-    this.popup = window.open(this.url, this.name, this._stringifyOptions());
+    this.popup = window.open(this.url, this.name, stringifyOptions(this.popupOptions));
     if (this.popup && this.popup.focus) {
       this.popup.focus();
     }
@@ -756,16 +796,6 @@ OAuthPopup.prototype.pooling = function pooling (redirectUri) {
       }
     }, 250);
   })
-};
-
-OAuthPopup.prototype._stringifyOptions = function _stringifyOptions () {
-    var this$1 = this;
-
-  var options = [];
-  for (var optionKey in this$1.popupOptions) {
-    options.push((optionKey + "=" + (this$1.popupOptions[optionKey])));
-  }
-  return options.join(',')
 };
 
 var defaultProviderConfig = {
@@ -876,159 +906,209 @@ OAuth.prototype.buildQueryString = function buildQueryString (params) {
 };
 
 /**
+ * InAppBrowser OAuth2 popup management class
+ *
+ * @author James Kirkby <https://github.com/jkirkby91-2> <jkirkby@protonmail.ch>
+ * @copyright ames Kirkby <jkirkby@protonmail.ch>
+ * heavily influanced cordova inappbrowser oauth popup from ng-cordova-oauth and sahat/satellizer
+ * adjusted to fit vue-authenticate library,
+ * make sure you set your provider default option responseType to token
+ */
+var InAppBrowser = function InAppBrowser(url, target, popupOptions) {
+  this.url = url;
+  this.target = target;
+  this.options = popupOptions;
+};
+
+InAppBrowser.prototype.open = function open (redirectUri) {
+    var this$1 = this;
+
+  return new Promise$1(function (resolve, reject) {
+
+    var browserRef = window.cordova.InAppBrowser.open(this$1.url, this$1.target, stringifyOptions(this$1.options));
+    browserRef.addEventListener("loadstart", function (event) {
+      if ((event.url).indexOf(redirectUri) === 0) {
+        browserRef.removeEventListener("exit", function (event) {});
+        browserRef.close();
+        var responseParameters = ((event.url).split("#")[1]).split("&");
+        var parsedResponse = {};
+        for (var i = 0; i < responseParameters.length; i++) {
+          parsedResponse[responseParameters[i].split("=")[0]] = responseParameters[i].split("=")[1];
+        }
+        if (parsedResponse["access_token"] !== undefined && parsedResponse["access_token"] !== null) {
+          console.log(parsedResponse);
+          resolve(parsedResponse);
+        } else {
+          reject("Problem authenticating with Facebook");
+        }
+      }
+    });
+    browserRef.addEventListener("exit", function(event) {
+      reject("The Facebook sign in flow was canceled");
+    });
+
+  })
+
+};
+
+/**
  * Default provider configuration
  * @type {Object}
  */
 var defaultProviderConfig$1 = {
-  name: null,
-  url: null,
-  clientId: null,
-  authorizationEndpoint: null,
-  redirectUri: null,
-  scope: null,
-  scopePrefix: null,
-  scopeDelimiter: null,
-  state: null,
-  requiredUrlParams: null,
-  defaultUrlParams: ['response_type', 'client_id', 'redirect_uri'],
-  responseType: 'code',
-  responseParams: {
-    code: 'code',
-    clientId: 'clientId',
-    redirectUri: 'redirectUri'
-  },
-  oauthType: '2.0',
-  popupOptions: { width: null, height: null }
+    name: null,
+    url: null,
+    clientId: null,
+    authorizationEndpoint: null,
+    redirectUri: null,
+    scope: null,
+    scopePrefix: null,
+    scopeDelimiter: null,
+    state: null,
+    requiredUrlParams: null,
+    defaultUrlParams: ['response_type', 'client_id', 'redirect_uri'],
+    responseType: 'code',
+    responseParams: {
+        code: 'code',
+        clientId: 'clientId',
+        redirectUri: 'redirectUri'
+    },
+    oauthType: '2.0',
+    popupOptions: { width: null, height: null }
 };
 
 var OAuth2 = function OAuth2($http, storage, providerConfig, options) {
-  this.$http = $http;
-  this.storage = storage;
-  this.providerConfig = objectExtend({}, defaultProviderConfig$1);
-  this.providerConfig = objectExtend(this.providerConfig, providerConfig);
-  this.options = options;
+    this.$http = $http;
+    this.storage = storage;
+    this.providerConfig = objectExtend({}, defaultProviderConfig$1);
+    this.providerConfig = objectExtend(this.providerConfig, providerConfig);
+    this.options = options;
 };
 
 OAuth2.prototype.init = function init (userData) {
-    var this$1 = this;
+        var this$1 = this;
 
-  var stateName = this.providerConfig.name + '_state';
-  if (isFunction(this.providerConfig.state)) {
-    this.storage.setItem(stateName, this.providerConfig.state());
-  } else if (isString(this.providerConfig.state)) {
-    this.storage.setItem(stateName, this.providerConfig.state);
-  }
+    var stateName = this.providerConfig.name + '_state';
+    if (isFunction(this.providerConfig.state)) {
+        this.storage.setItem(stateName, this.providerConfig.state());
+    } else if (isString(this.providerConfig.state)) {
+        this.storage.setItem(stateName, this.providerConfig.state);
+    }
 
-  var url = [this.providerConfig.authorizationEndpoint, this._stringifyRequestParams()].join('?');
+    var url = [this.providerConfig.authorizationEndpoint, this._stringifyRequestParams()].join('?');
 
-  this.oauthPopup = new OAuthPopup(url, this.providerConfig.name, this.providerConfig.popupOptions);
-    
-  return new Promise(function (resolve, reject) {
-    this$1.oauthPopup.open(this$1.providerConfig.redirectUri).then(function (response) {
-      if (this$1.providerConfig.responseType === 'token' || !this$1.providerConfig.url) {
-        return resolve(response)
-      }
+    if (window.cordova && isInAppBrowserInstalled()) {
+        this.oauthPopup = new InAppBrowser(url, this.providerConfig.target, this.providerConfig.popupOptions);
+    } else {
+        this.oauthPopup = new OAuthPopup(url, this.providerConfig.name, this.providerConfig.popupOptions);
+    }
 
-      if (response.state && response.state !== this$1.storage.getItem(stateName)) {
-        return reject(new Error('State parameter value does not match original OAuth request state value'))
-      }
+    return new Promise(function (resolve, reject) {
+        this$1.oauthPopup.open(this$1.providerConfig.redirectUri).then(function (response) {
+            if (this$1.providerConfig.responseType === 'token' || !this$1.providerConfig.url) {
+                return resolve(response)
+            }
 
-      resolve(this$1.exchangeForToken(response, userData));
-    }).catch(function (err) {
-      reject(err);
-    });
-  })
+            if (response.state && response.state !== this$1.storage.getItem(stateName)) {
+                return reject(new Error('State parameter value does not match original OAuth request state value'))
+            }
+
+            resolve(this$1.exchangeForToken(response, userData));
+        }).catch(function (err) {
+            reject(err);
+        });
+    })
 };
 
 /**
  * Exchange temporary oauth data for access token
  * @author Sahat Yalkabov <https://github.com/sahat>
  * @copyright Method taken from https://github.com/sahat/satellizer
- * 
- * @param{[type]} oauth  [description]
- * @param{[type]} userData [description]
- * @return {[type]}        [description]
+ *
+ * @param  {[type]} oauth[description]
+ * @param  {[type]} userData [description]
+ * @return {[type]}      [description]
  */
 OAuth2.prototype.exchangeForToken = function exchangeForToken (oauth, userData) {
-    var this$1 = this;
+        var this$1 = this;
 
-  var payload = objectExtend({}, userData);
+    var payload = objectExtend({}, userData);
 
-  for (var key in defaultProviderConfig$1.responseParams) {
-    var value = defaultProviderConfig$1[key];
+    for (var key in defaultProviderConfig$1.responseParams) {
+        var value = defaultProviderConfig$1[key];
 
-    switch(key) {
-      case 'code':
-        payload[key] = oauth.code;
-        break
-      case 'clientId':
-        payload[key] = this$1.providerConfig.clientId;
-        break
-      case 'redirectUri':
-        payload[key] = this$1.providerConfig.redirectUri;
-        break
-      default:
-        payload[key] = oauth[key];
+        switch(key) {
+            case 'code':
+                payload[key] = oauth.code;
+                break
+            case 'clientId':
+                payload[key] = this$1.providerConfig.clientId;
+                break
+            case 'redirectUri':
+                payload[key] = this$1.providerConfig.redirectUri;
+                break
+            default:
+                payload[key] = oauth[key];
+        }
     }
-  }
 
-  if (oauth.state) {
-    payload.state = oauth.state;
-  }
+    if (oauth.state) {
+        payload.state = oauth.state;
+    }
 
-  var exchangeTokenUrl;
-  if (this.options.baseUrl) {
-    exchangeTokenUrl = joinUrl(this.options.baseUrl, this.providerConfig.url);
-  } else {
-    exchangeTokenUrl = this.providerConfig.url;
-  }
+    var exchangeTokenUrl;
+    if (this.options.baseUrl) {
+        exchangeTokenUrl = joinUrl(this.options.baseUrl, this.providerConfig.url);
+    } else {
+        exchangeTokenUrl = this.providerConfig.url;
+    }
 
-  return this.$http.post(exchangeTokenUrl, payload, {
-    withCredentials: this.options.withCredentials
-  })
+    return this.$http.post(exchangeTokenUrl, payload, {
+        withCredentials: this.options.withCredentials
+    })
 };
 
 /**
  * Stringify oauth params
  * @author Sahat Yalkabov <https://github.com/sahat>
  * @copyright Method taken from https://github.com/sahat/satellizer
- * 
+ *
  * @return {String}
  */
 OAuth2.prototype._stringifyRequestParams = function _stringifyRequestParams () {
-    var this$1 = this;
+        var this$1 = this;
 
-  var keyValuePairs = [];
-  var paramCategories = ['defaultUrlParams', 'requiredUrlParams', 'optionalUrlParams'];
+    var keyValuePairs = [];
+    var paramCategories = ['defaultUrlParams', 'requiredUrlParams', 'optionalUrlParams'];
 
-  paramCategories.forEach(function (categoryName) {
-    if (!this$1.providerConfig[categoryName]) { return }
-    if (!Array.isArray(this$1.providerConfig[categoryName])) { return }
+    paramCategories.forEach(function (categoryName) {
+        if (!this$1.providerConfig[categoryName]) { return }
+        if (!Array.isArray(this$1.providerConfig[categoryName])) { return }
 
-    this$1.providerConfig[categoryName].forEach(function (paramName) {
-      var camelCaseParamName = camelCase(paramName);
-      var paramValue = isFunction(this$1.providerConfig[paramName]) ? this$1.providerConfig[paramName]() : this$1.providerConfig[camelCaseParamName];
+        this$1.providerConfig[categoryName].forEach(function (paramName) {
+            var camelCaseParamName = camelCase(paramName);
+            var paramValue = isFunction(this$1.providerConfig[paramName]) ? this$1.providerConfig[paramName]() : this$1.providerConfig[camelCaseParamName];
 
-      if (paramName === 'redirect_uri' && !paramValue) { return }
+            if (paramName === 'redirect_uri' && !paramValue) { return }
 
-      if (paramName === 'state') {
-        var stateName = this$1.providerConfig.name + '_state';
-        paramValue = encodeURIComponent(this$1.storage.getItem(stateName));
-      }
-      if (paramName === 'scope' && Array.isArray(paramValue)) {
-        paramValue = paramValue.join(this$1.providerConfig.scopeDelimiter);
-        if (this$1.providerConfig.scopePrefix) {
-          paramValue = [this$1.providerConfig.scopePrefix, paramValue].join(this$1.providerConfig.scopeDelimiter);
-        }
-      }
+            if (paramName === 'state') {
+                var stateName = this$1.providerConfig.name + '_state';
+                paramValue = encodeURIComponent(this$1.storage.getItem(stateName));
+            }
+            if (paramName === 'scope' && Array.isArray(paramValue)) {
+                paramValue = paramValue.join(this$1.providerConfig.scopeDelimiter);
+                if (this$1.providerConfig.scopePrefix) {
+                    paramValue = [this$1.providerConfig.scopePrefix, paramValue].join(this$1.providerConfig.scopeDelimiter);
+                }
+            }
 
-      keyValuePairs.push([paramName, paramValue]);
+            keyValuePairs.push([paramName, paramValue]);
+        });
     });
-  });
 
-  return keyValuePairs.map(function (param) {
-    return param.join('=')
-  }).join('&')
+    return keyValuePairs.map(function (param) {
+        return param.join('=')
+    }).join('&')
 };
 
 var VueAuthenticate = function VueAuthenticate($http, overrideOptions) {
@@ -1084,7 +1164,7 @@ var VueAuthenticate = function VueAuthenticate($http, overrideOptions) {
       } else {
         request.headers.delete('Authorization');
       }
-        
+
       next(function (response) {
         try {
           var responseJson = JSON.parse(response[this$1.options.responseDataKey]);
@@ -1143,7 +1223,7 @@ VueAuthenticate.prototype.setToken = function setToken (response) {
   if (response[this.options.responseDataKey]) {
     response = response[this.options.responseDataKey];
   }
-    
+
   var token;
   if (response.access_token) {
     if (isObject(response.access_token) && isObject(response.access_token[this.options.responseDataKey])) {
@@ -1173,7 +1253,7 @@ VueAuthenticate.prototype.getPayload = function getPayload () {
     } catch (e) {}
   }
 };
-  
+
 /**
  * Login user using email and password
  * @param{Object} user         User data
@@ -1246,7 +1326,7 @@ VueAuthenticate.prototype.logout = function logout (requestOptions) {
 
 /**
  * Authenticate user using authentication provider
- * 
+ *
  * @param{String} provider     Provider name
  * @param{Object} userData     User data
  * @param{Object} requestOptions Request options
@@ -1268,6 +1348,7 @@ VueAuthenticate.prototype.authenticate = function authenticate (provider, userDa
         break
       case '2.0':
         providerInstance = new OAuth2(this$1.$http, this$1.storage, providerConfig, this$1.options);
+        console.log(providerInstance);
         break
       default:
         return reject(new Error('Invalid OAuth type'))
@@ -1275,6 +1356,7 @@ VueAuthenticate.prototype.authenticate = function authenticate (provider, userDa
     }
 
     return providerInstance.init(userData).then(function (response) {
+      console.log(response);
       this$1.setToken(response);
 
       if (this$1.isAuthenticated()) {

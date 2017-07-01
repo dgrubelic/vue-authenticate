@@ -57,7 +57,7 @@ export default class VueAuthenticate {
         } else {
           request.headers.delete('Authorization')
         }
-        
+
         next((response) => {
           try {
             var responseJson = JSON.parse(response[this.options.responseDataKey])
@@ -116,7 +116,7 @@ export default class VueAuthenticate {
     if (response[this.options.responseDataKey]) {
       response = response[this.options.responseDataKey];
     }
-    
+
     let token;
     if (response.access_token) {
       if (isObject(response.access_token) && isObject(response.access_token[this.options.responseDataKey])) {
@@ -146,7 +146,7 @@ export default class VueAuthenticate {
       } catch (e) {}
     }
   }
-  
+
   /**
    * Login user using email and password
    * @param  {Object} user           User data
@@ -213,7 +213,7 @@ export default class VueAuthenticate {
 
   /**
    * Authenticate user using authentication provider
-   * 
+   *
    * @param  {String} provider       Provider name
    * @param  {Object} userData       User data
    * @param  {Object} requestOptions Request options
@@ -233,6 +233,7 @@ export default class VueAuthenticate {
           break
         case '2.0':
           providerInstance = new OAuth2(this.$http, this.storage, providerConfig, this.options)
+          console.log(providerInstance)
           break
         default:
           return reject(new Error('Invalid OAuth type'))
@@ -240,6 +241,7 @@ export default class VueAuthenticate {
       }
 
       return providerInstance.init(userData).then((response) => {
+        console.log(response)
         this.setToken(response)
 
         if (this.isAuthenticated()) {

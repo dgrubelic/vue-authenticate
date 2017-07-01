@@ -167,6 +167,19 @@ export function parseQueryString(str) {
 }
 
 /**
+ * return options as string
+ * @param options
+ * @returns {string}
+ */
+export function stringifyOptions(options) {
+  let optionsString = []
+  for (var optionKey in options) {
+    optionsString.push(`${optionKey}=${options[optionKey]}`)
+  }
+  return optionsString.join(',')
+}
+
+/**
  * Decode base64 string
  * @author Sahat Yalkabov <https://github.com/sahat>
  * @copyright Method taken from https://github.com/sahat/satellizer
