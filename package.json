@@ -1,32 +1,41 @@
 {
-  "name": "vue-authenticate",
-  "version": "1.2.7",
-  "description": "Authentication library for Vue.js",
-  "main": "dist/vue-authenticate.js",
-  "module": "dist/vue-authenticate.es2015.js",
-  "unpkg": "dist/vue-authenticate.js",
-  "scripts": {
-    "dev": "parallelshell \"node-dev ./example/server.js\" \"gulp dev\"",
-    "build": "node build/build.js && cp ./dist/vue-authenticate.js ./example/"
+  "_from": "git+https://github.com/jkirkby91-2/vue-authenticate.git#develop",
+  "_id": "vue-authenticate@1.2.7",
+  "_inBundle": false,
+  "_integrity": "sha1-4fUN6OVoGrANusvbJVbmo8TuweQ=",
+  "_location": "/vue-authenticate",
+  "_phantomChildren": {},
+  "_requested": {
+    "type": "git",
+    "raw": "vue-authenticate@git+https://github.com/jkirkby91-2/vue-authenticate.git#develop",
+    "name": "vue-authenticate",
+    "escapedName": "vue-authenticate",
+    "rawSpec": "git+https://github.com/jkirkby91-2/vue-authenticate.git#develop",
+    "saveSpec": "git+https://github.com/jkirkby91-2/vue-authenticate.git#develop",
+    "fetchSpec": "https://github.com/jkirkby91-2/vue-authenticate.git",
+    "gitCommittish": "develop"
   },
-  "keywords": [
-    "vue",
-    "vuejs",
-    "auth"
+  "_requiredBy": [
+    "/",
+    "/vue-apiarchitect"
   ],
+  "_resolved": "git+https://github.com/jkirkby91-2/vue-authenticate.git#925feec0484b7d003fc0237d0ce88bc3a61c3f99",
+  "_spec": "vue-authenticate@git+https://github.com/jkirkby91-2/vue-authenticate.git#develop",
+  "_where": "/srv/clients/agentfree/agentfree-mobilev2",
   "author": {
     "name": "Davor Grubelic",
     "email": "davor.grubelic@gmail.com",
     "url": "https://dgrubelic.me"
   },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/dgrubelic/vue-authenticate.git"
+  "bugs": {
+    "url": "https://github.com/dgrubelic/vue-authenticate/issues"
   },
-  "license": "MIT",
+  "bundleDependencies": false,
   "dependencies": {
     "vue": "^2.2.5"
   },
+  "deprecated": false,
+  "description": "Authentication library for Vue.js",
   "devDependencies": {
     "axios": "^0.15.3",
     "babel-core": "^6.24.0",
@@ -62,6 +71,24 @@
     "webpack": "^2.3.2",
     "webpack-dev-server": "^2.4.2"
   },
+  "homepage": "https://github.com/dgrubelic/vue-authenticate#readme",
+  "keywords": [
+    "vue",
+    "vuejs",
+    "auth"
+  ],
+  "license": "MIT",
+  "main": "dist/vue-authenticate.js",
+  "module": "dist/vue-authenticate.es2015.js",
+  "name": "vue-authenticate",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dgrubelic/vue-authenticate.git"
+  },
+  "scripts": {
+    "build": "node build/build.js && cp ./dist/vue-authenticate.js ./example/",
+    "dev": "parallelshell \"node-dev ./example/server.js\" \"gulp dev\""
+  },
   "tags": [
     "auth",
     "authentication",
@@ -78,5 +105,7 @@
     "oauth",
     "oauth 1.0",
     "oauth 2.0"
-  ]
+  ],
+  "unpkg": "dist/vue-authenticate.js",
+  "version": "1.2.7"
 }

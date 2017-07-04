@@ -1,5 +1,5 @@
 import Promise from '../promise.js'
-import { stringifyOptions } from '../utils.js'
+import { stringifyOptions, objectExtend, parseQueryString } from '../utils.js'
 
 /**
  * InAppBrowser OAuth2 popup management class
@@ -11,10 +11,11 @@ import { stringifyOptions } from '../utils.js'
  * make sure you set your provider default option responseType to token
  */
 export default class InAppBrowser {
-  constructor(url, target, popupOptions) {
+  constructor(url, target, popupOptions, responseType) {
     this.url = url
     this.target = target
     this.options = popupOptions
+    this.responseType = responseType
   }
 
   open(redirectUri) {
@@ -25,16 +26,33 @@ export default class InAppBrowser {
         if ((event.url).indexOf(redirectUri) === 0) {
           browserRef.removeEventListener("exit", (event) => {});
           browserRef.close();
-          var responseParameters = ((event.url).split("#")[1]).split("&");
-          var parsedResponse = {};
-          for (var i = 0; i < responseParameters.length; i++) {
-            parsedResponse[responseParameters[i].split("=")[0]] = responseParameters[i].split("=")[1];
-          }
-          if (parsedResponse["access_token"] !== undefined && parsedResponse["access_token"] !== null) {
-            console.log(parsedResponse)
-            resolve(parsedResponse);
+          console.log(event)
+          console.log((event.url))
+          console.log(((event.url).split("#")[1]))
+          if (this.responseType === 'token') {
+            var responseParameters = ((event.url).split("#")[1]).split("&");
+            var parsedResponse = {};
+            for (var i = 0; i < responseParameters.length; i++) {
+              parsedResponse[responseParameters[i].split("=")[0]] = responseParameters[i].split("=")[1];
+            }
+            if (parsedResponse["access_token"] !== undefined && parsedResponse["access_token"] !== null) {
+              console.log(parsedResponse)
+              resolve(parsedResponse);
+            } else {
+              reject("Problem authenticating");
+            }
           } else {
-            reject("Problem authenticating");
+            const query = parseQueryString(((event.url).split("/auth/oauth/linkedin/callback?code=")[1]).split('&')[1]);
+            const hash = []
+            hash['code'] = ((event.url).split("/auth/oauth/linkedin/callback?code=")[1]).split('&')[0];
+            let params = objectExtend({}, query);
+            params = objectExtend(params, hash);
+            console.log(params);
+            if (params.error) {
+              reject(new Error(params.error));
+            } else {
+              resolve(params);
+            }
           }
         }
       });

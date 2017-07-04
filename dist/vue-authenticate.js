@@ -918,10 +918,11 @@ OAuth.prototype.buildQueryString = function buildQueryString (params) {
  * adjusted to fit vue-authenticate library,
  * make sure you set your provider default option responseType to token
  */
-var InAppBrowser = function InAppBrowser(url, target, popupOptions) {
+var InAppBrowser = function InAppBrowser(url, target, popupOptions, responseType) {
   this.url = url;
   this.target = target;
   this.options = popupOptions;
+  this.responseType = responseType;
 };
 
 InAppBrowser.prototype.open = function open (redirectUri) {
@@ -934,16 +935,33 @@ InAppBrowser.prototype.open = function open (redirectUri) {
       if ((event.url).indexOf(redirectUri) === 0) {
         browserRef.removeEventListener("exit", function (event) {});
         browserRef.close();
-        var responseParameters = ((event.url).split("#")[1]).split("&");
-        var parsedResponse = {};
-        for (var i = 0; i < responseParameters.length; i++) {
-          parsedResponse[responseParameters[i].split("=")[0]] = responseParameters[i].split("=")[1];
-        }
-        if (parsedResponse["access_token"] !== undefined && parsedResponse["access_token"] !== null) {
-          console.log(parsedResponse);
-          resolve(parsedResponse);
+        console.log(event);
+        console.log((event.url));
+        console.log(((event.url).split("#")[1]));
+        if (this$1.responseType === 'token') {
+          var responseParameters = ((event.url).split("#")[1]).split("&");
+          var parsedResponse = {};
+          for (var i = 0; i < responseParameters.length; i++) {
+            parsedResponse[responseParameters[i].split("=")[0]] = responseParameters[i].split("=")[1];
+          }
+          if (parsedResponse["access_token"] !== undefined && parsedResponse["access_token"] !== null) {
+            console.log(parsedResponse);
+            resolve(parsedResponse);
+          } else {
+            reject("Problem authenticating");
+          }
         } else {
-          reject("Problem authenticating");
+          var query = parseQueryString(((event.url).split("/auth/oauth/linkedin/callback?code=")[1]).split('&')[1]);
+          var hash = [];
+          hash['code'] = ((event.url).split("/auth/oauth/linkedin/callback?code=")[1]).split('&')[0];
+          var params = objectExtend({}, query);
+          params = objectExtend(params, hash);
+          console.log(params);
+          if (params.error) {
+            reject(new Error(params.error));
+          } else {
+            resolve(params);
+          }
         }
       }
     });
@@ -958,68 +976,70 @@ InAppBrowser.prototype.open = function open (redirectUri) {
  * @type {Object}
  */
 var defaultProviderConfig$1 = {
-    name: null,
-    url: null,
-    clientId: null,
-    authorizationEndpoint: null,
-    redirectUri: null,
-    scope: null,
-    scopePrefix: null,
-    scopeDelimiter: null,
-    state: null,
-    requiredUrlParams: null,
-    defaultUrlParams: ['response_type', 'client_id', 'redirect_uri'],
-    responseType: 'code',
-    responseParams: {
-        code: 'code',
-        clientId: 'clientId',
-        redirectUri: 'redirectUri'
-    },
-    oauthType: '2.0',
-    popupOptions: { width: null, height: null }
+  name: null,
+  url: null,
+  clientId: null,
+  authorizationEndpoint: null,
+  redirectUri: null,
+  scope: null,
+  scopePrefix: null,
+  scopeDelimiter: null,
+  state: null,
+  requiredUrlParams: null,
+  defaultUrlParams: ['response_type', 'client_id', 'redirect_uri'],
+  responseType: 'code',
+  responseParams: {
+    code: 'code',
+    clientId: 'clientId',
+    redirectUri: 'redirectUri'
+  },
+  oauthType: '2.0',
+  popupOptions: { width: null, height: null }
 };
 
 var OAuth2 = function OAuth2($http, storage, providerConfig, options) {
-    this.$http = $http;
-    this.storage = storage;
-    this.providerConfig = objectExtend({}, defaultProviderConfig$1);
-    this.providerConfig = objectExtend(this.providerConfig, providerConfig);
-    this.options = options;
+  this.$http = $http;
+  this.storage = storage;
+  this.providerConfig = objectExtend({}, defaultProviderConfig$1);
+  this.providerConfig = objectExtend(this.providerConfig, providerConfig);
+  this.options = options;
 };
 
 OAuth2.prototype.init = function init (userData) {
-        var this$1 = this;
+    var this$1 = this;
 
-    var stateName = this.providerConfig.name + '_state';
-    if (isFunction(this.providerConfig.state)) {
-        this.storage.setItem(stateName, this.providerConfig.state());
-    } else if (isString(this.providerConfig.state)) {
-        this.storage.setItem(stateName, this.providerConfig.state);
-    }
+  var stateName = this.providerConfig.name + '_state';
+  if (isFunction(this.providerConfig.state)) {
+    this.storage.setItem(stateName, this.providerConfig.state());
+  } else if (isString(this.providerConfig.state)) {
+    this.storage.setItem(stateName, this.providerConfig.state);
+  }
 
-    var url = [this.providerConfig.authorizationEndpoint, this._stringifyRequestParams()].join('?');
+  var url = [this.providerConfig.authorizationEndpoint, this._stringifyRequestParams()].join('?');
+  console.log(window.cordova);
+  console.log(isInAppBrowserInstalled());
+  if (window.cordova && isInAppBrowserInstalled()) {
+    console.log('is cordova');
+    this.oauthPopup = new InAppBrowser(url, this.providerConfig.target, this.providerConfig.popupOptions, this.responseType);
+  } else {
+    this.oauthPopup = new OAuthPopup(url, this.providerConfig.name, this.providerConfig.popupOptions);
+  }
 
-    if (window.cordova && isInAppBrowserInstalled()) {
-        this.oauthPopup = new InAppBrowser(url, this.providerConfig.target, this.providerConfig.popupOptions);
-    } else {
-        this.oauthPopup = new OAuthPopup(url, this.providerConfig.name, this.providerConfig.popupOptions);
-    }
+  return new Promise(function (resolve, reject) {
+    this$1.oauthPopup.open(this$1.providerConfig.redirectUri).then(function (response) {
+      if (this$1.providerConfig.responseType === 'token' || !this$1.providerConfig.url) {
+        return resolve(response)
+      }
 
-    return new Promise(function (resolve, reject) {
-        this$1.oauthPopup.open(this$1.providerConfig.redirectUri).then(function (response) {
-            if (this$1.providerConfig.responseType === 'token' || !this$1.providerConfig.url) {
-                return resolve(response)
-            }
+      if (response.state && response.state !== this$1.storage.getItem(stateName)) {
+        return reject(new Error('State parameter value does not match original OAuth request state value'))
+      }
 
-            if (response.state && response.state !== this$1.storage.getItem(stateName)) {
-                return reject(new Error('State parameter value does not match original OAuth request state value'))
-            }
-
-            resolve(this$1.exchangeForToken(response, userData));
-        }).catch(function (err) {
-            reject(err);
-        });
-    })
+      resolve(this$1.exchangeForToken(response, userData));
+    }).catch(function (err) {
+      reject(err);
+    });
+  })
 };
 
 /**
@@ -1027,47 +1047,47 @@ OAuth2.prototype.init = function init (userData) {
  * @author Sahat Yalkabov <https://github.com/sahat>
  * @copyright Method taken from https://github.com/sahat/satellizer
  *
- * @param  {[type]} oauth[description]
- * @param  {[type]} userData [description]
- * @return {[type]}      [description]
+ * @param{[type]} oauth  [description]
+ * @param{[type]} userData [description]
+ * @return {[type]}        [description]
  */
 OAuth2.prototype.exchangeForToken = function exchangeForToken (oauth, userData) {
-        var this$1 = this;
+    var this$1 = this;
 
-    var payload = objectExtend({}, userData);
+  var payload = objectExtend({}, userData);
 
-    for (var key in defaultProviderConfig$1.responseParams) {
-        var value = defaultProviderConfig$1[key];
+  for (var key in defaultProviderConfig$1.responseParams) {
+    var value = defaultProviderConfig$1[key];
 
-        switch(key) {
-            case 'code':
-                payload[key] = oauth.code;
-                break
-            case 'clientId':
-                payload[key] = this$1.providerConfig.clientId;
-                break
-            case 'redirectUri':
-                payload[key] = this$1.providerConfig.redirectUri;
-                break
-            default:
-                payload[key] = oauth[key];
-        }
+    switch(key) {
+      case 'code':
+        payload[key] = oauth.code;
+        break
+      case 'clientId':
+        payload[key] = this$1.providerConfig.clientId;
+        break
+      case 'redirectUri':
+        payload[key] = this$1.providerConfig.redirectUri;
+        break
+      default:
+        payload[key] = oauth[key];
     }
+  }
 
-    if (oauth.state) {
-        payload.state = oauth.state;
-    }
+  if (oauth.state) {
+    payload.state = oauth.state;
+  }
 
-    var exchangeTokenUrl;
-    if (this.options.baseUrl) {
-        exchangeTokenUrl = joinUrl(this.options.baseUrl, this.providerConfig.url);
-    } else {
-        exchangeTokenUrl = this.providerConfig.url;
-    }
+  var exchangeTokenUrl;
+  if (this.options.baseUrl) {
+    exchangeTokenUrl = joinUrl(this.options.baseUrl, this.providerConfig.url);
+  } else {
+    exchangeTokenUrl = this.providerConfig.url;
+  }
 
-    return this.$http.post(exchangeTokenUrl, payload, {
-        withCredentials: this.options.withCredentials
-    })
+  return this.$http.post(exchangeTokenUrl, payload, {
+    withCredentials: this.options.withCredentials
+  })
 };
 
 /**
@@ -1078,39 +1098,39 @@ OAuth2.prototype.exchangeForToken = function exchangeForToken (oauth, userData) 
  * @return {String}
  */
 OAuth2.prototype._stringifyRequestParams = function _stringifyRequestParams () {
-        var this$1 = this;
+    var this$1 = this;
 
-    var keyValuePairs = [];
-    var paramCategories = ['defaultUrlParams', 'requiredUrlParams', 'optionalUrlParams'];
+  var keyValuePairs = [];
+  var paramCategories = ['defaultUrlParams', 'requiredUrlParams', 'optionalUrlParams'];
 
-    paramCategories.forEach(function (categoryName) {
-        if (!this$1.providerConfig[categoryName]) { return }
-        if (!Array.isArray(this$1.providerConfig[categoryName])) { return }
+  paramCategories.forEach(function (categoryName) {
+    if (!this$1.providerConfig[categoryName]) { return }
+    if (!Array.isArray(this$1.providerConfig[categoryName])) { return }
 
-        this$1.providerConfig[categoryName].forEach(function (paramName) {
-            var camelCaseParamName = camelCase(paramName);
-            var paramValue = isFunction(this$1.providerConfig[paramName]) ? this$1.providerConfig[paramName]() : this$1.providerConfig[camelCaseParamName];
+    this$1.providerConfig[categoryName].forEach(function (paramName) {
+      var camelCaseParamName = camelCase(paramName);
+      var paramValue = isFunction(this$1.providerConfig[paramName]) ? this$1.providerConfig[paramName]() : this$1.providerConfig[camelCaseParamName];
 
-            if (paramName === 'redirect_uri' && !paramValue) { return }
+      if (paramName === 'redirect_uri' && !paramValue) { return }
 
-            if (paramName === 'state') {
-                var stateName = this$1.providerConfig.name + '_state';
-                paramValue = encodeURIComponent(this$1.storage.getItem(stateName));
-            }
-            if (paramName === 'scope' && Array.isArray(paramValue)) {
-                paramValue = paramValue.join(this$1.providerConfig.scopeDelimiter);
-                if (this$1.providerConfig.scopePrefix) {
-                    paramValue = [this$1.providerConfig.scopePrefix, paramValue].join(this$1.providerConfig.scopeDelimiter);
-                }
-            }
+      if (paramName === 'state') {
+        var stateName = this$1.providerConfig.name + '_state';
+        paramValue = encodeURIComponent(this$1.storage.getItem(stateName));
+      }
+      if (paramName === 'scope' && Array.isArray(paramValue)) {
+        paramValue = paramValue.join(this$1.providerConfig.scopeDelimiter);
+        if (this$1.providerConfig.scopePrefix) {
+          paramValue = [this$1.providerConfig.scopePrefix, paramValue].join(this$1.providerConfig.scopeDelimiter);
+        }
+      }
 
-            keyValuePairs.push([paramName, paramValue]);
-        });
+      keyValuePairs.push([paramName, paramValue]);
     });
+  });
 
-    return keyValuePairs.map(function (param) {
-        return param.join('=')
-    }).join('&')
+  return keyValuePairs.map(function (param) {
+    return param.join('=')
+  }).join('&')
 };
 
 var VueAuthenticate = function VueAuthenticate($http, overrideOptions) {
