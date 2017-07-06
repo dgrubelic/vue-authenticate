@@ -1,12 +1,9 @@
-
-# Dependency directory
-node_modules
-bower_components
-
-# Editors
-.idea
-*.iml
-
-# OS metadata
 .DS_Store
-Thumbs.db
+.thumbs.db
+node_modules/
+dist/
+npm-debug.log*
+cordova/platforms
+cordova/plugins
+.idea/
+cordova/platforms/browser/cordova/build
