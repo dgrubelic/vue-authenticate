@@ -47,12 +47,11 @@ export default class OAuth2 {
     }
 
     let url = [this.providerConfig.authorizationEndpoint, this._stringifyRequestParams()].join('?')
-    console.log(window.cordova)
-    console.log(isInAppBrowserInstalled())
-    if (window.cordova && isInAppBrowserInstalled()) {
-      console.log('is cordova')
-      console.log(this.providerConfig.name)
-      this.oauthPopup = new InAppBrowser(url, this.providerConfig.target, this.providerConfig.popupOptions, this.providerConfig.responseType)
+
+    if (typeof window.cordova !== 'undefined') {
+      if (window.cordova && isInAppBrowserInstalled()) {
+        this.oauthPopup = new InAppBrowser(url, this.providerConfig.target, this.providerConfig.popupOptions, this.providerConfig.responseType)
+      }
     } else {
       this.oauthPopup = new OAuthPopup(url, this.providerConfig.name, this.providerConfig.popupOptions)
     }
