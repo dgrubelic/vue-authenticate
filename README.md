@@ -188,7 +188,7 @@ new Vue({
 ### Custom request and response interceptors
 
 You can easily setup custom request and response interceptors if you use different request handling library.
-Fro example, if you use **axios** in your app, request and response interceptors would look something like this:
+For example, if you use **axios** in your app, request and response interceptors would look something like this:
 
 **Important**: You must set both `request` and `response` interceptors if your uses request handling library other than `vue-resource` (default library).
 
