@@ -18,7 +18,7 @@ For now, this package only supports ES6 import usage, but soon will have standal
 
 *DEMO app comming soon...*
 
-## Instalation
+## Installation
 ```bash
 npm install vue-authenticate
 ```
