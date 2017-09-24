@@ -3,10 +3,21 @@
 node_modules
 bower_components
 
-# Editors
-.idea
-*.iml
-
-# OS metadata
-.DS_Store
 Thumbs.db
+.DS_Store
+
+dist/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Editor directories and files
+.idea
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.iml
+.vscode
+settings.json
+jsconfig.json
