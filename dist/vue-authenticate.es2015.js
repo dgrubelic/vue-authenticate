@@ -1,5 +1,5 @@
 /*!
- * vue-authenticate v1.2.7
+ * vue-authenticate v1.3.0
  * https://github.com/dgrubelic/vue-authenticate
  * Released under the MIT License.
  */
@@ -449,10 +449,40 @@ var defaultOptions = {
   logoutUrl: null,
   storageType: 'localStorage',
   storageNamespace: 'vue-authenticate',
-  requestDataKey: 'body',
-  responseDataKey: 'body',
-  bindRequestInterceptor: null,
-  bindResponseInterceptor: null,
+  requestDataKey: 'data',
+  responseDataKey: 'data',
+
+  /**
+   * Default request interceptor for Axios library
+   * @context {VueAuthenticate}
+   */
+  bindRequestInterceptor: function () {
+    var this$1 = this;
+
+    this.$http.interceptors.request.use(function (config) {
+      if (this$1.isAuthenticated()) {
+        config.headers['Authorization'] = [
+          this$1.options.tokenType, this$1.getToken()
+        ].join(' ');
+      } else {
+        delete config.headers['Authorization'];
+      }
+      return config
+    });
+  },
+
+  /**
+   * Default response interceptor for Axios library
+   * @contect {VueAuthenticate}
+   */
+  bindResponseInterceptor: function () {
+    var this$1 = this;
+
+    this.$http.interceptors.response.use(function (response) {
+      this$1.setToken(response);
+      return response
+    });
+  },
 
   providers: {
     facebook: {
@@ -1030,8 +1060,6 @@ OAuth2.prototype._stringifyRequestParams = function _stringifyRequestParams () {
 };
 
 var VueAuthenticate = function VueAuthenticate($http, overrideOptions) {
-  var this$1 = this;
-
   var options = objectExtend({}, defaultOptions);
   options = objectExtend(options, overrideOptions);
   var storage = StorageFactory(options);
@@ -1073,28 +1101,7 @@ var VueAuthenticate = function VueAuthenticate($http, overrideOptions) {
     this.options.bindRequestInterceptor.call(this, this);
     this.options.bindResponseInterceptor.call(this, this);
   } else {
-    // By default, request and response interceptors are for vue-resource
-    this.$http.interceptors.push(function (request, next) {
-      if (this$1.isAuthenticated()) {
-        request.headers.set('Authorization', [
-          this$1.options.tokenType, this$1.getToken()
-        ].join(' '));
-      } else {
-        request.headers.delete('Authorization');
-      }
-        
-      next(function (response) {
-        try {
-          var responseJson = JSON.parse(response[this$1.options.responseDataKey]);
-          if (responseJson[this$1.options.tokenName]) {
-            this$1.setToken(responseJson);
-            delete responseJson[this$1.options.tokenName];
-            return responseJson
-          }
-        } catch(e) {}
-        return response
-      });
-    });
+    throw new Error('Both request and response interceptors must be functions')
   }
 };
 
