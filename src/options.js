@@ -12,10 +12,36 @@ export default {
   logoutUrl: null,
   storageType: 'localStorage',
   storageNamespace: 'vue-authenticate',
-  requestDataKey: 'body',
-  responseDataKey: 'body',
-  bindRequestInterceptor: null,
-  bindResponseInterceptor: null,
+  requestDataKey: 'data',
+  responseDataKey: 'data',
+
+  /**
+   * Default request interceptor for Axios library
+   * @context {VueAuthenticate}
+   */
+  bindRequestInterceptor: function () {
+    this.$http.interceptors.request.use((config) => {
+      if (this.isAuthenticated()) {
+        config.headers['Authorization'] = [
+          this.options.tokenType, this.getToken()
+        ].join(' ')
+      } else {
+        delete config.headers['Authorization']
+      }
+      return config
+    })
+  },
+
+  /**
+   * Default response interceptor for Axios library
+   * @contect {VueAuthenticate}
+   */
+  bindResponseInterceptor: function () {
+    this.$http.interceptors.response.use((response) => {
+      this.setToken(response)
+      return response
+    })
+  },
 
   providers: {
     facebook: {
