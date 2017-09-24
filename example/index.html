@@ -41,6 +41,17 @@
     .button--linkedin  { color: #0077b5; border: 1px solid #0077b5; }
     .button--live  { color: #f65314; border: 1px solid #f65314; }
 
+    .authentication-status {
+      background-color: #42b983;
+      color: #fff;
+      left: 0;
+      padding: 16px 32px;
+      position: fixed;
+      right: 0;
+      text-align: center;
+      top: 0;
+    }
+
     hr {
       border: 0;
       border-bottom: 1px solid #ddd;
@@ -50,6 +61,7 @@
     #app {
       margin: 32px auto;
       max-width: 640px;
+      padding-top: 53px;
       word-break: break-all;
     }
   </style>
@@ -61,7 +73,8 @@
   
   <script src="https://unpkg.com/vue@2.2.6/dist/vue.min.js"></script>
   <script src="https://unpkg.com/vue-router@2.4.0/dist/vue-router.min.js"></script>
-  <script src="https://unpkg.com/vue-resource@1.3.1/dist/vue-resource.min.js"></script>
+  <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+  <script src="https://unpkg.com/vue-axios@2.0.2/dist/vue-axios.min.js"></script>
   <script src="/vue-authenticate.js"></script>
   <script src="/index.js"></script>
 </body>

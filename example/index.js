@@ -1,9 +1,9 @@
-Vue.http.options.root = 'http://localhost:3000';
+axios.defaults.baseURL = 'http://localhost:4000';
 
 Vue.use(VueRouter)
-Vue.use(VueResource)
 Vue.use(VueAuthenticate, {
-  baseUrl: 'http://localhost:4000', 
+  tokenName: 'access_token',
+  baseUrl: 'http://localhost:4000',
   providers: {
     // Define OAuth providers config
   }
@@ -21,8 +21,16 @@ var router = new VueRouter({
             response: null
           }
         },
+        computed: {
+          isAuthenticated: function () {
+            console.log(this.$auth.isAuthenticated());
+            return this.$auth.isAuthenticated();
+          }
+        },
         template: `
           <div class="index-component">
+            <div class="authentication-status" v-if="isAuthenticated">You are successfully authenticated</div>
+
             <button @click="authLogin()">Login</button>
             <button @click="authRegister()">Register</button>
             <button @click="authLogout()">Logout</button>
@@ -46,7 +54,8 @@ var router = new VueRouter({
         `,
         methods: {
 
-          authLogin: function() {
+          authLogin: function () {
+            var this_ = this;
             let user = {
               email: 'john.doe@domain.com', 
               password: 'pass123456'
@@ -57,13 +66,14 @@ var router = new VueRouter({
             }
 
             this.$auth.login(user).then(function (response) {
-              this.response = response
+              this_.response = response
 
-              console.log(this.$auth.isAuthenticated())
+              console.log(this_.$auth.isAuthenticated())
             })
           },
 
-          authRegister: function() {
+          authRegister: function () {
+            var this_ = this;
             let user = {
               name: 'John Doe',
               email: 'john.doe@domain.com', 
@@ -75,9 +85,9 @@ var router = new VueRouter({
             }
             
             this.$auth.register(user).then(function (response) {
-              this.response = response
+              this_.response = response
 
-              console.log(this.$auth.isAuthenticated())
+              console.log(this_.$auth.isAuthenticated())
             })
           },
 
@@ -129,6 +139,7 @@ var router = new VueRouter({
                 this_.response = authResponse
               }
             }).catch(function (err) {
+              console.log(err)
               this_.response = err
             })
           }

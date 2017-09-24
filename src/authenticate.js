@@ -48,28 +48,7 @@ export default class VueAuthenticate {
       this.options.bindRequestInterceptor.call(this, this)
       this.options.bindResponseInterceptor.call(this, this)
     } else {
-      // By default, request and response interceptors are for vue-resource
-      this.$http.interceptors.push((request, next) => {
-        if (this.isAuthenticated()) {
-          request.headers.set('Authorization', [
-            this.options.tokenType, this.getToken()
-          ].join(' '))
-        } else {
-          request.headers.delete('Authorization')
-        }
-        
-        next((response) => {
-          try {
-            var responseJson = JSON.parse(response[this.options.responseDataKey])
-            if (responseJson[this.options.tokenName]) {
-              this.setToken(responseJson)
-              delete responseJson[this.options.tokenName]
-              return responseJson
-            }
-          } catch(e) {}
-          return response
-        })
-      })
+      throw new Error('Both request and response interceptors must be functions')
     }
   }
 
