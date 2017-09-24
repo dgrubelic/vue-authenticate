@@ -2,21 +2,28 @@
 
 [![Join the chat at https://gitter.im/vuejs-auth/vue-authenticate](https://badges.gitter.im/vue-authenticate/Lobby.svg)](https://gitter.im/vuejs-auth/vue-authenticate?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
-**vue-authenticate** is easily configurable solution for [Vue.js](https://vuejs.org/) that provides local login/registration as well as Social login using Github, Facebook, Google and Twitter OAuth providers (only those 4 tested for now).
+**vue-authenticate** is easily configurable solution for [Vue.js](https://vuejs.org/) that provides local login/registration as well as Social login using Github, Facebook, Google and other OAuth providers.
 
-The best part about this library is that it is not strictly coupled to one request handling library like [vue-resource](https://github.com/pagekit/vue-resource). You will be able to use it with different libraries. 
 
-For now it is tested to work with  [vue-resource](https://github.com/pagekit/vue-resource) (default library) and [axios](https://github.com/mzabriskie/axios) (using [vue-axios](https://github.com/imcvampire/vue-axios) wrapper).
+
+The best part about this library is that it is not strictly coupled to one request handling library like [vue-axios](https://github.com/imcvampire/vue-axios). You will be able to use it with different libraries. 
+
+For now it is tested to work with  [vue-resource](https://github.com/pagekit/vue-resource) and [axios](https://github.com/mzabriskie/axios) (using [vue-axios](https://github.com/imcvampire/vue-axios) wrapper).
+
+**WARNING** From version 1.3.0 default request library is `axios` using `vue-axios` wrapper plugin.
 
 This library was inspired by well known authentication library for Angular called [Satellizer](https://github.com/sahat/satellizer) developed by [Sahat Yalkabov](http://sahatyalkabov.com). They share almost identical configuration and API so you can easily switch from Angular to Vue.js project.
 
-**DISCLAIMER**
+## Supported OAuth providers and configurations
 
-For now, this package only supports ES6 import usage, but soon will have standalone ES5 build.
-
-
-
-*DEMO app comming soon...*
+1. Facebook (https://github.com/dgrubelic/vue-authenticate/blob/master/src/options.js#L21)
+2. Google (https://github.com/dgrubelic/vue-authenticate/blob/master/src/options.js#L34)
+3. Github (https://github.com/dgrubelic/vue-authenticate/blob/master/src/options.js#L49)
+4. Instagram (https://github.com/dgrubelic/vue-authenticate/blob/master/src/options.js#L61)
+5. Twitter (https://github.com/dgrubelic/vue-authenticate/blob/master/src/options.js#L72)
+6. Bitbucket (https://github.com/dgrubelic/vue-authenticate/blob/master/src/options.js#L81)
+7. LinkedIn (https://github.com/dgrubelic/vue-authenticate/blob/master/src/options.js#L93)
+8. Microsoft Live (https://github.com/dgrubelic/vue-authenticate/blob/master/src/options.js#L106)
 
 ## Instalation
 ```bash
@@ -188,11 +195,14 @@ new Vue({
 ### Custom request and response interceptors
 
 You can easily setup custom request and response interceptors if you use different request handling library.
-Fro example, if you use **axios** in your app, request and response interceptors would look something like this:
 
-**Important**: You must set both `request` and `response` interceptors if your uses request handling library other than `vue-resource` (default library).
+**Important**: You must set both `request` and `response` interceptors at all times.
 
 ```javascript
+
+/**
+* This is example for request and response interceptors for axios library
+*/
 
 Vue.use(VueAuthenticate, {
   bindRequestInterceptor: function () {
