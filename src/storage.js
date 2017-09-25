@@ -17,7 +17,7 @@ export default function StorageFactory(options) {
         window.sessionStorage.setItem('testKey', 'test')
         window.sessionStorage.removeItem('testKey')
         return new SessionStorage(options.storageNamespace)
-      } catch (e) { }
+      } catch (e) {}
       
     case 'cookieStorage':
       return new CookieStorage(options.cookieStorage);
