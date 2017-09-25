@@ -1,3 +1,4 @@
+import CookieStorage from './storage/cookie-storage.js';
 import LocalStorage from './storage/local-storage.js'
 import MemoryStorage from './storage/memory-storage.js'
 import SessionStorage from './storage/session-storage.js'
@@ -16,7 +17,10 @@ export default function StorageFactory(options) {
         window.sessionStorage.setItem('testKey', 'test')
         window.sessionStorage.removeItem('testKey')
         return new SessionStorage(options.storageNamespace)
-      } catch(e) {}
+      } catch (e) { }
+      
+    case 'cookieStorage':
+      return new CookieStorage(options.cookieStorage);
 
     case 'memoryStorage': 
     default:

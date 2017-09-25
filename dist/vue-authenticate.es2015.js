@@ -1,5 +1,5 @@
 /*!
- * vue-authenticate v1.3.0
+ * vue-authenticate v1.3.1
  * https://github.com/dgrubelic/vue-authenticate
  * Released under the MIT License.
  */
@@ -209,6 +209,47 @@ function decodeBase64(str) {
     })
       .replace(/[^A-Za-z0-9\+\/]/g, '')
   );
+}
+
+function parseCookies(str) {
+  if (str.length === 0) { return {}; }
+  var parsed = {};
+  var pattern = new RegExp('\\s*;\\s*');
+  str.split(pattern).forEach(function (i) {
+    var ref = i.split('=');
+    var encodedKey = ref[0];
+    var encodedValue = ref[1];
+    var key = decodeURIComponent(encodedKey);
+    var value = decodeURIComponent(encodedValue);
+    parsed[key] = value;
+  });
+  return parsed;
+}
+
+function formatOptions(options) {
+  var path = options.path;
+  var domain = options.domain;
+  var expires = options.expires;
+  var secure = options.secure;
+  return [
+    typeof path === 'undefined' || path === null
+      ? '' : ';path=' + path,
+    typeof domain === 'undefined' || domain === null
+      ? '' : ';domain=' + domain,
+    typeof expires === 'undefined' || expires === null
+      ? '' : ';expires=' + expires.toUTCString(),
+    typeof secure === 'undefined' || secure === null || secure === false
+      ? '' : ';secure'
+  ].join('');
+}
+
+function formatCookie(key, value, options) {
+  return [
+    encodeURIComponent(key),
+    '=',
+    encodeURIComponent(value),
+    formatOptions(options)
+  ].join('');
 }
 
 // Store setTimeout reference so promise-polyfill will be unaffected by
@@ -449,6 +490,7 @@ var defaultOptions = {
   logoutUrl: null,
   storageType: 'localStorage',
   storageNamespace: 'vue-authenticate',
+  cookieStorage: {},
   requestDataKey: 'data',
   responseDataKey: 'data',
 
@@ -617,6 +659,46 @@ var defaultOptions = {
   }
 };
 
+var CookieStorage = function CookieStorage(defaultOptions) {
+  this._defaultOptions = objectExtend({
+    domain: null,
+    expires: null,
+    path: null,
+    secure: false
+  }, defaultOptions);
+};
+
+CookieStorage.prototype.setItem = function setItem (key, value) {
+  var options = objectExtend({}, this._defaultOptions);
+  var cookie = formatCookie(key, value, options);
+  this._setCookie(cookie);
+};
+
+CookieStorage.prototype.getItem = function getItem (key) {
+  var cookies = parseCookies(this._getCookie());
+  return cookies.hasOwnProperty(key) ? cookies[key] : null;
+};
+
+CookieStorage.prototype.removeItem = function removeItem (key) {
+  var value = '';
+  var defaultOptions = objectExtend({}, this._defaultOptions);
+  var options = objectExtend(defaultOptions, {
+    expires: new Date(0)
+  });
+  var cookie = formatCookie(key, value, options);
+  this._setCookie(cookie);
+};
+
+CookieStorage.prototype._getCookie = function _getCookie () {
+  return typeof document === 'undefined'
+    ? '' : typeof document.cookie === 'undefined'
+      ? '' : document.cookie;
+};
+
+CookieStorage.prototype._setCookie = function _setCookie (cookie) {
+  document.cookie = cookie;
+};
+
 var LocalStorage = function LocalStorage(namespace) {
   this.namespace = namespace || null;
 };
@@ -701,7 +783,10 @@ function StorageFactory(options) {
         window.sessionStorage.setItem('testKey', 'test');
         window.sessionStorage.removeItem('testKey');
         return new LocalStorage$2(options.storageNamespace)
-      } catch(e) {}
+      } catch (e) { }
+      
+    case 'cookieStorage':
+      return new CookieStorage(options.cookieStorage);
 
     case 'memoryStorage': 
     default:

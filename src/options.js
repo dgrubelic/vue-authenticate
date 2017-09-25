@@ -12,6 +12,7 @@ export default {
   logoutUrl: null,
   storageType: 'localStorage',
   storageNamespace: 'vue-authenticate',
+  cookieStorage: {},
   requestDataKey: 'data',
   responseDataKey: 'data',
 
