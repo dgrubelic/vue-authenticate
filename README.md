@@ -25,7 +25,7 @@ This library was inspired by well known authentication library for Angular calle
 7. LinkedIn (https://github.com/dgrubelic/vue-authenticate/blob/master/src/options.js#L93)
 8. Microsoft Live (https://github.com/dgrubelic/vue-authenticate/blob/master/src/options.js#L106)
 
-## Instalation
+## Installation
 ```bash
 npm install vue-authenticate
 ```
