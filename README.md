@@ -1,3 +1,5 @@
+[**WARNING**]: README file is currently in process of rewrite and will be released soon.
+
 # vue-authenticate
 
 [![Join the chat at https://gitter.im/vuejs-auth/vue-authenticate](https://badges.gitter.im/vue-authenticate/Lobby.svg)](https://gitter.im/vuejs-auth/vue-authenticate?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
@@ -10,7 +12,7 @@ The best part about this library is that it is not strictly coupled to one reque
 
 For now it is tested to work with  [vue-resource](https://github.com/pagekit/vue-resource) and [axios](https://github.com/mzabriskie/axios) (using [vue-axios](https://github.com/imcvampire/vue-axios) wrapper).
 
-**WARNING** From version 1.3.0 default request library is `axios` using `vue-axios` wrapper plugin.
+**WARNING:** From version 1.3.0 default request library is `axios` using `vue-axios` wrapper plugin.
 
 This library was inspired by well known authentication library for Angular called [Satellizer](https://github.com/sahat/satellizer) developed by [Sahat Yalkabov](http://sahatyalkabov.com). They share almost identical configuration and API so you can easily switch from Angular to Vue.js project.
 
@@ -33,10 +35,11 @@ npm install vue-authenticate
 ## Usage
 ```javascript
 import Vue from 'vue'
-import VueResource from 'vue-resource'
+import VueAxios from 'vue-axios'
 import VueAuthenticate from 'vue-authenticate'
+import axios from 'axios';
 
-Vue.use(VueResource)
+Vue.use(VueAxios, axios)
 Vue.use(VueAuthenticate, {
   baseUrl: 'http://localhost:3000', // Your API domain
   
@@ -73,7 +76,7 @@ new Vue({
 <button @click="register()">Register</button>
 ```
 
-### Social authentication
+### Social account authentication
 
 ```javascript
 new Vue({
@@ -102,13 +105,14 @@ new Vue({
 // ES6 example
 import Vue from 'vue'
 import Vuex from 'vuex'
-import VueResource from 'vue-resource'
+import VueAxios from 'vue-axios'
 import { VueAuthenticate } from 'vue-authenticate'
+import axios from 'axios';
 
 Vue.use(Vuex)
-Vue.use(VueResource)
+Vue.use(VueAxios, axios)
 
-const vueAuth = new VueAuthenticate(Vue.http, {
+const vueAuth = new VueAuthenticate(Vue.prototype.$http, {
   baseUrl: 'http://localhost:4000'
 })
 ```
@@ -117,14 +121,15 @@ const vueAuth = new VueAuthenticate(Vue.http, {
 // CommonJS example
 var Vue = require('vue')
 var Vuex = require('vuex')
-var VueResource = require('vue-resource')
+var VueAxios = require('vue-axios')
 var VueAuthenticate = require('vue-authenticate')
+var axios = require('axios');
 
 Vue.use(Vuex)
-Vue.use(VueResource)
+Vue.use(VueAxios, axios)
 
 // ES5, CommonJS example
-var vueAuth = VueAuthenticate.factory(Vue.http, {
+var vueAuth = VueAuthenticate.factory(Vue.prototype.$http, {
   baseUrl: 'http://localhost:4000'
 })
 ```
