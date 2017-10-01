@@ -12,7 +12,7 @@ const defaultProviderConfig = {
   requiredUrlParams: null,
   defaultUrlParams: null,
   oauthType: '1.0',
-  popupOptions: { width: null, height: null }
+  popupOptions: {}
 }
 
 export default class OAuth {
