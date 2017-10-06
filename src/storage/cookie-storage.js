@@ -7,9 +7,9 @@ import {
 class CookieStorage {
   constructor(defaultOptions) {
     this._defaultOptions = objectExtend({
-      domain: null,
+      domain: window.location.hostname,
       expires: null,
-      path: null,
+      path: '/',
       secure: false
     }, defaultOptions);
   }
