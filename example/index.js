@@ -4,6 +4,7 @@ Vue.use(VueRouter)
 Vue.use(VueAuthenticate, {
   tokenName: 'access_token',
   baseUrl: 'http://localhost:4000',
+  storageType: 'cookieStorage',
   providers: {
     // Define OAuth providers config
   }
@@ -18,18 +19,22 @@ var router = new VueRouter({
       component: {
         data: function () {
           return {
+            access_token: null,
             response: null
           }
         },
         computed: {
           isAuthenticated: function () {
-            console.log(this.$auth.isAuthenticated());
+            this.access_token = this.$auth.getToken();
             return this.$auth.isAuthenticated();
           }
         },
         template: `
           <div class="index-component">
-            <div class="authentication-status" v-if="isAuthenticated">You are successfully authenticated</div>
+            <div class="authentication-status" v-if="isAuthenticated">
+              You are successfully authenticated
+              <div class="authentication-status__token">{{access_token}}</div>
+            </div>
 
             <button @click="authLogin()">Login</button>
             <button @click="authRegister()">Register</button>

@@ -67,7 +67,7 @@ function loginAuth(req, res) {
     name: 'John Doe',
     email: 'john.doe@domain.com',
     created_at: new Date(),
-    access_token: 'eyJpZCI6MSwiZW1haWwiOiJqb2huLmRvZUBkb21haW4uY29tIiwibmFtZSI6IkpvaG4gRG9lIiwiYWxnIjoiSFMyNTYifQ.eyJpZCI6MSwiZW1haWwiOiJqb2huLmRvZUBkb21haW4uY29tIiwibmFtZSI6IkpvaG4gRG9lIn0.CyXHbjCBjA4uLuOwefCGbFw1ulQtF-QfS9-X0fFUCGE'
+    access_token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjMiLCJuYW1lIjoiSm9obiBMb2dpbiBEb2UiLCJhZG1pbiI6dHJ1ZX0.VHK2sCbj5nKJ8oC44UTHuhQHXEdPN8zjKjaFT0OZ-LY'
   })
 }
 
@@ -77,7 +77,7 @@ function registerAuth(req, res) {
     name: 'John Doe',
     email: 'john.doe@domain.com',
     created_at: new Date(),
-    access_token: 'eyJpZCI6MSwiZW1haWwiOiJqb2huLmRvZUBkb21haW4uY29tIiwibmFtZSI6IkpvaG4gRG9lIiwiYWxnIjoiSFMyNTYifQ.eyJpZCI6MSwiZW1haWwiOiJqb2huLmRvZUBkb21haW4uY29tIiwibmFtZSI6IkpvaG4gRG9lIn0.CyXHbjCBjA4uLuOwefCGbFw1ulQtF-QfS9-X0fFUCGE'
+    access_token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NSIsIm5hbWUiOiJKb2huIFJlZ2lzdGVyIERvZSIsImFkbWluIjp0cnVlfQ.zTR57xocFkGp2UdFwBLk1cZUeqgSujvTqVAFagBlU4I'
   })
 }
 

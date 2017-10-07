@@ -12,6 +12,11 @@ export default {
   logoutUrl: null,
   storageType: 'localStorage',
   storageNamespace: 'vue-authenticate',
+  cookieStorage: {
+    domain: window.location.hostname,
+    path: '/',
+    secure: false
+  },
   requestDataKey: 'data',
   responseDataKey: 'data',
 
@@ -94,7 +99,8 @@ export default {
       requiredUrlParams: ['scope'],
       scope: ['basic'],
       scopeDelimiter: '+',
-      oauthType: '2.0'
+      oauthType: '2.0',
+      popupOptions: { width: null, height: null }
     },
 
     twitter: {
