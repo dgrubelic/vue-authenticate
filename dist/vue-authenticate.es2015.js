@@ -1,5 +1,5 @@
 /*!
- * vue-authenticate v1.3.2
+ * vue-authenticate v1.3.3
  * https://github.com/dgrubelic/vue-authenticate
  * Released under the MIT License.
  */
@@ -37,7 +37,9 @@ function camelCase(name) {
   });
 }
 
-
+function isUndefined(value) {
+  return typeof value === 'undefined'
+}
 
 
 
@@ -490,7 +492,11 @@ var defaultOptions = {
   logoutUrl: null,
   storageType: 'localStorage',
   storageNamespace: 'vue-authenticate',
-  cookieStorage: {},
+  cookieStorage: {
+    domain: window.location.hostname,
+    path: '/',
+    secure: false
+  },
   requestDataKey: 'data',
   responseDataKey: 'data',
 
@@ -498,16 +504,16 @@ var defaultOptions = {
    * Default request interceptor for Axios library
    * @context {VueAuthenticate}
    */
-  bindRequestInterceptor: function () {
-    var this$1 = this;
+  bindRequestInterceptor: function ($auth) {
+    var tokenHeader = $auth.options.tokenHeader;
 
-    this.$http.interceptors.request.use(function (config) {
-      if (this$1.isAuthenticated()) {
-        config.headers['Authorization'] = [
-          this$1.options.tokenType, this$1.getToken()
+    $auth.$http.interceptors.request.use(function (config) {
+      if ($auth.isAuthenticated()) {
+        config.headers[tokenHeader] = [
+          $auth.options.tokenType, $auth.getToken()
         ].join(' ');
       } else {
-        delete config.headers['Authorization'];
+        delete config.headers[tokenHeader];
       }
       return config
     });
@@ -517,11 +523,9 @@ var defaultOptions = {
    * Default response interceptor for Axios library
    * @contect {VueAuthenticate}
    */
-  bindResponseInterceptor: function () {
-    var this$1 = this;
-
-    this.$http.interceptors.response.use(function (response) {
-      this$1.setToken(response);
+  bindResponseInterceptor: function ($auth) {
+    $auth.$http.interceptors.response.use(function (response) {
+      $auth.setToken(response);
       return response
     });
   },
@@ -531,7 +535,7 @@ var defaultOptions = {
       name: 'facebook',
       url: '/auth/facebook',
       authorizationEndpoint: 'https://www.facebook.com/v2.5/dialog/oauth',
-      redirectUri: null,
+      redirectUri: window.location.origin + '/',
       requiredUrlParams: ['display', 'scope'],
       scope: ['email'],
       scopeDelimiter: ',',
@@ -544,7 +548,7 @@ var defaultOptions = {
       name: 'google',
       url: '/auth/google',
       authorizationEndpoint: 'https://accounts.google.com/o/oauth2/auth',
-      redirectUri: null,
+      redirectUri: window.location.origin,
       requiredUrlParams: ['scope'],
       optionalUrlParams: ['display'],
       scope: ['profile', 'email'],
@@ -559,7 +563,7 @@ var defaultOptions = {
       name: 'github',
       url: '/auth/github',
       authorizationEndpoint: 'https://github.com/login/oauth/authorize',
-      redirectUri: null,
+      redirectUri: window.location.origin,
       optionalUrlParams: ['scope'],
       scope: ['user:email'],
       scopeDelimiter: ' ',
@@ -571,18 +575,19 @@ var defaultOptions = {
       name: 'instagram',
       url: '/auth/instagram',
       authorizationEndpoint: 'https://api.instagram.com/oauth/authorize',
-      redirectUri: null,
+      redirectUri: window.location.origin,
       requiredUrlParams: ['scope'],
       scope: ['basic'],
       scopeDelimiter: '+',
-      oauthType: '2.0'
+      oauthType: '2.0',
+      popupOptions: { width: null, height: null }
     },
 
     twitter: {
       name: 'twitter',
       url: '/auth/twitter',
       authorizationEndpoint: 'https://api.twitter.com/oauth/authenticate',
-      redirectUri: null,
+      redirectUri: window.location.origin,
       oauthType: '1.0',
       popupOptions: { width: 495, height: 645 }
     },
@@ -591,7 +596,7 @@ var defaultOptions = {
       name: 'bitbucket',
       url: '/auth/bitbucket',
       authorizationEndpoint: 'https://bitbucket.org/site/oauth2/authorize',
-      redirectUri: null,
+      redirectUri: window.location.origin + '/',
       optionalUrlParams: ['scope'],
       scope: ['email'],
       scopeDelimiter: ' ',
@@ -603,7 +608,7 @@ var defaultOptions = {
       name: 'linkedin',
       url: '/auth/linkedin',
       authorizationEndpoint: 'https://www.linkedin.com/oauth/v2/authorization',
-      redirectUri: null,
+      redirectUri: window.location.origin,
       requiredUrlParams: ['state'],
       scope: ['r_emailaddress'],
       scopeDelimiter: ' ',
@@ -616,7 +621,7 @@ var defaultOptions = {
       name: 'live',
       url: '/auth/live',
       authorizationEndpoint: 'https://login.live.com/oauth20_authorize.srf',
-      redirectUri: null,
+      redirectUri: window.location.origin,
       requiredUrlParams: ['display', 'scope'],
       scope: ['wl.emails'],
       scopeDelimiter: ' ',
@@ -629,7 +634,7 @@ var defaultOptions = {
       name: null,
       url: '/auth/oauth1',
       authorizationEndpoint: null,
-      redirectUri: null,
+      redirectUri: window.location.origin,
       oauthType: '1.0',
       popupOptions: null
     },
@@ -638,7 +643,7 @@ var defaultOptions = {
       name: null,
       url: '/auth/oauth2',
       clientId: null,
-      redirectUri: null,
+      redirectUri: window.location.origin,
       authorizationEndpoint: null,
       defaultUrlParams: ['response_type', 'client_id', 'redirect_uri'],
       requiredUrlParams: null,
@@ -661,9 +666,9 @@ var defaultOptions = {
 
 var CookieStorage = function CookieStorage(defaultOptions) {
   this._defaultOptions = objectExtend({
-    domain: null,
+    domain: window.location.hostname,
     expires: null,
-    path: null,
+    path: '/',
     secure: false
   }, defaultOptions);
 };
@@ -783,7 +788,7 @@ function StorageFactory(options) {
         window.sessionStorage.setItem('testKey', 'test');
         window.sessionStorage.removeItem('testKey');
         return new LocalStorage$2(options.storageNamespace)
-      } catch (e) { }
+      } catch (e) {}
       
     case 'cookieStorage':
       return new CookieStorage(options.cookieStorage);
@@ -876,7 +881,9 @@ OAuthPopup.prototype._stringifyOptions = function _stringifyOptions () {
 
   var options = [];
   for (var optionKey in this$1.popupOptions) {
-    options.push((optionKey + "=" + (this$1.popupOptions[optionKey])));
+    if (!isUndefined(this$1.popupOptions[optionKey])) {
+      options.push((optionKey + "=" + (this$1.popupOptions[optionKey])));
+    }
   }
   return options.join(',')
 };
@@ -892,7 +899,7 @@ var defaultProviderConfig = {
   requiredUrlParams: null,
   defaultUrlParams: null,
   oauthType: '1.0',
-  popupOptions: { width: null, height: null }
+  popupOptions: {}
 };
 
 var OAuth = function OAuth($http, storage, providerConfig, options) {
@@ -1011,7 +1018,7 @@ var defaultProviderConfig$1 = {
     redirectUri: 'redirectUri'
   },
   oauthType: '2.0',
-  popupOptions: { width: null, height: null }
+  popupOptions: {}
 };
 
 var OAuth2 = function OAuth2($http, storage, providerConfig, options) {
@@ -1372,8 +1379,6 @@ VueAuthenticate.prototype.authenticate = function authenticate (provider, userDa
       } else {
         return reject(new Error('Authentication failed'))
       }
-    }).catch(function () {
-      reject(new Error('Authentication error occurred'));
     })
   })
 };
