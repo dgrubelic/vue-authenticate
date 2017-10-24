@@ -1,5 +1,5 @@
 /*!
- * vue-authenticate v1.3.3
+ * vue-authenticate v1.3.4
  * https://github.com/dgrubelic/vue-authenticate
  * Released under the MIT License.
  */
@@ -1385,7 +1385,7 @@ VueAuthenticate.prototype.authenticate = function authenticate (provider, userDa
       } else {
         return reject(new Error('Authentication failed'))
       }
-    })
+    }).catch(function (err) { return reject(err); })
   })
 };
 
