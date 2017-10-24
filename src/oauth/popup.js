@@ -1,5 +1,5 @@
 import Promise from '../promise.js'
-import { objectExtend, parseQueryString, getFullUrlPath } from '../utils.js'
+import { objectExtend, parseQueryString, getFullUrlPath, isUndefined } from '../utils.js'
 
 /**
  * OAuth2 popup management class
@@ -79,7 +79,9 @@ export default class OAuthPopup {
   _stringifyOptions() {
     let options = []
     for (var optionKey in this.popupOptions) {
-      options.push(`${optionKey}=${this.popupOptions[optionKey]}`)
+      if (!isUndefined(this.popupOptions[optionKey])) {
+        options.push(`${optionKey}=${this.popupOptions[optionKey]}`)
+      }
     }
     return options.join(',')
   }

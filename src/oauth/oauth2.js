@@ -24,7 +24,7 @@ const defaultProviderConfig = {
     redirectUri: 'redirectUri'
   },
   oauthType: '2.0',
-  popupOptions: { width: null, height: null }
+  popupOptions: {}
 }
 
 export default class OAuth2 {

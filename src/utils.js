@@ -208,3 +208,39 @@ export function decodeBase64(str) {
       .replace(/[^A-Za-z0-9\+\/]/g, '')
   );
 }
+
+export function parseCookies(str) {
+  if (str.length === 0) return {};
+  const parsed = {};
+  const pattern = new RegExp('\\s*;\\s*');
+  str.split(pattern).forEach((i) => {
+    const [encodedKey, encodedValue] = i.split('=');
+    const key = decodeURIComponent(encodedKey);
+    const value = decodeURIComponent(encodedValue);
+    parsed[key] = value;
+  });
+  return parsed;
+};
+
+export function formatOptions(options) {
+  const { path, domain, expires, secure } = options;
+  return [
+    typeof path === 'undefined' || path === null
+      ? '' : ';path=' + path,
+    typeof domain === 'undefined' || domain === null
+      ? '' : ';domain=' + domain,
+    typeof expires === 'undefined' || expires === null
+      ? '' : ';expires=' + expires.toUTCString(),
+    typeof secure === 'undefined' || secure === null || secure === false
+      ? '' : ';secure'
+  ].join('');
+};
+
+export function formatCookie(key, value, options) {
+  return [
+    encodeURIComponent(key),
+    '=',
+    encodeURIComponent(value),
+    formatOptions(options)
+  ].join('');
+};
