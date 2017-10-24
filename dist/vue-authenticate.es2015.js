@@ -1379,7 +1379,7 @@ VueAuthenticate.prototype.authenticate = function authenticate (provider, userDa
       } else {
         return reject(new Error('Authentication failed'))
       }
-    })
+    }).catch(function (err) { return reject(err); })
   })
 };
 
