@@ -246,9 +246,10 @@ export function formatCookie(key, value, options) {
 };
 
 export function getCookieDomain() {
-  return isUndefined(window) ? '' : `${window.location.hostname}`;
+  // Directly check typeof as going through isUndefined seems to break in server environment
+  return typeof window === 'undefined' ? '' : `${window.location.hostname}`;
 }
 
 export function getRedirectUri(path = '') {
-  return isUndefined(window) ? path : `${window.location.origin}${path}`;
+  return typeof window === 'undefined' ? path : `${window.location.origin}${path}`;
 }
