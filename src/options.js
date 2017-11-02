@@ -1,13 +1,6 @@
-import { isUndefined } from './utils.js';
+import { getCookieDomain, getRedirectUri } from './utils.js';
 
 
-function getCookieDomain() {
-  return isUndefined(window) ? '' : `${window.location.hostname}`;
-}
-
-function getRedirectUri(path = '') {
-  return isUndefined(window) ? path : `${window.location.origin}${path}`;
-}
 /**
  * Default configuration
  */
