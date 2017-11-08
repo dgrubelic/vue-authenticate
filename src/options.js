@@ -150,6 +150,18 @@ export default {
       popupOptions: { width: 500, height: 560 }
     },
 
+    baidu: {
+      name: 'baidu',
+      url: '/auth/baidu',
+      authorizationEndpoint: 'https://openapi.baidu.com/oauth/2.0/authorize',
+      redirectUri: window.location.origin,
+      requiredUrlParams: ['scope'],
+      scope: ['basic'],
+      scopeDelimiter: ' ',
+      oauthType: '2.0',
+      popupOptions: { width: 452, height: 633 },
+    },
+
     oauth1: {
       name: null,
       url: '/auth/oauth1',
