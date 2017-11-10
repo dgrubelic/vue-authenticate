@@ -18,7 +18,8 @@ export default {
   cookieStorage: {
     domain: getCookieDomain(),
     path: '/',
-    secure: false
+    secure: false,
+    getCookieFn: null,
   },
   requestDataKey: 'data',
   responseDataKey: 'data',
