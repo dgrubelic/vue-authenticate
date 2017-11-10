@@ -1,3 +1,6 @@
+import { getCookieDomain, getRedirectUri } from './utils.js';
+
+
 /**
  * Default configuration
  */
@@ -13,9 +16,10 @@ export default {
   storageType: 'localStorage',
   storageNamespace: 'vue-authenticate',
   cookieStorage: {
-    domain: window.location.hostname,
+    domain: getCookieDomain(),
     path: '/',
-    secure: false
+    secure: false,
+    getCookieFn: null,
   },
   requestDataKey: 'data',
   responseDataKey: 'data',
@@ -55,7 +59,7 @@ export default {
       name: 'facebook',
       url: '/auth/facebook',
       authorizationEndpoint: 'https://www.facebook.com/v2.5/dialog/oauth',
-      redirectUri: window.location.origin + '/',
+      redirectUri: getRedirectUri('/'),
       requiredUrlParams: ['display', 'scope'],
       scope: ['email'],
       scopeDelimiter: ',',
@@ -68,7 +72,7 @@ export default {
       name: 'google',
       url: '/auth/google',
       authorizationEndpoint: 'https://accounts.google.com/o/oauth2/auth',
-      redirectUri: window.location.origin,
+      redirectUri: getRedirectUri(),
       requiredUrlParams: ['scope'],
       optionalUrlParams: ['display'],
       scope: ['profile', 'email'],
@@ -83,7 +87,7 @@ export default {
       name: 'github',
       url: '/auth/github',
       authorizationEndpoint: 'https://github.com/login/oauth/authorize',
-      redirectUri: window.location.origin,
+      redirectUri: getRedirectUri(),
       optionalUrlParams: ['scope'],
       scope: ['user:email'],
       scopeDelimiter: ' ',
@@ -95,7 +99,7 @@ export default {
       name: 'instagram',
       url: '/auth/instagram',
       authorizationEndpoint: 'https://api.instagram.com/oauth/authorize',
-      redirectUri: window.location.origin,
+      redirectUri: getRedirectUri(),
       requiredUrlParams: ['scope'],
       scope: ['basic'],
       scopeDelimiter: '+',
@@ -107,7 +111,7 @@ export default {
       name: 'twitter',
       url: '/auth/twitter',
       authorizationEndpoint: 'https://api.twitter.com/oauth/authenticate',
-      redirectUri: window.location.origin,
+      redirectUri: getRedirectUri(),
       oauthType: '1.0',
       popupOptions: { width: 495, height: 645 }
     },
@@ -116,7 +120,7 @@ export default {
       name: 'bitbucket',
       url: '/auth/bitbucket',
       authorizationEndpoint: 'https://bitbucket.org/site/oauth2/authorize',
-      redirectUri: window.location.origin + '/',
+      redirectUri: getRedirectUri('/'),
       optionalUrlParams: ['scope'],
       scope: ['email'],
       scopeDelimiter: ' ',
@@ -128,7 +132,7 @@ export default {
       name: 'linkedin',
       url: '/auth/linkedin',
       authorizationEndpoint: 'https://www.linkedin.com/oauth/v2/authorization',
-      redirectUri: window.location.origin,
+      redirectUri: getRedirectUri(),
       requiredUrlParams: ['state'],
       scope: ['r_emailaddress'],
       scopeDelimiter: ' ',
@@ -141,7 +145,7 @@ export default {
       name: 'live',
       url: '/auth/live',
       authorizationEndpoint: 'https://login.live.com/oauth20_authorize.srf',
-      redirectUri: window.location.origin,
+      redirectUri: getRedirectUri(),
       requiredUrlParams: ['display', 'scope'],
       scope: ['wl.emails'],
       scopeDelimiter: ' ',
@@ -154,7 +158,7 @@ export default {
       name: null,
       url: '/auth/oauth1',
       authorizationEndpoint: null,
-      redirectUri: window.location.origin,
+      redirectUri: getRedirectUri(),
       oauthType: '1.0',
       popupOptions: null
     },
@@ -163,7 +167,7 @@ export default {
       name: null,
       url: '/auth/oauth2',
       clientId: null,
-      redirectUri: window.location.origin,
+      redirectUri: getRedirectUri(),
       authorizationEndpoint: null,
       defaultUrlParams: ['response_type', 'client_id', 'redirect_uri'],
       requiredUrlParams: null,

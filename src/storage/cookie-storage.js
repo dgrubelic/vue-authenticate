@@ -1,16 +1,18 @@
 import {
   objectExtend,
   formatCookie,
+  getCookieDomain,
   parseCookies
 } from '../utils.js';
 
 class CookieStorage {
   constructor(defaultOptions) {
     this._defaultOptions = objectExtend({
-      domain: window.location.hostname,
+      domain: getCookieDomain(),
       expires: null,
       path: '/',
-      secure: false
+      secure: false,
+      getCookieFn: this._getCookie,
     }, defaultOptions);
   }
 
@@ -21,7 +23,8 @@ class CookieStorage {
   }
 
   getItem(key) {
-    const cookies = parseCookies(this._getCookie());
+    const options = objectExtend({}, this._defaultOptions);
+    const cookies = parseCookies(options.getCookieFn());
     return cookies.hasOwnProperty(key) ? cookies[key] : null;
   }
 
