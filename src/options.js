@@ -1,6 +1,6 @@
 import { isUndefined } from './utils';
 
-function getCookieDomainUrl() {
+export function getCookieDomainUrl() {
   try {
     return window.location.hostname
   } catch (e) {}
@@ -8,7 +8,7 @@ function getCookieDomainUrl() {
   return '';
 }
 
-function getRedirectUri(uri) {
+export function getRedirectUri(uri) {
   try {
     return (!isUndefined(uri))
       ? `${window.location.origin}${uri}`
