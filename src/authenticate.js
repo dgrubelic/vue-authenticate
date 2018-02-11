@@ -42,13 +42,10 @@ export default class VueAuthenticate {
     })
 
     // Setup request interceptors
-    if (this.options.bindRequestInterceptor && isFunction(this.options.bindRequestInterceptor) &&
-        this.options.bindResponseInterceptor && isFunction(this.options.bindResponseInterceptor)) {
-
+    if (this.options.bindRequestInterceptor && isFunction(this.options.bindRequestInterceptor)) {
       this.options.bindRequestInterceptor.call(this, this)
-      this.options.bindResponseInterceptor.call(this, this)
     } else {
-      throw new Error('Both request and response interceptors must be functions')
+      throw new Error('Request interceptor must be functions')
     }
   }
 

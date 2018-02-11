@@ -39,17 +39,6 @@ export default {
     })
   },
 
-  /**
-   * Default response interceptor for Axios library
-   * @contect {VueAuthenticate}
-   */
-  bindResponseInterceptor: function ($auth) {
-    $auth.$http.interceptors.response.use((response) => {
-      $auth.setToken(response)
-      return response
-    })
-  },
-
   providers: {
     facebook: {
       name: 'facebook',
