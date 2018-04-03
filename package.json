@@ -19,9 +19,13 @@
     "email": "davor.grubelic@gmail.com",
     "url": "https://dgrubelic.me"
   },
+  "contributors": [{
+    "name": "Balazs Sarvari",
+    "email": "balazs.sarvari@gmail.com"
+  }],
   "repository": {
     "type": "git",
-    "url": "https://github.com/dgrubelic/vue-authenticate.git"
+    "url": "https://github.com/bsarvari/vue-authenticate.git"
   },
   "license": "MIT",
   "devDependencies": {
@@ -61,11 +65,13 @@
   },
   "tags": [
     "auth",
+    "oauth",
     "authentication",
     "login",
     "registration",
     "jwt",
     "token",
+    "iframe",
     "vuejs",
     "vue.js",
     "github",
