@@ -91,7 +91,11 @@ export default class OAuthContext {
             clearInterval(poolingInterval)
             poolingInterval = null
             if (this.authContextOptions.iframe) {
-              this.iframeTarget.removeChild(this.iframe)
+              if (this.authContextOptions.iframeTarget) {
+                this.iframeTarget.removeChild(this.iframe)
+              } else {
+                document.body.removeChild(this.iframeTarget)
+              }
             } else {
               this.authWindow.close()
             }
