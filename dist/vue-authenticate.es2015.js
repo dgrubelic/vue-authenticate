@@ -908,7 +908,11 @@ OAuthContext.prototype.pooling = function pooling (redirectUri) {
           clearInterval(poolingInterval);
           poolingInterval = null;
           if (this$1.authContextOptions.iframe) {
-            this$1.iframeTarget.removeChild(this$1.iframe);
+            if (this$1.authContextOptions.iframeTarget) {
+              this$1.iframeTarget.removeChild(this$1.iframe);
+            } else {
+              document.body.removeChild(this$1.iframeTarget);
+            }
           } else {
             this$1.authWindow.close();
           }
