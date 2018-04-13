@@ -55,6 +55,14 @@ export default class OAuthContext {
   }
 
   pooling (redirectUri) {
+    this.timedOut = false
+    let authTimeout
+    if (this.authContextOptions.timeout) {
+      authTimeout = setTimeout(() => {
+        this.timedOut = true
+      }, this.authContextOptions.timeout)
+    }
+
     return new Promise((resolve, reject) => {
       const redirectUriParser = document.createElement('a')
       redirectUriParser.href = redirectUri
@@ -87,7 +95,7 @@ export default class OAuthContext {
             } else {
               reject(new Error('OAuth redirect has occurred but no query or hash parameters were found.'))
             }
-
+            clearTimeout(authTimeout)
             clearInterval(poolingInterval)
             poolingInterval = null
             if (this.authContextOptions.iframe) {
@@ -99,9 +107,19 @@ export default class OAuthContext {
             } else {
               this.authWindow.close()
             }
+          } else {
+            if (this.timedOut) {
+              clearInterval(poolingInterval)
+              poolingInterval = null
+              reject(new Error('auth_timeout'))
+            }
           }
-        } catch (e) {
-          // Ignore DOMException: Blocked a frame with origin from accessing a cross-origin frame.
+        } catch (e) { // DOMException: Blocked a frame with origin from accessing a cross-origin frame.
+          if (this.timedOut) {
+            clearInterval(poolingInterval)
+            poolingInterval = null
+            reject(new Error('auth_timeout'))
+          }
         }
       }, 250)
     })
