@@ -1,5 +1,5 @@
 /*!
- * vue-authenticate v1.3.5-beta.1.1
+ * vue-authenticate v1.3.5-beta.1.2
  * https://github.com/dgrubelic/vue-authenticate
  * Released under the MIT License.
  */
@@ -81,10 +81,10 @@ function objectExtend(a, b) {
 
 /**
  * Assemble url from two segments
- * 
+ *
  * @author Sahat Yalkabov <https://github.com/sahat>
  * @copyright Method taken from https://github.com/sahat/satellizer
- * 
+ *
  * @param  {String} baseUrl Base url
  * @param  {String} url     URI
  * @return {String}
@@ -106,26 +106,23 @@ function joinUrl(baseUrl, url) {
 
 /**
  * Get full path based on current location
- * 
+ *
  * @author Sahat Yalkabov <https://github.com/sahat>
  * @copyright Method taken from https://github.com/sahat/satellizer
- * 
+ *
  * @param  {Location} location
  * @return {String}
  */
 function getFullUrlPath(location) {
-  var isHttps = location.protocol === 'https:';
-  return location.protocol + '//' + location.hostname +
-    ':' + (location.port || (isHttps ? '443' : '80')) +
-    (/^\//.test(location.pathname) ? location.pathname : '/' + location.pathname);
+  return location.protocol + '//' + location.host + (/^\//.test(location.pathname) ? location.pathname : '/' + location.pathname)
 }
 
 /**
  * Parse query string variables
- * 
+ *
  * @author Sahat Yalkabov <https://github.com/sahat>
  * @copyright Method taken from https://github.com/sahat/satellizer
- * 
+ *
  * @param  {String} Query string
  * @return {String}
  */
@@ -147,7 +144,7 @@ function parseQueryString(str) {
  * Decode base64 string
  * @author Sahat Yalkabov <https://github.com/sahat>
  * @copyright Method taken from https://github.com/sahat/satellizer
- * 
+ *
  * @param  {String} str base64 encoded string
  * @return {Object}
  */
@@ -872,6 +869,14 @@ prototypeAccessors.iframeTarget.get = function () {
 OAuthContext.prototype.pooling = function pooling (redirectUri) {
     var this$1 = this;
 
+  this.timedOut = false;
+  var authTimeout;
+  if (this.authContextOptions.timeout) {
+    authTimeout = setTimeout(function () {
+      this$1.timedOut = true;
+    }, this.authContextOptions.timeout);
+  }
+
   return new Promise$1(function (resolve, reject) {
     var redirectUriParser = document.createElement('a');
     redirectUriParser.href = redirectUri;
@@ -904,7 +909,7 @@ OAuthContext.prototype.pooling = function pooling (redirectUri) {
           } else {
             reject(new Error('OAuth redirect has occurred but no query or hash parameters were found.'));
           }
-
+          clearTimeout(authTimeout);
           clearInterval(poolingInterval);
           poolingInterval = null;
           if (this$1.authContextOptions.iframe) {
@@ -916,9 +921,19 @@ OAuthContext.prototype.pooling = function pooling (redirectUri) {
           } else {
             this$1.authWindow.close();
           }
+        } else {
+          if (this$1.timedOut) {
+            clearInterval(poolingInterval);
+            poolingInterval = null;
+            reject(new Error('auth_timeout'));
+          }
         }
-      } catch (e) {
-        // Ignore DOMException: Blocked a frame with origin from accessing a cross-origin frame.
+      } catch (e) { // DOMException: Blocked a frame with origin from accessing a cross-origin frame.
+        if (this$1.timedOut) {
+          clearInterval(poolingInterval);
+          poolingInterval = null;
+          reject(new Error('auth_timeout'));
+        }
       }
     }, 250);
   })
