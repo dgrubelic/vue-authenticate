@@ -1,5 +1,5 @@
 /*!
- * vue-authenticate v1.3.5-beta.1.2
+ * vue-authenticate v1.3.5-beta.1.3
  * https://github.com/dgrubelic/vue-authenticate
  * Released under the MIT License.
  */
@@ -836,7 +836,6 @@ OAuthContext.prototype.open = function open (redirectUri, skipPooling) {
       this.iframe = document.createElement('iframe');
       this.iframe.src = this.url;
       this.iframeTarget.appendChild(this.iframe);
-      this.authWindow = this.iframe.contentWindow;
     } else {
       this.authWindow = window.open(this.url, this.name, this._stringifyOptions());
       if (this.authWindow && this.authWindow.focus) {
@@ -885,7 +884,7 @@ OAuthContext.prototype.pooling = function pooling (redirectUri) {
     var redirectUriPath = getFullUrlPath(redirectUriParser);
 
     var poolingInterval = setInterval(function () {
-      if (!this$1.authContextOptions.iframe) {
+      if (!this$1.iframe) {
         if (!this$1.authWindow || this$1.authWindow.closed || this$1.authWindow.closed === undefined) {
           clearInterval(poolingInterval);
           poolingInterval = null;
@@ -894,12 +893,13 @@ OAuthContext.prototype.pooling = function pooling (redirectUri) {
       }
 
       try {
-        var authWindowPath = getFullUrlPath(this$1.authWindow.location);
+        var authWindow = this$1.authWindow || this$1.iframe.contentWindow;
+        var authWindowPath = getFullUrlPath(authWindow.location);
 
         if (authWindowPath === redirectUriPath) {
-          if (this$1.authWindow.location.search || this$1.authWindow.location.hash) {
-            var query = parseQueryString(this$1.authWindow.location.search.substring(1).replace(/\/$/, ''));
-            var hash = parseQueryString(this$1.authWindow.location.hash.substring(1).replace(/[\/$]/, ''));
+          if (authWindow.location.search || authWindow.location.hash) {
+            var query = parseQueryString(authWindow.location.search.substring(1).replace(/\/$/, ''));
+            var hash = parseQueryString(authWindow.location.hash.substring(1).replace(/[\/$]/, ''));
             var params = objectExtend({}, query);
             params = objectExtend(params, hash);
 
@@ -914,7 +914,7 @@ OAuthContext.prototype.pooling = function pooling (redirectUri) {
           clearTimeout(authTimeout);
           clearInterval(poolingInterval);
           poolingInterval = null;
-          if (this$1.authContextOptions.iframe) {
+          if (this$1.iframe) {
             if (this$1.authContextOptions.iframeTarget) {
               this$1.iframeTarget.removeChild(this$1.iframe);
             } else {
