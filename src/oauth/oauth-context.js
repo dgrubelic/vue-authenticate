@@ -22,7 +22,6 @@ export default class OAuthContext {
         this.iframe = document.createElement('iframe')
         this.iframe.src = this.url
         this.iframeTarget.appendChild(this.iframe)
-        this.authWindow = this.iframe.contentWindow
       } else {
         this.authWindow = window.open(this.url, this.name, this._stringifyOptions())
         if (this.authWindow && this.authWindow.focus) {
@@ -69,7 +68,7 @@ export default class OAuthContext {
       const redirectUriPath = getFullUrlPath(redirectUriParser)
 
       let poolingInterval = setInterval(() => {
-        if (!this.authContextOptions.iframe) {
+        if (!this.iframe) {
           if (!this.authWindow || this.authWindow.closed || this.authWindow.closed === undefined) {
             clearInterval(poolingInterval)
             poolingInterval = null
@@ -78,12 +77,13 @@ export default class OAuthContext {
         }
 
         try {
-          const authWindowPath = getFullUrlPath(this.authWindow.location)
+          const authWindow = this.authWindow || this.iframe.contentWindow
+          const authWindowPath = getFullUrlPath(authWindow.location)
 
           if (authWindowPath === redirectUriPath) {
-            if (this.authWindow.location.search || this.authWindow.location.hash) {
-              const query = parseQueryString(this.authWindow.location.search.substring(1).replace(/\/$/, ''))
-              const hash = parseQueryString(this.authWindow.location.hash.substring(1).replace(/[\/$]/, ''))
+            if (authWindow.location.search || authWindow.location.hash) {
+              const query = parseQueryString(authWindow.location.search.substring(1).replace(/\/$/, ''))
+              const hash = parseQueryString(authWindow.location.hash.substring(1).replace(/[\/$]/, ''))
               let params = objectExtend({}, query)
               params = objectExtend(params, hash)
 
@@ -98,7 +98,7 @@ export default class OAuthContext {
             clearTimeout(authTimeout)
             clearInterval(poolingInterval)
             poolingInterval = null
-            if (this.authContextOptions.iframe) {
+            if (this.iframe) {
               if (this.authContextOptions.iframeTarget) {
                 this.iframeTarget.removeChild(this.iframe)
               } else {
