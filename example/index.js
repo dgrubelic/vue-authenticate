@@ -130,6 +130,9 @@ var router = new VueRouter({
               } else if (provider === 'live') {
                 this_.response = authResponse
               }
+              else if (provider === 'meetup') {
+                this_.response = authResponse
+              }
             }).catch(function (err) {
               this_.response = err
             })
