@@ -1,5 +1,5 @@
 import Promise from './promise.js'
-import { objectExtend, isString, isObject, isFunction, joinUrl, decodeBase64 } from './utils.js'
+import {objectExtend, isString, isObject, isFunction, joinUrl, decodeBase64} from './utils.js'
 import defaultOptions from './options.js'
 import StorageFactory from './storage.js'
 import OAuth1 from './oauth/oauth1.js'
@@ -47,6 +47,13 @@ export default class VueAuthenticate {
     } else {
       throw new Error('Request interceptor must be functions')
     }
+
+    // Setup response interceptors
+    if (this.options.bindResponseInterceptor && isFunction(this.options.bindResponseInterceptor)) {
+      this.options.bindResponseInterceptor.call(this, this)
+    } else {
+      throw new Error('Response interceptor must be functions')
+    }
   }
 
   /**
@@ -92,7 +99,7 @@ export default class VueAuthenticate {
     if (response[this.options.responseDataKey]) {
       response = response[this.options.responseDataKey];
     }
-    
+
     let token;
     if (response.access_token) {
       if (isObject(response.access_token) && isObject(response.access_token[this.options.responseDataKey])) {
@@ -119,10 +126,11 @@ export default class VueAuthenticate {
         const base64Url = token.split('.')[1];
         const base64 = base64Url.replace('-', '+').replace('_', '/');
         return JSON.parse(decodeBase64(base64));
-      } catch (e) {}
+      } catch (e) {
+      }
     }
   }
-  
+
   /**
    * Login user using email and password
    * @param  {Object} user           User data
@@ -130,7 +138,7 @@ export default class VueAuthenticate {
    * @return {Promise}               Request promise
    */
   login(user, requestOptions) {
-    requestOptions = requestOptions || {}
+    requestOptions = requestOptions || {}
     requestOptions.url = requestOptions.url ? requestOptions.url : joinUrl(this.options.baseUrl, this.options.loginUrl)
     requestOptions[this.options.requestDataKey] = user || requestOptions[this.options.requestDataKey]
     requestOptions.method = requestOptions.method || 'POST'
@@ -149,7 +157,7 @@ export default class VueAuthenticate {
    * @return {Promise}               Request promise
    */
   register(user, requestOptions) {
-    requestOptions = requestOptions || {}
+    requestOptions = requestOptions || {}
     requestOptions.url = requestOptions.url ? requestOptions.url : joinUrl(this.options.baseUrl, this.options.registerUrl)
     requestOptions[this.options.requestDataKey] = user || requestOptions[this.options.requestDataKey]
     requestOptions.method = requestOptions.method || 'POST'
@@ -190,7 +198,7 @@ export default class VueAuthenticate {
 
   /**
    * Authenticate user using authentication provider
-   * 
+   *
    * @param  {String} provider       Provider name
    * @param  {Object} userData       User data
    * @param  {Object} requestOptions Request options
