@@ -87,10 +87,10 @@ function objectExtend(a, b) {
 
 /**
  * Assemble url from two segments
- * 
+ *
  * @author Sahat Yalkabov <https://github.com/sahat>
  * @copyright Method taken from https://github.com/sahat/satellizer
- * 
+ *
  * @param  {String} baseUrl Base url
  * @param  {String} url     URI
  * @return {String}
@@ -112,10 +112,10 @@ function joinUrl(baseUrl, url) {
 
 /**
  * Get full path based on current location
- * 
+ *
  * @author Sahat Yalkabov <https://github.com/sahat>
  * @copyright Method taken from https://github.com/sahat/satellizer
- * 
+ *
  * @param  {Location} location
  * @return {String}
  */
@@ -128,10 +128,10 @@ function getFullUrlPath(location) {
 
 /**
  * Parse query string variables
- * 
+ *
  * @author Sahat Yalkabov <https://github.com/sahat>
  * @copyright Method taken from https://github.com/sahat/satellizer
- * 
+ *
  * @param  {String} Query string
  * @return {String}
  */
@@ -153,7 +153,7 @@ function parseQueryString(str) {
  * Decode base64 string
  * @author Sahat Yalkabov <https://github.com/sahat>
  * @copyright Method taken from https://github.com/sahat/satellizer
- * 
+ *
  * @param  {String} str base64 encoded string
  * @return {Object}
  */
@@ -258,6 +258,16 @@ function formatCookie(key, value, options) {
     encodeURIComponent(value),
     formatOptions(options)
   ].join('');
+}
+
+function makeRequestOptions(requestOptions, options, urlName, user) {
+  requestOptions = requestOptions || {};
+  requestOptions.url = requestOptions.url ? requestOptions.url : joinUrl(options.baseUrl, options[urlName]);
+  requestOptions[options.requestDataKey] = user || requestOptions[options.requestDataKey];
+  requestOptions.method = requestOptions.method || 'POST';
+  requestOptions.withCredentials = requestOptions.withCredentials || options.withCredentials;
+
+  return requestOptions
 }
 
 // Store setTimeout reference so promise-polyfill will be unaffected by
@@ -487,7 +497,8 @@ Promise$1._setUnhandledRejectionFn = function _setUnhandledRejectionFn(fn) {
 function getCookieDomainUrl() {
   try {
     return window.location.hostname
-  } catch (e) {}
+  } catch (e) {
+  }
 
   return '';
 }
@@ -497,7 +508,8 @@ function getRedirectUri(uri) {
     return (!isUndefined(uri))
       ? ("" + (window.location.origin) + uri)
       : window.location.origin
-  } catch (e) {}
+  } catch (e) {
+  }
 
   return uri || null;
 }
@@ -511,9 +523,19 @@ var defaultOptions = {
   tokenPrefix: 'vueauth',
   tokenHeader: 'Authorization',
   tokenType: 'Bearer',
+  // There are three types of refresh tokens,
+  // 1. (httponly): refresh token is set via HttpOnly Cookie which is the safest method
+  // 2. (storage): refresh token is safe in the local storage, which is as safe as just send a long life access_token
+  // 3. (null): refresh token is not use
+  refreshType: 'storage',
+  refreshTokenName: 'refresh_token',
+  refreshTokenPrefix: null,
+  expirationName: 'expiration',
+  expirationPrefix: null,
   loginUrl: '/auth/login',
   registerUrl: '/auth/register',
   logoutUrl: null,
+  refreshUrl: '/auth/login/refresh',
   storageType: 'localStorage',
   storageNamespace: 'vue-authenticate',
   cookieStorage: {
@@ -529,18 +551,37 @@ var defaultOptions = {
    * @context {VueAuthenticate}
    */
   bindRequestInterceptor: function ($auth) {
+
+    // check if token is expired
+    if($auth.options.refreshType && $auth.isExpired())
+      { $auth.refresh(); }
+
     var tokenHeader = $auth.options.tokenHeader;
 
-    $auth.$http.interceptors.request.use(function (config) {
+    $auth.$http.interceptors.request.use(function (request) {
       if ($auth.isAuthenticated()) {
-        config.headers[tokenHeader] = [
+        request.headers[tokenHeader] = [
           $auth.options.tokenType, $auth.getToken()
         ].join(' ');
       } else {
-        delete config.headers[tokenHeader];
+        delete request.headers[tokenHeader];
       }
-      return config
+      return request
     });
+  },
+
+  bindResponseInterceptor: function ($auth) {
+    $auth.$http.interceptors.response.use(function (response) {
+      return response
+    }, (function (error) {
+      switch (error.response.status) {
+        case 401:
+          // refresh token if there is a token given and if
+          if ($auth.isAuthenticated() && $auth.options.refreshType)
+            { $auth.refresh(); }
+          break
+      }
+    }));
   },
 
   providers: {
@@ -554,7 +595,7 @@ var defaultOptions = {
       scopeDelimiter: ',',
       display: 'popup',
       oauthType: '2.0',
-      popupOptions: { width: 580, height: 400 }
+      popupOptions: {width: 580, height: 400}
     },
 
     google: {
@@ -569,7 +610,7 @@ var defaultOptions = {
       scopeDelimiter: ' ',
       display: 'popup',
       oauthType: '2.0',
-      popupOptions: { width: 452, height: 633 }
+      popupOptions: {width: 452, height: 633}
     },
 
     github: {
@@ -581,7 +622,7 @@ var defaultOptions = {
       scope: ['user:email'],
       scopeDelimiter: ' ',
       oauthType: '2.0',
-      popupOptions: { width: 1020, height: 618 }
+      popupOptions: {width: 1020, height: 618}
     },
 
     instagram: {
@@ -593,7 +634,7 @@ var defaultOptions = {
       scope: ['basic'],
       scopeDelimiter: '+',
       oauthType: '2.0',
-      popupOptions: { width: null, height: null }
+      popupOptions: {width: null, height: null}
     },
 
     twitter: {
@@ -602,7 +643,7 @@ var defaultOptions = {
       authorizationEndpoint: 'https://api.twitter.com/oauth/authenticate',
       redirectUri: getRedirectUri(),
       oauthType: '1.0',
-      popupOptions: { width: 495, height: 645 }
+      popupOptions: {width: 495, height: 645}
     },
 
     bitbucket: {
@@ -614,7 +655,7 @@ var defaultOptions = {
       scope: ['email'],
       scopeDelimiter: ' ',
       oauthType: '2.0',
-      popupOptions: { width: 1020, height: 618 }
+      popupOptions: {width: 1020, height: 618}
     },
 
     linkedin: {
@@ -627,7 +668,7 @@ var defaultOptions = {
       scopeDelimiter: ' ',
       state: 'STATE',
       oauthType: '2.0',
-      popupOptions: { width: 527, height: 582 }
+      popupOptions: {width: 527, height: 582}
     },
 
     live: {
@@ -640,7 +681,7 @@ var defaultOptions = {
       scopeDelimiter: ' ',
       display: 'popup',
       oauthType: '2.0',
-      popupOptions: { width: 500, height: 560 }
+      popupOptions: {width: 500, height: 560}
     },
 
     oauth1: {
@@ -1202,6 +1243,26 @@ var VueAuthenticate = function VueAuthenticate($http, overrideOptions) {
           return this.options.tokenName
         }
       }
+    },
+
+    refreshTokenName: {
+      get: function get() {
+        if (this.options.refreshTokenPrefix) {
+          return [this.options.refreshTokenPrefix, this.options.refreshTokenName].join('_')
+        } else {
+          return this.options.refreshTokenName
+        }
+      }
+    },
+
+    expirationName: {
+      get: function get() {
+        if (this.options.expirationPrefix) {
+          return [this.options.expirationPrefix, this.options.expirationName].join('_')
+        } else {
+          return this.options.expirationName
+        }
+      }
     }
   });
 
@@ -1210,6 +1271,13 @@ var VueAuthenticate = function VueAuthenticate($http, overrideOptions) {
     this.options.bindRequestInterceptor.call(this, this);
   } else {
     throw new Error('Request interceptor must be functions')
+  }
+
+  // Setup response interceptors
+  if (this.options.bindResponseInterceptor && isFunction(this.options.bindResponseInterceptor)) {
+    this.options.bindResponseInterceptor.call(this, this);
+  } else {
+    throw new Error('Response interceptor must be functions')
   }
 };
 
@@ -1241,6 +1309,18 @@ VueAuthenticate.prototype.isAuthenticated = function isAuthenticated () {
 };
 
 /**
+ * Return if the access_token is expired
+ * @returns {boolean}
+ */
+VueAuthenticate.prototype.isExpired = function isExpired (){
+  if(!this.options.refreshType){
+    return Date.now() < this.storage.getItem(this.options.expirationName)
+  }else{
+    return true;
+  }
+};
+
+/**
  * Get token if user is authenticated
  * @return {String} Authentication token
  */
@@ -1250,13 +1330,13 @@ VueAuthenticate.prototype.getToken = function getToken () {
 
 /**
  * Set new authentication token
- * @param {String|Object} token
+ * @param {String|Object} response
  */
 VueAuthenticate.prototype.setToken = function setToken (response) {
   if (response[this.options.responseDataKey]) {
     response = response[this.options.responseDataKey];
   }
-    
+
   var token;
   if (response.access_token) {
     if (isObject(response.access_token) && isObject(response.access_token[this.options.responseDataKey])) {
@@ -1275,6 +1355,83 @@ VueAuthenticate.prototype.setToken = function setToken (response) {
   }
 };
 
+/**
+ * Get refresh token
+ * @returns {*}
+ */
+VueAuthenticate.prototype.getRefreshToken = function getRefreshToken () {
+  if (this.options.refreshType === 'storage')
+    { return this.storage.getItem(this.refreshTokenName) }
+
+  return null;
+};
+
+/**
+ * Get expiration of the access token
+ * @returns {*}
+ */
+VueAuthenticate.prototype.getExpiration = function getExpiration () {
+  if(this.options.refreshType)
+    { return this.storage.getItem(this.expirationName) }
+  return null;
+};
+
+/**
+ * Set new refresh token
+ * @param {String|Object} response
+ */
+VueAuthenticate.prototype.setRefreshToken = function setRefreshToken (response) {
+  // Check if refresh token is required
+  if (!this.options.refreshType) {
+    return;
+  }
+
+  if (response[this.options.responseDataKey]) {
+    response = response[this.options.responseDataKey];
+  }
+
+  /*
+  response: { access_token: ..., expires_in: ..., refresh_token: ...}
+   */
+
+  // set expiration of access token
+  var expiration;
+  if (response.expires_in) {
+    var expires_in = parseInt(response.expires_in);
+    if (isNaN(expires_in)) { expires_in = 0; }
+    expiration = Date.now() + expires_in;
+  }
+
+  if (!expiration && response) {
+    var expires_in$1 = parseInt(response[this.options.expirationName]);
+    if (isNaN(expires_in$1)) { expires_in$1 = 0; }
+    expiration = Date.now() + expires_in$1;
+  }
+
+  if (expiration) {
+    this.storage.setItem(this.expirationName, expiration);
+  }
+
+  // set refresh token if it's not provided over a HttpOnly cookie
+  if (!this.options.refreshType === 'storage') {
+    return;
+  }
+
+  var refresh_token;
+  if (response.refresh_token) {
+    refresh_token = response.refresh_token;
+  }
+
+  if (!refresh_token && response) {
+    refresh_token = response[this.options.expirationName];
+  }
+
+  if (expiration) {
+    this.storage.setItem(this.refreshTokenNames, refresh_token);
+  }
+};
+
+
 VueAuthenticate.prototype.getPayload = function getPayload () {
   var token = this.storage.getItem(this.tokenName);
 
@@ -1283,10 +1440,11 @@ VueAuthenticate.prototype.getPayload = function getPayload () {
       var base64Url = token.split('.')[1];
       var base64 = base64Url.replace('-', '+').replace('_', '/');
       return JSON.parse(decodeBase64(base64));
-    } catch (e) {}
+    } catch (e) {
+    }
   }
 };
-  
+
 /**
  * Login user using email and password
  * @param{Object} user         User data
@@ -1296,11 +1454,7 @@ VueAuthenticate.prototype.getPayload = function getPayload () {
 VueAuthenticate.prototype.login = function login (user, requestOptions) {
     var this$1 = this;
 
-  requestOptions = requestOptions || {};
-  requestOptions.url = requestOptions.url ? requestOptions.url : joinUrl(this.options.baseUrl, this.options.loginUrl);
-  requestOptions[this.options.requestDataKey] = user || requestOptions[this.options.requestDataKey];
-  requestOptions.method = requestOptions.method || 'POST';
-  requestOptions.withCredentials = requestOptions.withCredentials || this.options.withCredentials;
+  requestOptions = makeRequestOptions(requestOptions, this.options, 'loginUrl', user);
 
   return this.$http(requestOptions).then(function (response) {
     this$1.setToken(response);
@@ -1317,11 +1471,7 @@ VueAuthenticate.prototype.login = function login (user, requestOptions) {
 VueAuthenticate.prototype.register = function register (user, requestOptions) {
     var this$1 = this;
 
-  requestOptions = requestOptions || {};
-  requestOptions.url = requestOptions.url ? requestOptions.url : joinUrl(this.options.baseUrl, this.options.registerUrl);
-  requestOptions[this.options.requestDataKey] = user || requestOptions[this.options.requestDataKey];
-  requestOptions.method = requestOptions.method || 'POST';
-  requestOptions.withCredentials = requestOptions.withCredentials || this.options.withCredentials;
+  requestOptions = makeRequestOptions(requestOptions, this.options, 'registerUrl', user);
 
   return this.$http(requestOptions).then(function (response) {
     this$1.setToken(response);
@@ -1350,17 +1500,41 @@ VueAuthenticate.prototype.logout = function logout (requestOptions) {
     requestOptions.withCredentials = requestOptions.withCredentials || this.options.withCredentials;
 
     return this.$http(requestOptions).then(function (response) {
-      this$1.storage.removeItem(this$1.tokenName);
+      this$1.clearStorage();
     })
   } else {
-    this.storage.removeItem(this.tokenName);
+    this.clearStorage();
     return Promise$1.resolve();
   }
 };
 
+VueAuthenticate.prototype.refresh = function refresh (requestOptions) {
+    var this$1 = this;
+
+  requestOptions = makeRequestOptions(requestOptions, this.options, 'refreshUrl', null);
+
+  return this.$http(requestOptions)
+    .then(function (response) {
+      this$1.setToken(response);
+      this$1.setRefreshToken(response);
+      return response
+    })
+    .catch(function (error) {
+      this$1.clearStorage();
+      return error;
+    })
+
+};
+
+VueAuthenticate.prototype.clearStorage = function clearStorage (){
+  this.storage.removeItem(this.tokenName);
+  this.storage.removeItem(this.expirationName);
+  this.storage.removeItem(this.refreshTokenName);
+};
+
 /**
  * Authenticate user using authentication provider
- * 
+ *
  * @param{String} provider     Provider name
  * @param{Object} userData     User data
  * @param{Object} requestOptions Request options
