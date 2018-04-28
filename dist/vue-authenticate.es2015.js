@@ -178,7 +178,7 @@ function decodeBase64(str) {
           | (0x3f & cccc.charCodeAt(3));
         var offset = cp - 0x10000;
         return (fromCharCode((offset >>> 10) + 0xD800)
-        + fromCharCode((offset & 0x3FF) + 0xDC00));
+          + fromCharCode((offset & 0x3FF) + 0xDC00));
       case 3:
         return fromCharCode(
           ((0x0f & cccc.charCodeAt(0)) << 12)
@@ -198,12 +198,12 @@ function decodeBase64(str) {
   };
 
   var _decode = buffer ? function (a) {
-    return (a.constructor === buffer.constructor
-      ? a : new buffer(a, 'base64')).toString();
-  }
+      return (a.constructor === buffer.constructor
+        ? a : new buffer(a, 'base64')).toString();
+    }
     : function (a) {
-    return btou(atob(a));
-  };
+      return btou(atob(a));
+    };
 
   return _decode(
     String(str).replace(/[-_]/g, function (m0) {
@@ -262,6 +262,12 @@ function makeRequestOptions(requestOptions, options, urlName, user) {
   requestOptions.withCredentials = requestOptions.withCredentials || options.withCredentials;
 
   return requestOptions
+}
+
+function parseJWT(token) {
+  var base64Url = token.split('.')[1];
+  var base64 = base64Url.replace('-', '+').replace('_', '/');
+  return JSON.parse(window.atob(base64));
 }
 
 // Store setTimeout reference so promise-polyfill will be unaffected by
@@ -545,11 +551,6 @@ var defaultOptions = {
    * @context {VueAuthenticate}
    */
   bindRequestInterceptor: function ($auth) {
-
-    // check if token is expired
-    if($auth.options.refreshType && $auth.isExpired())
-      { $auth.refresh(); }
-
     var tokenHeader = $auth.options.tokenHeader;
 
     $auth.$http.interceptors.request.use(function (request) {
@@ -568,12 +569,42 @@ var defaultOptions = {
     $auth.$http.interceptors.response.use(function (response) {
       return response
     }, (function (error) {
-      switch (error.response.status) {
-        case 401:
-          // refresh token if there is a token given and if
-          if ($auth.isAuthenticated() && $auth.options.refreshType)
-            { $auth.refresh(); }
-          break
+      var config = error.config;
+      var status = error.response.status;
+      var originalRequest = config;
+
+      // Check if we should refresh the token
+      // 1. unauthorized
+      // 2. refreshType is set
+      // 3. any token is set
+      if (status === 401 && $auth.options.refreshType && $auth.isTokenSet()) {
+        // check if we are already refreshing, to prevent endless loop
+        if (!$auth._isRefreshing) {
+          $auth._isRefreshing = true;
+          // Try to refresh our token
+          var refreshPromise = $auth.refresh();
+          $auth._isRefreshing = false;
+
+          // react to the refresh
+          refreshPromise
+            .then(function (error) {
+              // Refreshing fails :(
+              $auth.clearStorage();
+              return Promise.reject(error)
+            })
+            .catch(function (response) { return Promise.resolve(response); });
+        }
+
+        // send original request
+        $auth.$http(originalRequest)
+          .then(function (response) {
+            return Promise.resolve(response)
+          })
+          .catch(function (error) {
+            return Promise.reject(error)
+          });
+      } else {
+        return Promise.reject(error)
       }
     }));
   },
@@ -1287,10 +1318,8 @@ VueAuthenticate.prototype.isAuthenticated = function isAuthenticated () {
   if (token) {// Token is present
     if (token.split('.').length === 3) {// Token with a valid JWT format XXX.YYY.ZZZ
       try { // Could be a valid JWT or an access token with the same format
-        var base64Url = token.split('.')[1];
-        var base64 = base64Url.replace('-', '+').replace('_', '/');
-        var exp = JSON.parse(window.atob(base64)).exp;
-        if (typeof exp === 'number') {// JWT with an optonal expiration claims
+        var exp = parseJWT(token).exp;
+        if (typeof exp === 'number') {// JWT with an optional expiration claims
           return Math.round(new Date().getTime() / 1000) < exp;
         }
       } catch (e) {
@@ -1303,15 +1332,12 @@ VueAuthenticate.prototype.isAuthenticated = function isAuthenticated () {
 };
 
 /**
- * Return if the access_token is expired
+ * Returns if a token is set
  * @returns {boolean}
  */
-VueAuthenticate.prototype.isExpired = function isExpired (){
-  if(!this.options.refreshType){
-    return Date.now() < this.storage.getItem(this.options.expirationName)
-  }else{
-    return true;
-  }
+VueAuthenticate.prototype.isTokenSet = function isTokenSet () {
+  if (isUndefined(this.getToken())) { return false; }
+  return !!this.getToken()
 };
 
 /**
@@ -1351,7 +1377,7 @@ VueAuthenticate.prototype.setToken = function setToken (response) {
 
 /**
  * Get refresh token
- * @returns {*}
+ * @returns {String|null} refresh token
  */
 VueAuthenticate.prototype.getRefreshToken = function getRefreshToken () {
   if (this.options.refreshType === 'storage')
@@ -1362,10 +1388,10 @@ VueAuthenticate.prototype.getRefreshToken = function getRefreshToken () {
 
 /**
  * Get expiration of the access token
- * @returns {*}
+ * @returns {number|null} expiration
  */
 VueAuthenticate.prototype.getExpiration = function getExpiration () {
-  if(this.options.refreshType)
+  if (this.options.refreshType)
     { return this.storage.getItem(this.expirationName) }
   return null;
 };
@@ -1373,6 +1399,7 @@ VueAuthenticate.prototype.getExpiration = function getExpiration () {
 /**
  * Set new refresh token
  * @param {String|Object} response
+ * @returns {String|Object} response
  */
 VueAuthenticate.prototype.setRefreshToken = function setRefreshToken (response) {
   // Check if refresh token is required
@@ -1384,31 +1411,10 @@ VueAuthenticate.prototype.setRefreshToken = function setRefreshToken (response) 
     response = response[this.options.responseDataKey];
   }
 
-  /*
-  response: { access_token: ..., expires_in: ..., refresh_token: ...}
-   */
-
-  // set expiration of access token
-  var expiration;
-  if (response.expires_in) {
-    var expires_in = parseInt(response.expires_in);
-    if (isNaN(expires_in)) { expires_in = 0; }
-    expiration = Date.now() + expires_in;
-  }
-
-  if (!expiration && response) {
-    var expires_in$1 = parseInt(response[this.options.expirationName]);
-    if (isNaN(expires_in$1)) { expires_in$1 = 0; }
-    expiration = Date.now() + expires_in$1;
-  }
-
-  if (expiration) {
-    this.storage.setItem(this.expirationName, expiration);
-  }
-
+  this.setExpiration(response);
   // set refresh token if it's not provided over a HttpOnly cookie
-  if (!this.options.refreshType === 'storage') {
-    return;
+  if (!(this.options.refreshType === 'storage')) {
+    return response;
   }
 
   var refresh_token;
@@ -1420,9 +1426,38 @@ VueAuthenticate.prototype.setRefreshToken = function setRefreshToken (response) 
     refresh_token = response[this.options.expirationName];
   }
 
-  if (expiration) {
-    this.storage.setItem(this.refreshTokenNames, refresh_token);
+  if (refresh_token) {
+    this.storage.setItem(this.refreshTokenName, refresh_token);
   }
+
+  return response
+};
+
+/**
+ * Sets the expiration of the access token
+ * @param {String|Object} response
+ * @returns {String|Object} response
+ */
+VueAuthenticate.prototype.setExpiration = function setExpiration (response) {
+  // set expiration of access token
+  var expiration;
+  if (response.expires_in) {
+    var expires_in = parseInt(response.expires_in);
+    if (isNaN(expires_in)) { expires_in = 0; }
+    expiration = Math.round(new Date().getTime() / 1000) + expires_in;
+  }
+
+  if (!expiration && response) {
+    var expires_in$1 = parseInt(response[this.options.expirationName]);
+    if (isNaN(expires_in$1)) { expires_in$1 = 0; }
+    expiration = Math.round(new Date().getTime() / 1000) + expires_in$1;
+  }
+
+  if (expiration) {
+    this.storage.setItem(this.expirationName, expiration);
+  }
+
+  return response
 };
 
 
@@ -1450,10 +1485,15 @@ VueAuthenticate.prototype.login = function login (user, requestOptions) {
 
   requestOptions = makeRequestOptions(requestOptions, this.options, 'loginUrl', user);
 
-  return this.$http(requestOptions).then(function (response) {
-    this$1.setToken(response);
-    return response
-  })
+  return this.$http(requestOptions)
+    .then(function (response) {
+      this$1.setToken(response);
+      this$1.setRefreshToken(response);
+      return response
+    })
+    .catch(function (error) {
+      return Promise$1.reject(error)
+    })
 };
 
 /**
@@ -1467,10 +1507,13 @@ VueAuthenticate.prototype.register = function register (user, requestOptions) {
 
   requestOptions = makeRequestOptions(requestOptions, this.options, 'registerUrl', user);
 
-  return this.$http(requestOptions).then(function (response) {
-    this$1.setToken(response);
-    return response
-  })
+  return this.$http(requestOptions)
+    .then(function (response) {
+      this$1.setToken(response);
+      this$1.setRefreshToken(response);
+      return response
+    })
+    .catch(function (err) { return err; })
 };
 
 /**
@@ -1493,20 +1536,35 @@ VueAuthenticate.prototype.logout = function logout (requestOptions) {
     requestOptions[this.options.requestDataKey] = requestOptions[this.options.requestDataKey] || undefined;
     requestOptions.withCredentials = requestOptions.withCredentials || this.options.withCredentials;
 
-    return this.$http(requestOptions).then(function (response) {
-      this$1.clearStorage();
-    })
+    return this.$http(requestOptions)
+      .then(function (response) {
+        this$1.clearStorage();
+        return response
+      })
+      .catch(function (err) { return err; })
   } else {
     this.clearStorage();
     return Promise$1.resolve();
   }
 };
 
+/**
+ * Refresh access token
+ * @param requestOptionsRequest options
+ * @returns {Promise}   Request Promise
+ */
 VueAuthenticate.prototype.refresh = function refresh (requestOptions) {
     var this$1 = this;
 
-  requestOptions = makeRequestOptions(requestOptions, this.options, 'refreshUrl', null);
+  if (!this.options.storageType)
+    { return new Error('Refreshing is not set') }
 
+  var data = {};
+
+  if (this.options.refreshType === 'storage')
+    { data.refresh_token = this.getRefreshToken(); }
+
+  requestOptions = makeRequestOptions(requestOptions, this.options, 'refreshUrl', data);
   return this.$http(requestOptions)
     .then(function (response) {
       this$1.setToken(response);
@@ -1520,7 +1578,10 @@ VueAuthenticate.prototype.refresh = function refresh (requestOptions) {
 
 };
 
-VueAuthenticate.prototype.clearStorage = function clearStorage (){
+/**
+ * Remove all item from the storage
+ */
+VueAuthenticate.prototype.clearStorage = function clearStorage () {
   this.storage.removeItem(this.tokenName);
   this.storage.removeItem(this.expirationName);
   this.storage.removeItem(this.refreshTokenName);
