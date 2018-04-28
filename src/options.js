@@ -29,9 +29,19 @@ export default {
   tokenPrefix: 'vueauth',
   tokenHeader: 'Authorization',
   tokenType: 'Bearer',
+  // There are three types of refresh tokens,
+  // 1. (httponly): refresh token is set via HttpOnly Cookie which is the safest method
+  // 2. (storage): refresh token is safe in the local storage, which is as safe as just send a long life access_token
+  // 3. (null): refresh token is not use
+  refreshType: 'storage',
+  refreshTokenName: 'refresh_token',
+  refreshTokenPrefix: null,
+  expirationName: 'expiration',
+  expirationPrefix: null,
   loginUrl: '/auth/login',
   registerUrl: '/auth/register',
   logoutUrl: null,
+  refreshUrl: '/auth/login/refresh',
   storageType: 'localStorage',
   storageNamespace: 'vue-authenticate',
   cookieStorage: {
@@ -69,7 +79,6 @@ export default {
         case 401:
           // refresh token
           break;
-          $auth.refresh();
       }
     }))
   },

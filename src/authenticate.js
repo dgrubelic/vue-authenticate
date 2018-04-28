@@ -38,6 +38,26 @@ export default class VueAuthenticate {
             return this.options.tokenName
           }
         }
+      },
+
+      refreshTokenName: {
+        get() {
+          if (this.options.refreshTokenPrefix) {
+            return [this.options.refreshTokenPrefix, this.options.refreshTokenName].join('_')
+          } else {
+            return this.options.refreshTokenName
+          }
+        }
+      },
+
+      expirationName: {
+        get() {
+          if (this.options.expirationPrefix) {
+            return [this.options.expirationPrefix, this.options.expirationName].join('_')
+          } else {
+            return this.options.expirationName
+          }
+        }
       }
     })
 
@@ -93,7 +113,7 @@ export default class VueAuthenticate {
 
   /**
    * Set new authentication token
-   * @param {String|Object} token
+   * @param {String|Object} response
    */
   setToken(response) {
     if (response[this.options.responseDataKey]) {
@@ -117,6 +137,83 @@ export default class VueAuthenticate {
       this.storage.setItem(this.tokenName, token)
     }
   }
+
+  /**
+   * Get refresh token
+   * @returns {*}
+   */
+  getRefreshToken() {
+    if (this.options.refreshType === 'storage')
+      return this.storage.getItem(this.refreshTokenName)
+
+    return null;
+  }
+
+  /**
+   * Get expiration of the access token
+   * @returns {*}
+   */
+  getExpiration() {
+    if(this.options.refreshType)
+      return this.storage.getItem(this.expirationName)
+    return null;
+  }
+
+  /**
+   * Set new refresh token
+   * @param {String|Object} response
+   */
+  setRefreshToken(response) {
+    // Check if refresh token is required
+    if (!this.options.refreshType) {
+      return;
+    }
+
+    if (response[this.options.responseDataKey]) {
+      response = response[this.options.responseDataKey];
+    }
+
+    /*
+    response: { access_token: ..., expires_in: ..., refresh_token: ...}
+     */
+
+    // set expiration of access token
+    let expiration;
+    if (response.expires_in) {
+      let expires_in = parseInt(response.expires_in);
+      if (isNaN(expires_in)) expires_in = 0;
+      expiration = Date.now() + expires_in;
+    }
+
+    if (!expiration && response) {
+      let expires_in = parseInt(response[this.options.expirationName])
+      if (isNaN(expires_in)) expires_in = 0;
+      expiration = Date.now() + expires_in;
+    }
+
+    if (expiration) {
+      this.storage.setItem(this.expirationName, expiration)
+    }
+
+    // set refresh token if it's not provided over a HttpOnly cookie
+    if (!this.options.refreshType === 'storage') {
+      return;
+    }
+
+    let refresh_token;
+    if (response.refresh_token) {
+      refresh_token = response.refresh_token;
+    }
+
+    if (!refresh_token && response) {
+      refresh_token = response[this.options.expirationName]
+    }
+
+    if (expiration) {
+      this.storage.setItem(this.refreshTokenNames, refresh_token)
+    }
+  }
+
 
   getPayload() {
     const token = this.storage.getItem(this.tokenName);
