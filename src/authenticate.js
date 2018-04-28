@@ -1,5 +1,15 @@
 import Promise from './promise.js'
-import {objectExtend, isString, isObject, isFunction, joinUrl, decodeBase64, makeRequestOptions} from './utils.js'
+import {
+  objectExtend,
+  isString,
+  isObject,
+  isFunction,
+  joinUrl,
+  decodeBase64,
+  makeRequestOptions,
+  isUndefined,
+  parseJWT
+} from './utils.js'
 import defaultOptions from './options.js'
 import StorageFactory from './storage.js'
 import OAuth1 from './oauth/oauth1.js'
@@ -88,10 +98,8 @@ export default class VueAuthenticate {
     if (token) {  // Token is present
       if (token.split('.').length === 3) {  // Token with a valid JWT format XXX.YYY.ZZZ
         try { // Could be a valid JWT or an access token with the same format
-          const base64Url = token.split('.')[1];
-          const base64 = base64Url.replace('-', '+').replace('_', '/');
-          const exp = JSON.parse(window.atob(base64)).exp;
-          if (typeof exp === 'number') {  // JWT with an optonal expiration claims
+          const exp = parseJWT(token).exp;
+          if (typeof exp === 'number') {  // JWT with an optional expiration claims
             return Math.round(new Date().getTime() / 1000) < exp;
           }
         } catch (e) {
@@ -104,15 +112,12 @@ export default class VueAuthenticate {
   }
 
   /**
-   * Return if the access_token is expired
+   * Returns if a token is set
    * @returns {boolean}
    */
-  isExpired(){
-    if(!this.options.refreshType){
-      return Date.now() < this.storage.getItem(this.options.expirationName)
-    }else{
-      return true;
-    }
+  isTokenSet() {
+    if (isUndefined(this.getToken())) return false;
+    return !!this.getToken()
   }
 
   /**
@@ -152,7 +157,7 @@ export default class VueAuthenticate {
 
   /**
    * Get refresh token
-   * @returns {*}
+   * @returns {String|null} refresh token
    */
   getRefreshToken() {
     if (this.options.refreshType === 'storage')
@@ -163,10 +168,10 @@ export default class VueAuthenticate {
 
   /**
    * Get expiration of the access token
-   * @returns {*}
+   * @returns {number|null} expiration
    */
   getExpiration() {
-    if(this.options.refreshType)
+    if (this.options.refreshType)
       return this.storage.getItem(this.expirationName)
     return null;
   }
@@ -174,6 +179,7 @@ export default class VueAuthenticate {
   /**
    * Set new refresh token
    * @param {String|Object} response
+   * @returns {String|Object} response
    */
   setRefreshToken(response) {
     // Check if refresh token is required
@@ -185,31 +191,10 @@ export default class VueAuthenticate {
       response = response[this.options.responseDataKey];
     }
 
-    /*
-    response: { access_token: ..., expires_in: ..., refresh_token: ...}
-     */
-
-    // set expiration of access token
-    let expiration;
-    if (response.expires_in) {
-      let expires_in = parseInt(response.expires_in);
-      if (isNaN(expires_in)) expires_in = 0;
-      expiration = Date.now() + expires_in;
-    }
-
-    if (!expiration && response) {
-      let expires_in = parseInt(response[this.options.expirationName])
-      if (isNaN(expires_in)) expires_in = 0;
-      expiration = Date.now() + expires_in;
-    }
-
-    if (expiration) {
-      this.storage.setItem(this.expirationName, expiration)
-    }
-
+    this.setExpiration(response)
     // set refresh token if it's not provided over a HttpOnly cookie
-    if (!this.options.refreshType === 'storage') {
-      return;
+    if (!(this.options.refreshType === 'storage')) {
+      return response;
     }
 
     let refresh_token;
@@ -221,9 +206,38 @@ export default class VueAuthenticate {
       refresh_token = response[this.options.expirationName]
     }
 
-    if (expiration) {
-      this.storage.setItem(this.refreshTokenNames, refresh_token)
+    if (refresh_token) {
+      this.storage.setItem(this.refreshTokenName, refresh_token)
     }
+
+    return response
+  }
+
+  /**
+   * Sets the expiration of the access token
+   * @param {String|Object} response
+   * @returns {String|Object} response
+   */
+  setExpiration(response) {
+    // set expiration of access token
+    let expiration;
+    if (response.expires_in) {
+      let expires_in = parseInt(response.expires_in)
+      if (isNaN(expires_in)) expires_in = 0
+      expiration = Math.round(new Date().getTime() / 1000) + expires_in
+    }
+
+    if (!expiration && response) {
+      let expires_in = parseInt(response[this.options.expirationName])
+      if (isNaN(expires_in)) expires_in = 0
+      expiration = Math.round(new Date().getTime() / 1000) + expires_in
+    }
+
+    if (expiration) {
+      this.storage.setItem(this.expirationName, expiration)
+    }
+
+    return response
   }
 
 
@@ -249,10 +263,15 @@ export default class VueAuthenticate {
   login(user, requestOptions) {
     requestOptions = makeRequestOptions(requestOptions, this.options, 'loginUrl', user);
 
-    return this.$http(requestOptions).then((response) => {
-      this.setToken(response)
-      return response
-    })
+    return this.$http(requestOptions)
+      .then(response => {
+        this.setToken(response)
+        this.setRefreshToken(response)
+        return response
+      })
+      .catch(error => {
+        return Promise.reject(error)
+      })
   }
 
   /**
@@ -264,10 +283,13 @@ export default class VueAuthenticate {
   register(user, requestOptions) {
     requestOptions = makeRequestOptions(requestOptions, this.options, 'registerUrl', user)
 
-    return this.$http(requestOptions).then((response) => {
-      this.setToken(response)
-      return response
-    })
+    return this.$http(requestOptions)
+      .then((response) => {
+        this.setToken(response)
+        this.setRefreshToken(response)
+        return response
+      })
+      .catch(err => err)
   }
 
   /**
@@ -288,18 +310,33 @@ export default class VueAuthenticate {
       requestOptions[this.options.requestDataKey] = requestOptions[this.options.requestDataKey] || undefined
       requestOptions.withCredentials = requestOptions.withCredentials || this.options.withCredentials
 
-      return this.$http(requestOptions).then((response) => {
-        this.clearStorage();
-      })
+      return this.$http(requestOptions)
+        .then((response) => {
+          this.clearStorage();
+          return response
+        })
+        .catch(err => err)
     } else {
       this.clearStorage()
       return Promise.resolve();
     }
   }
 
+  /**
+   * Refresh access token
+   * @param requestOptions  Request options
+   * @returns {Promise}     Request Promise
+   */
   refresh(requestOptions) {
-    requestOptions = makeRequestOptions(requestOptions, this.options, 'refreshUrl', null)
+    if (!this.options.storageType)
+      return new Error('Refreshing is not set')
 
+    let data = {}
+
+    if (this.options.refreshType === 'storage')
+      data.refresh_token = this.getRefreshToken()
+
+    requestOptions = makeRequestOptions(requestOptions, this.options, 'refreshUrl', data)
     return this.$http(requestOptions)
       .then((response) => {
         this.setToken(response)
@@ -313,7 +350,10 @@ export default class VueAuthenticate {
 
   }
 
-  clearStorage(){
+  /**
+   * Remove all item from the storage
+   */
+  clearStorage() {
     this.storage.removeItem(this.tokenName)
     this.storage.removeItem(this.expirationName)
     this.storage.removeItem(this.refreshTokenName)

@@ -174,7 +174,7 @@ export function decodeBase64(str) {
           | (0x3f & cccc.charCodeAt(3));
         let offset = cp - 0x10000;
         return (fromCharCode((offset >>> 10) + 0xD800)
-        + fromCharCode((offset & 0x3FF) + 0xDC00));
+          + fromCharCode((offset & 0x3FF) + 0xDC00));
       case 3:
         return fromCharCode(
           ((0x0f & cccc.charCodeAt(0)) << 12)
@@ -194,12 +194,12 @@ export function decodeBase64(str) {
   };
 
   let _decode = buffer ? function (a) {
-    return (a.constructor === buffer.constructor
-      ? a : new buffer(a, 'base64')).toString();
-  }
+      return (a.constructor === buffer.constructor
+        ? a : new buffer(a, 'base64')).toString();
+    }
     : function (a) {
-    return btou(atob(a));
-  };
+      return btou(atob(a));
+    };
 
   return _decode(
     String(str).replace(/[-_]/g, function (m0) {
@@ -253,4 +253,10 @@ export function makeRequestOptions(requestOptions, options, urlName, user) {
   requestOptions.withCredentials = requestOptions.withCredentials || options.withCredentials
 
   return requestOptions
+}
+
+export function parseJWT(token) {
+  const base64Url = token.split('.')[1];
+  const base64 = base64Url.replace('-', '+').replace('_', '/');
+  return JSON.parse(window.atob(base64));
 }

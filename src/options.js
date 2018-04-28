@@ -57,11 +57,6 @@ export default {
    * @context {VueAuthenticate}
    */
   bindRequestInterceptor: function ($auth) {
-
-    // check if token is expired
-    if($auth.options.refreshType && $auth.isExpired())
-      $auth.refresh()
-
     const tokenHeader = $auth.options.tokenHeader;
 
     $auth.$http.interceptors.request.use((request) => {
@@ -80,12 +75,41 @@ export default {
     $auth.$http.interceptors.response.use((response) => {
       return response
     }, (error => {
-      switch (error.response.status) {
-        case 401:
-          // refresh token if there is a token given and if
-          if ($auth.isAuthenticated() && $auth.options.refreshType)
-            $auth.refresh()
-          break
+      const {config, response: {status}} = error
+      const originalRequest = config
+
+      // Check if we should refresh the token
+      // 1. unauthorized
+      // 2. refreshType is set
+      // 3. any token is set
+      if (status === 401 && $auth.options.refreshType && $auth.isTokenSet()) {
+        // check if we are already refreshing, to prevent endless loop
+        if (!$auth._isRefreshing) {
+          $auth._isRefreshing = true
+          // Try to refresh our token
+          let refreshPromise = $auth.refresh()
+          $auth._isRefreshing = false
+
+          // react to the refresh
+          refreshPromise
+            .then(error => {
+              // Refreshing fails :(
+              $auth.clearStorage()
+              return Promise.reject(error)
+            })
+            .catch(response => Promise.resolve(response))
+        }
+
+        // send original request
+        $auth.$http(originalRequest)
+          .then(response => {
+            return Promise.resolve(response)
+          })
+          .catch(error => {
+            return Promise.reject(error)
+          })
+      } else {
+        return Promise.reject(error)
       }
     }))
   },
