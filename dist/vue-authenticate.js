@@ -527,7 +527,7 @@ var defaultOptions = {
   // 1. (httponly): refresh token is set via HttpOnly Cookie which is the safest method
   // 2. (storage): refresh token is safe in the local storage, which is as safe as just send a long life access_token
   // 3. (null): refresh token is not use
-  refreshType: 'storage',
+  refreshType: null,
   refreshTokenName: 'refresh_token',
   refreshTokenPrefix: null,
   expirationName: 'expiration',
