@@ -1,5 +1,5 @@
 import Promise from './promise.js'
-import {objectExtend, isString, isObject, isFunction, joinUrl, decodeBase64} from './utils.js'
+import {objectExtend, isString, isObject, isFunction, joinUrl, decodeBase64, makeRequestOptions} from './utils.js'
 import defaultOptions from './options.js'
 import StorageFactory from './storage.js'
 import OAuth1 from './oauth/oauth1.js'
@@ -235,11 +235,7 @@ export default class VueAuthenticate {
    * @return {Promise}               Request promise
    */
   login(user, requestOptions) {
-    requestOptions = requestOptions || {}
-    requestOptions.url = requestOptions.url ? requestOptions.url : joinUrl(this.options.baseUrl, this.options.loginUrl)
-    requestOptions[this.options.requestDataKey] = user || requestOptions[this.options.requestDataKey]
-    requestOptions.method = requestOptions.method || 'POST'
-    requestOptions.withCredentials = requestOptions.withCredentials || this.options.withCredentials
+    requestOptions = makeRequestOptions(requestOptions, this.options, 'loginUrl', user);
 
     return this.$http(requestOptions).then((response) => {
       this.setToken(response)
@@ -254,11 +250,7 @@ export default class VueAuthenticate {
    * @return {Promise}               Request promise
    */
   register(user, requestOptions) {
-    requestOptions = requestOptions || {}
-    requestOptions.url = requestOptions.url ? requestOptions.url : joinUrl(this.options.baseUrl, this.options.registerUrl)
-    requestOptions[this.options.requestDataKey] = user || requestOptions[this.options.requestDataKey]
-    requestOptions.method = requestOptions.method || 'POST'
-    requestOptions.withCredentials = requestOptions.withCredentials || this.options.withCredentials
+    requestOptions = makeRequestOptions(requestOptions, this.options, 'registerUrl', user)
 
     return this.$http(requestOptions).then((response) => {
       this.setToken(response)

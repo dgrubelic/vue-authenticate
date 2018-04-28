@@ -77,10 +77,10 @@ export function objectExtend(a, b) {
 
 /**
  * Assemble url from two segments
- * 
+ *
  * @author Sahat Yalkabov <https://github.com/sahat>
  * @copyright Method taken from https://github.com/sahat/satellizer
- * 
+ *
  * @param  {String} baseUrl Base url
  * @param  {String} url     URI
  * @return {String}
@@ -102,10 +102,10 @@ export function joinUrl(baseUrl, url) {
 
 /**
  * Get full path based on current location
- * 
+ *
  * @author Sahat Yalkabov <https://github.com/sahat>
  * @copyright Method taken from https://github.com/sahat/satellizer
- * 
+ *
  * @param  {Location} location
  * @return {String}
  */
@@ -118,10 +118,10 @@ export function getFullUrlPath(location) {
 
 /**
  * Parse query string variables
- * 
+ *
  * @author Sahat Yalkabov <https://github.com/sahat>
  * @copyright Method taken from https://github.com/sahat/satellizer
- * 
+ *
  * @param  {String} Query string
  * @return {String}
  */
@@ -143,7 +143,7 @@ export function parseQueryString(str) {
  * Decode base64 string
  * @author Sahat Yalkabov <https://github.com/sahat>
  * @copyright Method taken from https://github.com/sahat/satellizer
- * 
+ *
  * @param  {String} str base64 encoded string
  * @return {Object}
  */
@@ -244,3 +244,13 @@ export function formatCookie(key, value, options) {
     formatOptions(options)
   ].join('');
 };
+
+export function makeRequestOptions(requestOptions, options, urlName, user) {
+  requestOptions = requestOptions || {}
+  requestOptions.url = requestOptions.url ? requestOptions.url : joinUrl(options.baseUrl, options[urlName])
+  requestOptions[options.requestDataKey] = user || requestOptions[options.requestDataKey]
+  requestOptions.method = requestOptions.method || 'POST'
+  requestOptions.withCredentials = requestOptions.withCredentials || options.withCredentials
+
+  return requestOptions
+}
