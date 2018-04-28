@@ -57,6 +57,11 @@ export default {
    * @context {VueAuthenticate}
    */
   bindRequestInterceptor: function ($auth) {
+
+    // check if token is expired
+    if($auth.options.refreshType && $auth.isExpired())
+      $auth.refresh()
+
     const tokenHeader = $auth.options.tokenHeader;
 
     $auth.$http.interceptors.request.use((request) => {
@@ -73,12 +78,14 @@ export default {
 
   bindResponseInterceptor: function ($auth) {
     $auth.$http.interceptors.response.use((response) => {
-      return response;
+      return response
     }, (error => {
       switch (error.response.status) {
         case 401:
-          // refresh token
-          break;
+          // refresh token if there is a token given and if
+          if ($auth.isAuthenticated() && $auth.options.refreshType)
+            $auth.refresh()
+          break
       }
     }))
   },

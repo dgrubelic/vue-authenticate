@@ -104,6 +104,18 @@ export default class VueAuthenticate {
   }
 
   /**
+   * Return if the access_token is expired
+   * @returns {boolean}
+   */
+  isExpired(){
+    if(!this.options.refreshType){
+      return Date.now() < this.storage.getItem(this.options.expirationName)
+    }else{
+      return true;
+    }
+  }
+
+  /**
    * Get token if user is authenticated
    * @return {String} Authentication token
    */
@@ -277,12 +289,34 @@ export default class VueAuthenticate {
       requestOptions.withCredentials = requestOptions.withCredentials || this.options.withCredentials
 
       return this.$http(requestOptions).then((response) => {
-        this.storage.removeItem(this.tokenName)
+        this.clearStorage();
       })
     } else {
-      this.storage.removeItem(this.tokenName)
+      this.clearStorage()
       return Promise.resolve();
     }
+  }
+
+  refresh(requestOptions) {
+    requestOptions = makeRequestOptions(requestOptions, this.options, 'refreshUrl', null)
+
+    return this.$http(requestOptions)
+      .then((response) => {
+        this.setToken(response)
+        this.setRefreshToken(response)
+        return response
+      })
+      .catch((error) => {
+        this.clearStorage()
+        return error;
+      })
+
+  }
+
+  clearStorage(){
+    this.storage.removeItem(this.tokenName)
+    this.storage.removeItem(this.expirationName)
+    this.storage.removeItem(this.refreshTokenName)
   }
 
   /**
