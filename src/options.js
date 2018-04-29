@@ -83,34 +83,26 @@ export default {
       // 2. refreshType is set
       // 3. any token is set
       if (status === 401 && $auth.options.refreshType && $auth.isTokenSet()) {
+
         // check if we are already refreshing, to prevent endless loop
         if (!$auth._isRefreshing) {
           $auth._isRefreshing = true
           // Try to refresh our token
-          let refreshPromise = $auth.refresh()
-          $auth._isRefreshing = false
-
-          // react to the refresh
-          refreshPromise
-            .then(error => {
+          return $auth.refresh()
+            .then(response => {
+              // refreshing was successful :)
+              $auth._isRefreshing = false
+              // send original request
+              return $auth.$http(originalRequest)
+            })
+            .catch(error => {
               // Refreshing fails :(
-              $auth.clearStorage()
+              $auth._isRefreshing = false
               return Promise.reject(error)
             })
-            .catch(response => Promise.resolve(response))
         }
-
-        // send original request
-        $auth.$http(originalRequest)
-          .then(response => {
-            return Promise.resolve(response)
-          })
-          .catch(error => {
-            return Promise.reject(error)
-          })
-      } else {
-        return Promise.reject(error)
       }
+      return Promise.reject(error)
     }))
   },
 
