@@ -63,10 +63,6 @@ export default class OAuthContext {
     }
 
     return new Promise((resolve, reject) => {
-      const redirectUriParser = document.createElement('a')
-      redirectUriParser.href = redirectUri
-      const redirectUriPath = getFullUrlPath(redirectUriParser)
-
       let poolingInterval = setInterval(() => {
         if (!this.iframe) {
           if (!this.authWindow || this.authWindow.closed || this.authWindow.closed === undefined) {
@@ -80,7 +76,7 @@ export default class OAuthContext {
           const authWindow = this.authWindow || this.iframe.contentWindow
           const authWindowPath = getFullUrlPath(authWindow.location)
 
-          if (authWindowPath === redirectUriPath) {
+          if (authWindowPath === redirectUri) {
             if (authWindow.location.search || authWindow.location.hash) {
               const query = parseQueryString(authWindow.location.search.substring(1).replace(/\/$/, ''))
               const hash = parseQueryString(authWindow.location.hash.substring(1).replace(/[\/$]/, ''))

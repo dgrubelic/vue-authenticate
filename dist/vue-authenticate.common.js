@@ -1,5 +1,5 @@
 /*!
- * vue-authenticate v1.3.5-beta.1.3
+ * vue-authenticate v1.3.5-beta.1.4
  * https://github.com/dgrubelic/vue-authenticate
  * Released under the MIT License.
  */
@@ -879,10 +879,6 @@ OAuthContext.prototype.pooling = function pooling (redirectUri) {
   }
 
   return new Promise$1(function (resolve, reject) {
-    var redirectUriParser = document.createElement('a');
-    redirectUriParser.href = redirectUri;
-    var redirectUriPath = getFullUrlPath(redirectUriParser);
-
     var poolingInterval = setInterval(function () {
       if (!this$1.iframe) {
         if (!this$1.authWindow || this$1.authWindow.closed || this$1.authWindow.closed === undefined) {
@@ -896,7 +892,7 @@ OAuthContext.prototype.pooling = function pooling (redirectUri) {
         var authWindow = this$1.authWindow || this$1.iframe.contentWindow;
         var authWindowPath = getFullUrlPath(authWindow.location);
 
-        if (authWindowPath === redirectUriPath) {
+        if (authWindowPath === redirectUri) {
           if (authWindow.location.search || authWindow.location.hash) {
             var query = parseQueryString(authWindow.location.search.substring(1).replace(/\/$/, ''));
             var hash = parseQueryString(authWindow.location.hash.substring(1).replace(/[\/$]/, ''));
