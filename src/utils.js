@@ -109,8 +109,14 @@ export function joinUrl(baseUrl, url) {
  * @param  {Location} location
  * @return {String}
  */
-export function getFullUrlPath(location) {
-  return location.protocol + '//' + location.host + (/^\//.test(location.pathname) ? location.pathname : '/' + location.pathname)
+export function getFullUrlPath (location) {
+  const isHttps = location.protocol === 'https:'
+  let port = location.port
+  if (!port || port === '0') {
+    port = isHttps ? '443' : '80'
+  }
+  return location.protocol + '//' + location.hostname + ':' + port +
+    (/^\//.test(location.pathname) ? location.pathname : '/' + location.pathname)
 }
 
 /**
