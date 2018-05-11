@@ -115,8 +115,14 @@ function joinUrl(baseUrl, url) {
  * @param  {Location} location
  * @return {String}
  */
-function getFullUrlPath(location) {
-  return location.protocol + '//' + location.host + (/^\//.test(location.pathname) ? location.pathname : '/' + location.pathname)
+function getFullUrlPath (location) {
+  var isHttps = location.protocol === 'https:';
+  var port = location.port;
+  if (!port || port === '0') {
+    port = isHttps ? '443' : '80';
+  }
+  return location.protocol + '//' + location.hostname + ':' + port +
+    (/^\//.test(location.pathname) ? location.pathname : '/' + location.pathname)
 }
 
 /**
@@ -879,6 +885,10 @@ OAuthContext.prototype.pooling = function pooling (redirectUri) {
   }
 
   return new Promise$1(function (resolve, reject) {
+    var redirectUriParser = document.createElement('a');
+    redirectUriParser.href = redirectUri;
+    var redirectUriPath = getFullUrlPath(redirectUriParser);
+  
     var poolingInterval = setInterval(function () {
       if (!this$1.iframe) {
         if (!this$1.authWindow || this$1.authWindow.closed || this$1.authWindow.closed === undefined) {
@@ -892,7 +902,7 @@ OAuthContext.prototype.pooling = function pooling (redirectUri) {
         var authWindow = this$1.authWindow || this$1.iframe.contentWindow;
         var authWindowPath = getFullUrlPath(authWindow.location);
 
-        if (authWindowPath === redirectUri) {
+        if (authWindowPath === redirectUriPath) {
           if (authWindow.location.search || authWindow.location.hash) {
             var query = parseQueryString(authWindow.location.search.substring(1).replace(/\/$/, ''));
             var hash = parseQueryString(authWindow.location.hash.substring(1).replace(/[\/$]/, ''));
