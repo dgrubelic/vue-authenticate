@@ -1,5 +1,5 @@
 /*!
- * vue-authenticate v1.3.5-beta.1.3
+ * vue-authenticate v1.3.5-beta.1.4
  * https://github.com/dgrubelic/vue-authenticate
  * Released under the MIT License.
  */
@@ -115,8 +115,14 @@ function joinUrl(baseUrl, url) {
  * @param  {Location} location
  * @return {String}
  */
-function getFullUrlPath(location) {
-  return location.protocol + '//' + location.host + (/^\//.test(location.pathname) ? location.pathname : '/' + location.pathname)
+function getFullUrlPath (location) {
+  var isHttps = location.protocol === 'https:';
+  var port = location.port;
+  if (!port || port === '0') {
+    port = isHttps ? '443' : '80';
+  }
+  return location.protocol + '//' + location.hostname + ':' + port +
+    (/^\//.test(location.pathname) ? location.pathname : '/' + location.pathname)
 }
 
 /**
@@ -882,7 +888,7 @@ OAuthContext.prototype.pooling = function pooling (redirectUri) {
     var redirectUriParser = document.createElement('a');
     redirectUriParser.href = redirectUri;
     var redirectUriPath = getFullUrlPath(redirectUriParser);
-
+  
     var poolingInterval = setInterval(function () {
       if (!this$1.iframe) {
         if (!this$1.authWindow || this$1.authWindow.closed || this$1.authWindow.closed === undefined) {
