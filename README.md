@@ -12,6 +12,8 @@ The best part about this library is that it is not strictly coupled to one reque
 
 For now it is tested to work with  [vue-resource](https://github.com/pagekit/vue-resource) and [axios](https://github.com/mzabriskie/axios) (using [vue-axios](https://github.com/imcvampire/vue-axios) wrapper).
 
+This library supports authentication in popup windows and iframes.
+
 **WARNING:** From version 1.3.0 default request library is `axios` using `vue-axios` wrapper plugin.
 
 This library was inspired by well known authentication library for Angular called [Satellizer](https://github.com/sahat/satellizer) developed by [Sahat Yalkabov](http://sahatyalkabov.com). They share almost identical configuration and API so you can easily switch from Angular to Vue.js project.

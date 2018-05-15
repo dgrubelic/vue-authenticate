@@ -1,6 +1,6 @@
 {
-  "name": "vue-authenticate",
-  "version": "1.3.5-beta.1",
+  "name": "@bsarvari/vue-authenticate",
+  "version": "1.3.5-beta.1.4",
   "description": "Authentication library for Vue.js",
   "main": "dist/vue-authenticate.js",
   "module": "dist/vue-authenticate.es2015.js",
@@ -19,9 +19,13 @@
     "email": "davor.grubelic@gmail.com",
     "url": "https://dgrubelic.me"
   },
+  "contributors": [{
+    "name": "Balazs Sarvari",
+    "email": "balazs.sarvari@gmail.com"
+  }],
   "repository": {
     "type": "git",
-    "url": "https://github.com/dgrubelic/vue-authenticate.git"
+    "url": "https://github.com/bsarvari/vue-authenticate.git"
   },
   "license": "MIT",
   "devDependencies": {
@@ -61,11 +65,13 @@
   },
   "tags": [
     "auth",
+    "oauth",
     "authentication",
     "login",
     "registration",
     "jwt",
     "token",
+    "iframe",
     "vuejs",
     "vue.js",
     "github",

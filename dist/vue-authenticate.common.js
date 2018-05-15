@@ -1,5 +1,5 @@
 /*!
- * vue-authenticate v1.3.5-beta.1
+ * vue-authenticate v1.3.5-beta.1.4
  * https://github.com/dgrubelic/vue-authenticate
  * Released under the MIT License.
  */
@@ -83,10 +83,10 @@ function objectExtend(a, b) {
 
 /**
  * Assemble url from two segments
- * 
+ *
  * @author Sahat Yalkabov <https://github.com/sahat>
  * @copyright Method taken from https://github.com/sahat/satellizer
- * 
+ *
  * @param  {String} baseUrl Base url
  * @param  {String} url     URI
  * @return {String}
@@ -108,26 +108,29 @@ function joinUrl(baseUrl, url) {
 
 /**
  * Get full path based on current location
- * 
+ *
  * @author Sahat Yalkabov <https://github.com/sahat>
  * @copyright Method taken from https://github.com/sahat/satellizer
- * 
+ *
  * @param  {Location} location
  * @return {String}
  */
-function getFullUrlPath(location) {
+function getFullUrlPath (location) {
   var isHttps = location.protocol === 'https:';
-  return location.protocol + '//' + location.hostname +
-    ':' + (location.port || (isHttps ? '443' : '80')) +
-    (/^\//.test(location.pathname) ? location.pathname : '/' + location.pathname);
+  var port = location.port;
+  if (!port || port === '0') {
+    port = isHttps ? '443' : '80';
+  }
+  return location.protocol + '//' + location.hostname + ':' + port +
+    (/^\//.test(location.pathname) ? location.pathname : '/' + location.pathname)
 }
 
 /**
  * Parse query string variables
- * 
+ *
  * @author Sahat Yalkabov <https://github.com/sahat>
  * @copyright Method taken from https://github.com/sahat/satellizer
- * 
+ *
  * @param  {String} Query string
  * @return {String}
  */
@@ -149,7 +152,7 @@ function parseQueryString(str) {
  * Decode base64 string
  * @author Sahat Yalkabov <https://github.com/sahat>
  * @copyright Method taken from https://github.com/sahat/satellizer
- * 
+ *
  * @param  {String} str base64 encoded string
  * @return {Object}
  */
@@ -550,7 +553,7 @@ var defaultOptions = {
       scopeDelimiter: ',',
       display: 'popup',
       oauthType: '2.0',
-      popupOptions: { width: 580, height: 400 }
+      authContextOptions: { width: 580, height: 400 }
     },
 
     google: {
@@ -565,7 +568,7 @@ var defaultOptions = {
       scopeDelimiter: ' ',
       display: 'popup',
       oauthType: '2.0',
-      popupOptions: { width: 452, height: 633 }
+      authContextOptions: { width: 452, height: 633 }
     },
 
     github: {
@@ -577,7 +580,7 @@ var defaultOptions = {
       scope: ['user:email'],
       scopeDelimiter: ' ',
       oauthType: '2.0',
-      popupOptions: { width: 1020, height: 618 }
+      authContextOptions: { width: 1020, height: 618 }
     },
 
     instagram: {
@@ -589,7 +592,7 @@ var defaultOptions = {
       scope: ['basic'],
       scopeDelimiter: '+',
       oauthType: '2.0',
-      popupOptions: { width: null, height: null }
+      authContextOptions: { width: null, height: null }
     },
 
     twitter: {
@@ -598,7 +601,7 @@ var defaultOptions = {
       authorizationEndpoint: 'https://api.twitter.com/oauth/authenticate',
       redirectUri: getRedirectUri(),
       oauthType: '1.0',
-      popupOptions: { width: 495, height: 645 }
+      authContextOptions: { width: 495, height: 645 }
     },
 
     bitbucket: {
@@ -610,7 +613,7 @@ var defaultOptions = {
       scope: ['email'],
       scopeDelimiter: ' ',
       oauthType: '2.0',
-      popupOptions: { width: 1020, height: 618 }
+      authContextOptions: { width: 1020, height: 618 }
     },
 
     linkedin: {
@@ -623,7 +626,7 @@ var defaultOptions = {
       scopeDelimiter: ' ',
       state: 'STATE',
       oauthType: '2.0',
-      popupOptions: { width: 527, height: 582 }
+      authContextOptions: { width: 527, height: 582 }
     },
 
     live: {
@@ -636,7 +639,7 @@ var defaultOptions = {
       scopeDelimiter: ' ',
       display: 'popup',
       oauthType: '2.0',
-      popupOptions: { width: 500, height: 560 }
+      authContextOptions: { width: 500, height: 560 }
     },
 
     oauth1: {
@@ -645,7 +648,7 @@ var defaultOptions = {
       authorizationEndpoint: null,
       redirectUri: getRedirectUri(),
       oauthType: '1.0',
-      popupOptions: null
+      authContextOptions: null
     },
 
     oauth2: {
@@ -662,7 +665,7 @@ var defaultOptions = {
       scopeDelimiter: null,
       state: null,
       oauthType: '2.0',
-      popupOptions: null,
+      authContextOptions: null,
       responseType: 'code',
       responseParams: {
         code: 'code',
@@ -816,24 +819,34 @@ function StorageFactory(options) {
 }
 
 /**
- * OAuth2 popup management class
- * 
+ * OAuth2 popup/iframe management class
+ *
  * @author Sahat Yalkabov <https://github.com/sahat>
- * @copyright Class mostly taken from https://github.com/sahat/satellizer 
+ * @copyright Class mostly taken from https://github.com/sahat/satellizer/blob/master/src/popup.ts
  * and adjusted to fit vue-authenticate library
  */
-var OAuthPopup = function OAuthPopup(url, name, popupOptions) {
-  this.popup = null;
+var OAuthContext = function OAuthContext (url, name, authContextOptions) {
+  if ( authContextOptions === void 0 ) authContextOptions = {};
+
+  this.authWindow = null;
   this.url = url;
   this.name = name;
-  this.popupOptions = popupOptions;
+  this.authContextOptions = authContextOptions;
 };
 
-OAuthPopup.prototype.open = function open (redirectUri, skipPooling) {
+var prototypeAccessors = { iframeTarget: {} };
+
+OAuthContext.prototype.open = function open (redirectUri, skipPooling) {
   try {
-    this.popup = window.open(this.url, this.name, this._stringifyOptions());
-    if (this.popup && this.popup.focus) {
-      this.popup.focus();
+    if (this.authContextOptions.iframe) {
+      this.iframe = document.createElement('iframe');
+      this.iframe.src = this.url;
+      this.iframeTarget.appendChild(this.iframe);
+    } else {
+      this.authWindow = window.open(this.url, this.name, this._stringifyOptions());
+      if (this.authWindow && this.authWindow.focus) {
+        this.authWindow.focus();
+      }
     }
 
     if (skipPooling) {
@@ -841,33 +854,58 @@ OAuthPopup.prototype.open = function open (redirectUri, skipPooling) {
     } else {
       return this.pooling(redirectUri)
     }
-  } catch(e) {
-    return Promise$1.reject(new Error('OAuth popup error occurred'))
+  } catch (e) {
+    return Promise$1.reject(new Error('Error occurred while opening authentication context'))
   }
 };
 
-OAuthPopup.prototype.pooling = function pooling (redirectUri) {
+prototypeAccessors.iframeTarget.get = function () {
+  if (!this._iframeTarget) {
+    if (this.authContextOptions.iframeTarget) {
+      this._iframeTarget = this.authContextOptions.iframeTarget;
+    } else {
+      this._iframeTarget = document.createElement('div');
+      this._iframeTarget.style.display = 'none';
+      document.body.appendChild(this._iframeTarget);
+    }
+  }
+
+  return this._iframeTarget
+};
+
+OAuthContext.prototype.pooling = function pooling (redirectUri) {
     var this$1 = this;
+
+  this.timedOut = false;
+  var authTimeout;
+  if (this.authContextOptions.timeout) {
+    authTimeout = setTimeout(function () {
+      this$1.timedOut = true;
+    }, this.authContextOptions.timeout);
+  }
 
   return new Promise$1(function (resolve, reject) {
     var redirectUriParser = document.createElement('a');
     redirectUriParser.href = redirectUri;
     var redirectUriPath = getFullUrlPath(redirectUriParser);
-
+  
     var poolingInterval = setInterval(function () {
-      if (!this$1.popup || this$1.popup.closed || this$1.popup.closed === undefined) {
-        clearInterval(poolingInterval);
-        poolingInterval = null;
-        reject(new Error('Auth popup window closed'));
+      if (!this$1.iframe) {
+        if (!this$1.authWindow || this$1.authWindow.closed || this$1.authWindow.closed === undefined) {
+          clearInterval(poolingInterval);
+          poolingInterval = null;
+          reject(new Error('Auth popup window closed'));
+        }
       }
 
       try {
-        var popupWindowPath = getFullUrlPath(this$1.popup.location);
+        var authWindow = this$1.authWindow || this$1.iframe.contentWindow;
+        var authWindowPath = getFullUrlPath(authWindow.location);
 
-        if (popupWindowPath === redirectUriPath) {
-          if (this$1.popup.location.search || this$1.popup.location.hash) {
-            var query = parseQueryString(this$1.popup.location.search.substring(1).replace(/\/$/, ''));
-            var hash = parseQueryString(this$1.popup.location.hash.substring(1).replace(/[\/$]/, ''));
+        if (authWindowPath === redirectUriPath) {
+          if (authWindow.location.search || authWindow.location.hash) {
+            var query = parseQueryString(authWindow.location.search.substring(1).replace(/\/$/, ''));
+            var hash = parseQueryString(authWindow.location.hash.substring(1).replace(/[\/$]/, ''));
             var params = objectExtend({}, query);
             params = objectExtend(params, hash);
 
@@ -879,29 +917,49 @@ OAuthPopup.prototype.pooling = function pooling (redirectUri) {
           } else {
             reject(new Error('OAuth redirect has occurred but no query or hash parameters were found.'));
           }
-
+          clearTimeout(authTimeout);
           clearInterval(poolingInterval);
           poolingInterval = null;
-          this$1.popup.close();
+          if (this$1.iframe) {
+            if (this$1.authContextOptions.iframeTarget) {
+              this$1.iframeTarget.removeChild(this$1.iframe);
+            } else {
+              document.body.removeChild(this$1.iframeTarget);
+            }
+          } else {
+            this$1.authWindow.close();
+          }
+        } else {
+          if (this$1.timedOut) {
+            clearInterval(poolingInterval);
+            poolingInterval = null;
+            reject(new Error('auth_timeout'));
+          }
         }
-      } catch(e) {
-        // Ignore DOMException: Blocked a frame with origin from accessing a cross-origin frame.
+      } catch (e) { // DOMException: Blocked a frame with origin from accessing a cross-origin frame.
+        if (this$1.timedOut) {
+          clearInterval(poolingInterval);
+          poolingInterval = null;
+          reject(new Error('auth_timeout'));
+        }
       }
     }, 250);
   })
 };
 
-OAuthPopup.prototype._stringifyOptions = function _stringifyOptions () {
+OAuthContext.prototype._stringifyOptions = function _stringifyOptions () {
     var this$1 = this;
 
   var options = [];
-  for (var optionKey in this$1.popupOptions) {
-    if (!isUndefined(this$1.popupOptions[optionKey])) {
-      options.push((optionKey + "=" + (this$1.popupOptions[optionKey])));
+  for (var optionKey in this$1.authContextOptions) {
+    if (!isUndefined(this$1.authContextOptions[optionKey])) {
+      options.push((optionKey + "=" + (this$1.authContextOptions[optionKey])));
     }
   }
   return options.join(',')
 };
+
+Object.defineProperties( OAuthContext.prototype, prototypeAccessors );
 
 var defaultProviderConfig = {
   name: null,
@@ -914,7 +972,7 @@ var defaultProviderConfig = {
   requiredUrlParams: null,
   defaultUrlParams: null,
   oauthType: '1.0',
-  popupOptions: {}
+  authContextOptions: {}
 };
 
 var OAuth = function OAuth($http, storage, providerConfig, options) {
@@ -926,17 +984,17 @@ var OAuth = function OAuth($http, storage, providerConfig, options) {
 };
 
 /**
- * Initialize OAuth1 process 
+ * Initialize OAuth1 process
  * @param{Object} userData User data
  * @return {Promise}
  */
 OAuth.prototype.init = function init (userData) {
     var this$1 = this;
 
-  this.oauthPopup = new OAuthPopup('about:blank', this.providerConfig.name, this.providerConfig.popupOptions);
+  this.oauthContext = new OAuthContext('about:blank', this.providerConfig.name, this.providerConfig.authContextOptions);
 
   if (window && !window['cordova']) {
-    this.oauthPopup.open(this.providerConfig.redirectUri, true);
+    this.oauthContext.open(this.providerConfig.redirectUri, true);
   }
 
   return this.getRequestToken().then(function (response) {
@@ -972,11 +1030,11 @@ OAuth.prototype.getRequestToken = function getRequestToken () {
 OAuth.prototype.openPopup = function openPopup (response) {
   var url = [this.providerConfig.authorizationEndpoint, this.buildQueryString(response[this.options.responseDataKey])].join('?');
 
-  this.oauthPopup.popup.location = url;
+  this.oauthContext.popup.location = url;
   if (window && window['cordova']) {
-    return this.oauthPopup.open(this.providerConfig.redirectUri)
+    return this.oauthContext.open(this.providerConfig.redirectUri)
   } else {
-    return this.oauthPopup.pooling(this.providerConfig.redirectUri)
+    return this.oauthContext.pooling(this.providerConfig.redirectUri)
   }
 };
 
@@ -1033,7 +1091,7 @@ var defaultProviderConfig$1 = {
     redirectUri: 'redirectUri'
   },
   oauthType: '2.0',
-  popupOptions: {}
+  authContextOptions: {}
 };
 
 var OAuth2 = function OAuth2($http, storage, providerConfig, options) {
@@ -1056,10 +1114,10 @@ OAuth2.prototype.init = function init (userData) {
 
   var url = [this.providerConfig.authorizationEndpoint, this._stringifyRequestParams()].join('?');
 
-  this.oauthPopup = new OAuthPopup(url, this.providerConfig.name, this.providerConfig.popupOptions);
+  this.oauthContext = new OAuthContext(url, this.providerConfig.name, this.providerConfig.authContextOptions);
     
   return new Promise(function (resolve, reject) {
-    this$1.oauthPopup.open(this$1.providerConfig.redirectUri).then(function (response) {
+    this$1.oauthContext.open(this$1.providerConfig.redirectUri).then(function (response) {
       if (this$1.providerConfig.responseType === 'token' || !this$1.providerConfig.url) {
         return resolve(response)
       }
@@ -1079,7 +1137,7 @@ OAuth2.prototype.init = function init (userData) {
  * Exchange temporary oauth data for access token
  * @author Sahat Yalkabov <https://github.com/sahat>
  * @copyright Method taken from https://github.com/sahat/satellizer
- * 
+ *
  * @param{[type]} oauth  [description]
  * @param{[type]} userData [description]
  * @return {[type]}        [description]
@@ -1127,7 +1185,7 @@ OAuth2.prototype.exchangeForToken = function exchangeForToken (oauth, userData) 
  * Stringify oauth params
  * @author Sahat Yalkabov <https://github.com/sahat>
  * @copyright Method taken from https://github.com/sahat/satellizer
- * 
+ *
  * @return {String}
  */
 OAuth2.prototype._stringifyRequestParams = function _stringifyRequestParams () {

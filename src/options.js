@@ -70,7 +70,7 @@ export default {
       scopeDelimiter: ',',
       display: 'popup',
       oauthType: '2.0',
-      popupOptions: { width: 580, height: 400 }
+      authContextOptions: { width: 580, height: 400 }
     },
 
     google: {
@@ -85,7 +85,7 @@ export default {
       scopeDelimiter: ' ',
       display: 'popup',
       oauthType: '2.0',
-      popupOptions: { width: 452, height: 633 }
+      authContextOptions: { width: 452, height: 633 }
     },
 
     github: {
@@ -97,7 +97,7 @@ export default {
       scope: ['user:email'],
       scopeDelimiter: ' ',
       oauthType: '2.0',
-      popupOptions: { width: 1020, height: 618 }
+      authContextOptions: { width: 1020, height: 618 }
     },
 
     instagram: {
@@ -109,7 +109,7 @@ export default {
       scope: ['basic'],
       scopeDelimiter: '+',
       oauthType: '2.0',
-      popupOptions: { width: null, height: null }
+      authContextOptions: { width: null, height: null }
     },
 
     twitter: {
@@ -118,7 +118,7 @@ export default {
       authorizationEndpoint: 'https://api.twitter.com/oauth/authenticate',
       redirectUri: getRedirectUri(),
       oauthType: '1.0',
-      popupOptions: { width: 495, height: 645 }
+      authContextOptions: { width: 495, height: 645 }
     },
 
     bitbucket: {
@@ -130,7 +130,7 @@ export default {
       scope: ['email'],
       scopeDelimiter: ' ',
       oauthType: '2.0',
-      popupOptions: { width: 1020, height: 618 }
+      authContextOptions: { width: 1020, height: 618 }
     },
 
     linkedin: {
@@ -143,7 +143,7 @@ export default {
       scopeDelimiter: ' ',
       state: 'STATE',
       oauthType: '2.0',
-      popupOptions: { width: 527, height: 582 }
+      authContextOptions: { width: 527, height: 582 }
     },
 
     live: {
@@ -156,7 +156,7 @@ export default {
       scopeDelimiter: ' ',
       display: 'popup',
       oauthType: '2.0',
-      popupOptions: { width: 500, height: 560 }
+      authContextOptions: { width: 500, height: 560 }
     },
 
     oauth1: {
@@ -165,7 +165,7 @@ export default {
       authorizationEndpoint: null,
       redirectUri: getRedirectUri(),
       oauthType: '1.0',
-      popupOptions: null
+      authContextOptions: null
     },
 
     oauth2: {
@@ -182,7 +182,7 @@ export default {
       scopeDelimiter: null,
       state: null,
       oauthType: '2.0',
-      popupOptions: null,
+      authContextOptions: null,
       responseType: 'code',
       responseParams: {
         code: 'code',
