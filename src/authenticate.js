@@ -267,7 +267,11 @@ export default class VueAuthenticate {
       .then(response => {
         this.setToken(response)
         this.setRefreshToken(response)
-        return response
+        // Check if we are authenticated
+        if(this.isAuthenticated()){
+          return Promise.resolve(response);
+        }
+        throw new Error('Server did not provided an access token.');
       })
       .catch(error => {
         return Promise.reject(error)
@@ -341,11 +345,11 @@ export default class VueAuthenticate {
       .then((response) => {
         this.setToken(response)
         this.setRefreshToken(response)
-        return response
+        return Promise.resolve(response)
       })
       .catch((error) => {
         this.clearStorage()
-        return error;
+        return Promise.reject(error);
       })
 
   }
