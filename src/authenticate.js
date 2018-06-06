@@ -289,11 +289,11 @@ export default class VueAuthenticate {
 
     return this.$http(requestOptions)
       .then((response) => {
-        this.setToken(response)
-        this.setRefreshToken(response)
-        return response
+        this.setToken(response);
+        this.setRefreshToken(response);
+        return Promise.resolve(response);
       })
-      .catch(err => err)
+      .catch(err => Promise.reject(err))
   }
 
   /**
@@ -317,9 +317,9 @@ export default class VueAuthenticate {
       return this.$http(requestOptions)
         .then((response) => {
           this.clearStorage();
-          return response
+          return Promise.resolve(response);
         })
-        .catch(err => err)
+        .catch(err => Promise.reject(err))
     } else {
       this.clearStorage()
       return Promise.resolve();
