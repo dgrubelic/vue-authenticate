@@ -333,22 +333,22 @@ export default class VueAuthenticate {
    */
   refresh(requestOptions) {
     if (!this.options.storageType)
-      return new Error('Refreshing is not set')
+      throw new Error('Refreshing is not set');
 
-    let data = {}
+    let data = {};
 
     if (this.options.refreshType === 'storage')
-      data.refresh_token = this.getRefreshToken()
+      data.refresh_token = this.getRefreshToken();
 
-    requestOptions = makeRequestOptions(requestOptions, this.options, 'refreshUrl', data)
+    requestOptions = makeRequestOptions(requestOptions, this.options, 'refreshUrl', data);
     return this.$http(requestOptions)
       .then((response) => {
-        this.setToken(response)
-        this.setRefreshToken(response)
-        return Promise.resolve(response)
+        this.setToken(response);
+        this.setRefreshToken(response);
+        return Promise.resolve(response);
       })
       .catch((error) => {
-        this.clearStorage()
+        this.clearStorage();
         return Promise.reject(error);
       })
 
