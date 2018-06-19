@@ -74,7 +74,7 @@ export default {
   bindResponseInterceptor: function ($auth) {
     $auth.$http.interceptors.response.use((response) => {
       return response
-    }, (error => {
+    }, (error) => {
       const {config, response: {status}} = error
       const originalRequest = config
 
@@ -103,7 +103,7 @@ export default {
         }
       }
       return Promise.reject(error)
-    }))
+    });
   },
 
   providers: {

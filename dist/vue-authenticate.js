@@ -574,7 +574,7 @@ var defaultOptions = {
   bindResponseInterceptor: function ($auth) {
     $auth.$http.interceptors.response.use(function (response) {
       return response
-    }, (function (error) {
+    }, function (error) {
       var config = error.config;
       var status = error.response.status;
       var originalRequest = config;
@@ -604,7 +604,7 @@ var defaultOptions = {
         }
       }
       return Promise.reject(error)
-    }));
+    });
   },
 
   providers: {
@@ -1487,7 +1487,11 @@ VueAuthenticate.prototype.login = function login (user, requestOptions) {
     .then(function (response) {
       this$1.setToken(response);
       this$1.setRefreshToken(response);
-      return response
+      // Check if we are authenticated
+      if(this$1.isAuthenticated()){
+        return Promise$1.resolve(response);
+      }
+      throw new Error('Server did not provided an access token.');
     })
     .catch(function (error) {
       return Promise$1.reject(error)
@@ -1509,9 +1513,9 @@ VueAuthenticate.prototype.register = function register (user, requestOptions) {
     .then(function (response) {
       this$1.setToken(response);
       this$1.setRefreshToken(response);
-      return response
+      return Promise$1.resolve(response);
     })
-    .catch(function (err) { return err; })
+    .catch(function (err) { return Promise$1.reject(err); })
 };
 
 /**
@@ -1537,9 +1541,9 @@ VueAuthenticate.prototype.logout = function logout (requestOptions) {
     return this.$http(requestOptions)
       .then(function (response) {
         this$1.clearStorage();
-        return response
+        return Promise$1.resolve(response);
       })
-      .catch(function (err) { return err; })
+      .catch(function (err) { return Promise$1.reject(err); })
   } else {
     this.clearStorage();
     return Promise$1.resolve();
@@ -1555,7 +1559,7 @@ VueAuthenticate.prototype.refresh = function refresh (requestOptions) {
     var this$1 = this;
 
   if (!this.options.storageType)
-    { return new Error('Refreshing is not set') }
+    { throw new Error('Refreshing is not set'); }
 
   var data = {};
 
@@ -1567,11 +1571,11 @@ VueAuthenticate.prototype.refresh = function refresh (requestOptions) {
     .then(function (response) {
       this$1.setToken(response);
       this$1.setRefreshToken(response);
-      return response
+      return Promise$1.resolve(response);
     })
     .catch(function (error) {
       this$1.clearStorage();
-      return error;
+      return Promise$1.reject(error);
     })
 
 };
