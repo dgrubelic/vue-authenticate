@@ -1,9 +1,10 @@
-import { isUndefined } from './utils';
+import {isUndefined} from './utils';
 
 export function getCookieDomainUrl() {
   try {
     return window.location.hostname
-  } catch (e) {}
+  } catch (e) {
+  }
 
   return '';
 }
@@ -13,7 +14,8 @@ export function getRedirectUri(uri) {
     return (!isUndefined(uri))
       ? `${window.location.origin}${uri}`
       : window.location.origin
-  } catch (e) {}
+  } catch (e) {
+  }
 
   return uri || null;
 }
@@ -27,9 +29,19 @@ export default {
   tokenPrefix: 'vueauth',
   tokenHeader: 'Authorization',
   tokenType: 'Bearer',
+  // There are three types of refresh tokens,
+  // 1. (httponly): refresh token is set via HttpOnly Cookie which is the safest method
+  // 2. (storage): refresh token is safe in the local storage, which is as safe as just send a long life access_token
+  // 3. (null): refresh token is not use
+  refreshType: null,
+  refreshTokenName: 'refresh_token',
+  refreshTokenPrefix: null,
+  expirationName: 'expiration',
+  expirationPrefix: null,
   loginUrl: '/auth/login',
   registerUrl: '/auth/register',
   logoutUrl: null,
+  refreshUrl: '/auth/login/refresh',
   storageType: 'localStorage',
   storageNamespace: 'vue-authenticate',
   cookieStorage: {
@@ -47,16 +59,51 @@ export default {
   bindRequestInterceptor: function ($auth) {
     const tokenHeader = $auth.options.tokenHeader;
 
-    $auth.$http.interceptors.request.use((config) => {
+    $auth.$http.interceptors.request.use((request) => {
       if ($auth.isAuthenticated()) {
-        config.headers[tokenHeader] = [
+        request.headers[tokenHeader] = [
           $auth.options.tokenType, $auth.getToken()
         ].join(' ')
       } else {
-        delete config.headers[tokenHeader]
+        delete request.headers[tokenHeader]
       }
-      return config
+      return request
     })
+  },
+
+  bindResponseInterceptor: function ($auth) {
+    $auth.$http.interceptors.response.use((response) => {
+      return response
+    }, (error) => {
+      const {config, response: {status}} = error
+      const originalRequest = config
+
+      // Check if we should refresh the token
+      // 1. unauthorized
+      // 2. refreshType is set
+      // 3. any token is set
+      if (status === 401 && $auth.options.refreshType && $auth.isTokenSet()) {
+
+        // check if we are already refreshing, to prevent endless loop
+        if (!$auth._isRefreshing) {
+          $auth._isRefreshing = true
+          // Try to refresh our token
+          return $auth.refresh()
+            .then(response => {
+              // refreshing was successful :)
+              $auth._isRefreshing = false
+              // send original request
+              return $auth.$http(originalRequest)
+            })
+            .catch(error => {
+              // Refreshing fails :(
+              $auth._isRefreshing = false
+              return Promise.reject(error)
+            })
+        }
+      }
+      return Promise.reject(error)
+    });
   },
 
   providers: {
@@ -70,7 +117,7 @@ export default {
       scopeDelimiter: ',',
       display: 'popup',
       oauthType: '2.0',
-      popupOptions: { width: 580, height: 400 }
+      popupOptions: {width: 580, height: 400}
     },
 
     google: {
@@ -85,7 +132,7 @@ export default {
       scopeDelimiter: ' ',
       display: 'popup',
       oauthType: '2.0',
-      popupOptions: { width: 452, height: 633 }
+      popupOptions: {width: 452, height: 633}
     },
 
     github: {
@@ -97,7 +144,7 @@ export default {
       scope: ['user:email'],
       scopeDelimiter: ' ',
       oauthType: '2.0',
-      popupOptions: { width: 1020, height: 618 }
+      popupOptions: {width: 1020, height: 618}
     },
 
     instagram: {
@@ -109,7 +156,7 @@ export default {
       scope: ['basic'],
       scopeDelimiter: '+',
       oauthType: '2.0',
-      popupOptions: { width: null, height: null }
+      popupOptions: {width: null, height: null}
     },
 
     twitter: {
@@ -118,7 +165,7 @@ export default {
       authorizationEndpoint: 'https://api.twitter.com/oauth/authenticate',
       redirectUri: getRedirectUri(),
       oauthType: '1.0',
-      popupOptions: { width: 495, height: 645 }
+      popupOptions: {width: 495, height: 645}
     },
 
     bitbucket: {
@@ -130,7 +177,7 @@ export default {
       scope: ['email'],
       scopeDelimiter: ' ',
       oauthType: '2.0',
-      popupOptions: { width: 1020, height: 618 }
+      popupOptions: {width: 1020, height: 618}
     },
 
     linkedin: {
@@ -143,7 +190,7 @@ export default {
       scopeDelimiter: ' ',
       state: 'STATE',
       oauthType: '2.0',
-      popupOptions: { width: 527, height: 582 }
+      popupOptions: {width: 527, height: 582}
     },
 
     live: {
@@ -156,7 +203,7 @@ export default {
       scopeDelimiter: ' ',
       display: 'popup',
       oauthType: '2.0',
-      popupOptions: { width: 500, height: 560 }
+      popupOptions: {width: 500, height: 560}
     },
 
     oauth1: {
