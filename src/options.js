@@ -111,21 +111,25 @@ export default {
       oauthType: '2.0',
       popupOptions: { width: null, height: null }
     },
-    
+
     meetup: {
       name: 'meetup',
       url: '/auth/meetup',
+      clientId: null,
       authorizationEndpoint: 'https://secure.meetup.com/oauth2/authorize',
       redirectUri: getRedirectUri(),
-      requiredUrlParams: ['scope'],
-      optionalUrlParams: ['display'],
+      requiredUrlParams: ['scope', 'client_id', 'redirect_uri'],
       scope: ['basic'],
       scopeDelimiter: ' ',
       display: 'popup',
       oauthType: '2.0',
-      popupOptions: { width: 452, height: 633 }
+      popupOptions: { width: 500, height: 350 },
+      responseType: 'token',
+      responseParams: {
+        token: 'access_token',
+        expires_in: 'expires_in'
+      }
     },
-
 
     twitter: {
       name: 'twitter',
