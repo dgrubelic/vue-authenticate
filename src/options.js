@@ -124,9 +124,9 @@ export default {
       display: 'popup',
       oauthType: '2.0',
       popupOptions: { width: 500, height: 350 },
-      responseType: 'token',
+      responseType: 'code',
       responseParams: {
-        token: 'access_token',
+        code: 'code',
         expires_in: 'expires_in'
       }
     },
