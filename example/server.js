@@ -43,6 +43,9 @@ app.post('/auth/:provider', function(req, res){
     case 'live':
       liveAuth(req, res)
       break
+    case 'meetup':
+      meetupAuth(req, res)
+      break
     case 'login':
       loginAuth(req, res)
       break
@@ -245,6 +248,35 @@ function liveAuth(req, res) {
     try {
       if (!err && response.statusCode === 200) {
         var responseJson = JSON.parse(body)
+        res.json(responseJson)
+      } else {
+        res.status(response.statusCode).json(err)
+      }
+    } catch (e) {
+      res.status(500).json(err || e)
+    }
+  })
+}
+
+function meetupAuth(req, res) {
+  Request({
+    method: 'post',
+    url: 'https://secure.meetup.com/oauth2/access',
+    form: {
+      code: req.body.code,
+      client_id: config.auth.meetup.clientId,
+      client_secret: config.auth.meetup.clientSecret,
+      redirect_uri: req.body.redirectUri,
+      grant_type: 'authorization_code'
+    },
+    headers: {
+      'content-type': 'application/x-www-form-urlencoded'
+    }
+  }, function (err, response, body) {
+    try {
+      if (!err && response.statusCode === 200) {
+        var responseJson = JSON.parse(body)
+        console.log(responseJson)
         res.json(responseJson)
       } else {
         res.status(response.statusCode).json(err)

@@ -590,6 +590,25 @@ var defaultOptions = {
       popupOptions: { width: null, height: null }
     },
 
+    meetup: {
+      name: 'meetup',
+      url: '/auth/meetup',
+      clientId: null,
+      authorizationEndpoint: 'https://secure.meetup.com/oauth2/authorize',
+      redirectUri: getRedirectUri(),
+      requiredUrlParams: ['scope', 'client_id', 'redirect_uri'],
+      scope: ['basic'],
+      scopeDelimiter: ' ',
+      display: 'popup',
+      oauthType: '2.0',
+      popupOptions: { width: 500, height: 350 },
+      responseType: 'code',
+      responseParams: {
+        code: 'code',
+        expires_in: 'expires_in'
+      }
+    },
+
     twitter: {
       name: 'twitter',
       url: '/auth/twitter',

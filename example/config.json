@@ -31,6 +31,10 @@
     "live": {
       "clientId": "",
       "clientSecret": ""
+    },
+    "meetup": {
+      "clientId": "",
+      "clientSecret": ""
     }
   }
 }
