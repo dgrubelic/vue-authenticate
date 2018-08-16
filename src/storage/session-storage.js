@@ -1,4 +1,4 @@
-class LocalStorage {
+class SessionStorage {
   constructor(namespace) {
     this.namespace = namespace || null
   }
@@ -23,4 +23,4 @@ class LocalStorage {
   }
 }
 
-export default LocalStorage
+export default SessionStorage
