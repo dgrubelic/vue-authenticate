@@ -33,6 +33,7 @@
       "clientSecret": ""
     },
     "meetup": {
+      "apiUrl": "",
       "clientId": "",
       "clientSecret": ""
     }

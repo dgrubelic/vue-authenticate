@@ -14,15 +14,17 @@
     "vuejs",
     "auth"
   ],
-  "contributors": [{
-    "name": "Davor Grubelic",
-    "email": "davor.grubelic@gmail.com",
-    "url": "https://dgrubelic.me"
-  },
-  {
-    "name": "Jeremie Zarca",
-    "email": "jeremie.zarca@gmail.com"
-  }],
+  "contributors": [
+    {
+      "name": "Davor Grubelic",
+      "email": "davor.grubelic@gmail.com",
+      "url": "https://dgrubelic.me"
+    },
+    {
+      "name": "Jeremie Zarca",
+      "email": "jeremie.zarca@gmail.com"
+    }
+  ],
   "repository": {
     "type": "git",
     "url": "https://github.com/dgrubelic/vue-authenticate.git"
@@ -79,5 +81,9 @@
     "oauth",
     "oauth 1.0",
     "oauth 2.0"
-  ]
+  ],
+  "dependencies": {
+    "http-proxy-middleware": "^0.18.0",
+    "https": "^1.0.0"
+  }
 }
