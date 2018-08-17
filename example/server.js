@@ -289,12 +289,15 @@ function meetupAuth(req, res) {
   }, function (err, response, body) {
     try {
       if (!err && response.statusCode === 200) {
+        console.log("resp", response)
         const responseJson = JSON.parse(body)
         res.json(responseJson)
       } else {
+        console.log(response)
         res.status(response.statusCode).json(err)
       }
     } catch (e) {
+      console.log("err", e)
       res.status(500).json(err || e)
     }
   })
