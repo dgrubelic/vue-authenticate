@@ -1,6 +1,6 @@
 {
   "name": "vue-authenticate",
-  "version": "1.3.5-beta.1",
+  "version": "1.3.7",
   "description": "Authentication library for Vue.js",
   "main": "dist/vue-authenticate.js",
   "module": "dist/vue-authenticate.es2015.js",
@@ -14,14 +14,23 @@
     "vuejs",
     "auth"
   ],
-  "author": {
-    "name": "Davor Grubelic",
-    "email": "davor.grubelic@gmail.com",
-    "url": "https://dgrubelic.me"
-  },
+  "contributors": [
+    {
+      "name": "Davor Grubelic",
+      "email": "davor.grubelic@gmail.com",
+      "url": "https://dgrubelic.me"
+    },
+    {
+      "name": "Jeremie Zarca",
+      "email": "jeremie.zarca@gmail.com"
+    },
+    {
+      "name": "Oliver Wycisk"
+    }
+  ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/dgrubelic/vue-authenticate.git"
+    "url": "https://github.com/jzarca01/vue-authenticate.git"
   },
   "license": "MIT",
   "devDependencies": {
@@ -75,5 +84,9 @@
     "oauth",
     "oauth 1.0",
     "oauth 2.0"
-  ]
+  ],
+  "dependencies": {
+    "http-proxy-middleware": "^0.18.0",
+    "https": "^1.0.0"
+  }
 }

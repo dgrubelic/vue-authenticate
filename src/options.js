@@ -27,9 +27,19 @@ export default {
   tokenPrefix: 'vueauth',
   tokenHeader: 'Authorization',
   tokenType: 'Bearer',
+  // There are three types of refresh tokens,
+  // 1. (httponly): refresh token is set via HttpOnly Cookie which is the safest method
+  // 2. (storage): refresh token is safe in the local storage, which is as safe as just send a long life access_token
+  // 3. (null): refresh token is not use
+  refreshType: null,
+  refreshTokenName: 'refresh_token',
+  refreshTokenPrefix: null,
+  expirationName: 'expiration',
+  expirationPrefix: null,
   loginUrl: '/auth/login',
   registerUrl: '/auth/register',
   logoutUrl: null,
+  refreshUrl: '/auth/login/refresh',
   storageType: 'localStorage',
   storageNamespace: 'vue-authenticate',
   cookieStorage: {
@@ -47,16 +57,49 @@ export default {
   bindRequestInterceptor: function ($auth) {
     const tokenHeader = $auth.options.tokenHeader;
 
-    $auth.$http.interceptors.request.use((config) => {
+    $auth.$http.interceptors.request.use((request) => {
       if ($auth.isAuthenticated()) {
-        config.headers[tokenHeader] = [
+        request.headers[tokenHeader] = [
           $auth.options.tokenType, $auth.getToken()
         ].join(' ')
       } else {
-        delete config.headers[tokenHeader]
+        delete request.headers[tokenHeader]
       }
-      return config
+      return request
     })
+  },
+
+  bindResponseInterceptor: function ($auth) {
+    $auth.$http.interceptors.response.use((response) => {
+      return response
+    }, (error) => {
+      const {config, response: {status}} = error
+      const originalRequest = config
+       // Check if we should refresh the token
+      // 1. unauthorized
+      // 2. refreshType is set
+      // 3. any token is set
+      if (status === 401 && $auth.options.refreshType && $auth.isTokenSet()) {
+         // check if we are already refreshing, to prevent endless loop
+        if (!$auth._isRefreshing) {
+          $auth._isRefreshing = true
+          // Try to refresh our token
+          return $auth.refresh()
+            .then(response => {
+              // refreshing was successful :)
+              $auth._isRefreshing = false
+              // send original request
+              return $auth.$http(originalRequest)
+            })
+            .catch(error => {
+              // Refreshing fails :(
+              $auth._isRefreshing = false
+              return Promise.reject(error)
+            })
+        }
+      }
+      return Promise.reject(error)
+    });
   },
 
   providers: {
@@ -110,6 +153,25 @@ export default {
       scopeDelimiter: '+',
       oauthType: '2.0',
       popupOptions: { width: null, height: null }
+    },
+
+    meetup: {
+      name: 'meetup',
+      url: '/auth/meetup',
+      clientId: null,
+      authorizationEndpoint: 'https://secure.meetup.com/oauth2/authorize',
+      redirectUri: getRedirectUri(),
+      requiredUrlParams: ['scope', 'client_id', 'redirect_uri'],
+      scope: ['basic'],
+      scopeDelimiter: ' ',
+      display: 'popup',
+      oauthType: '2.0',
+      popupOptions: { width: 500, height: 350 },
+      responseType: 'code',
+      responseParams: {
+        code: 'code',
+        expires_in: 'expires_in'
+      }
     },
 
     twitter: {

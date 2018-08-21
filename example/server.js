@@ -1,23 +1,37 @@
-var express = require('express')
-var bodyParser = require('body-parser')
-var Axios = require('axios')
-var Request = require('request')
-var cors = require('cors')
-var config = require('./config.json')
-var OAuth = require('oauth')
-var timestamp = require('unix-timestamp')
-var oauthSignature = require('oauth-signature')
+const express = require('express')
+const bodyParser = require('body-parser')
+const Axios = require('axios')
+const Request = require('request')
+const cors = require('cors')
+const config = require('./config.json')
+const OAuth = require('oauth')
+const timestamp = require('unix-timestamp')
+const oauthSignature = require('oauth-signature')
 
-var app = express()
+const requestProxy = require('./routes/request-proxy');
+const ALLOWED_HEADERS = ['Content-type', 'x-csrf-token', 'x-http-method'];
+
+const app = express()
 app.use(cors())
 app.use(bodyParser.json())
-// app.use(allowCrossDomain);
+
+app.use((req, res, next) => {
+  res.append('Access-Control-Allow-Credentials', 'true');
+  res.append('Access-Control-Allow-Headers', ALLOWED_HEADERS);
+  res.append('Access-Control-Allow-Methods', ['GET', 'POST', 'PUT']);
+  res.append('Access-Control-Expose-Headers', ALLOWED_HEADERS);
+  res.append('Access-Control-Request-Headers', ALLOWED_HEADERS);
+  next();
+});
+
+app.use('/api', requestProxy);
 
 app.get('/', function (req, res) {
   res.send('vue-authenticate')
 })
 
 app.post('/auth/:provider', function(req, res){
+  console.log("post auth provider", req.params.provider)
   switch(req.params.provider) {
     case 'github':
       githubAuth(req, res)
@@ -42,6 +56,9 @@ app.post('/auth/:provider', function(req, res){
       break
     case 'live':
       liveAuth(req, res)
+      break
+    case 'meetup':
+      meetupAuth(req, res)
       break
     case 'login':
       loginAuth(req, res)
@@ -90,7 +107,7 @@ function githubAuth(req, res) {
     state: req.body.state,
     grant_type: 'authorization_code'
   }, { 'Content-Type': 'application/json' }).then(function (response) {
-    var responseJson = parseQueryString(response.data)
+    const responseJson = parseQueryString(response.data)
     if (responseJson.error) {
       res.status(500).json({ error: responseJson.error })
     } else {
@@ -108,7 +125,7 @@ function facebookAuth(req, res) {
     code: req.body.code,
     redirect_uri: req.body.redirectUri
   }, { 'Content-Type': 'application/json' }).then(function (response) {
-    var responseJson = response.data
+    const responseJson = response.data
     res.json(responseJson)
   }).catch(function (err) {
     res.status(500).json(err)
@@ -132,7 +149,7 @@ function googleAuth(req, res) {
   }, function (err, response, body) {
     try {
       if (!err && response.statusCode === 200) {
-        var responseJson = JSON.parse(body)
+        const responseJson = JSON.parse(body)
         res.json(responseJson)
       } else {
         res.status(response.statusCode).json(err)
@@ -160,7 +177,7 @@ function instagramAuth(req, res) {
   }, function (err, response, body) {
     try {
       if (!err && response.statusCode === 200) {
-        var responseJson = JSON.parse(body)
+        const responseJson = JSON.parse(body)
         res.json(responseJson)
       } else {
         res.status(response.statusCode).json(err)
@@ -188,7 +205,7 @@ function bitbucketAuth(req, res) {
   }, function (err, response, body) {
     try {
       if (!err && response.statusCode === 200) {
-        var responseJson = JSON.parse(body)
+        const responseJson = JSON.parse(body)
         res.json(responseJson)
       } else {
         res.status(response.statusCode).json(err)
@@ -216,7 +233,7 @@ function linkedinAuth(req, res) {
   }, function (err, response, body) {
     try {
       if (!err && response.statusCode === 200) {
-        var responseJson = JSON.parse(body)
+        const responseJson = JSON.parse(body)
         res.json(responseJson)
       } else {
         res.status(response.statusCode).json(err)
@@ -244,12 +261,43 @@ function liveAuth(req, res) {
   }, function (err, response, body) {
     try {
       if (!err && response.statusCode === 200) {
-        var responseJson = JSON.parse(body)
+        const responseJson = JSON.parse(body)
         res.json(responseJson)
       } else {
         res.status(response.statusCode).json(err)
       }
     } catch (e) {
+      res.status(500).json(err || e)
+    }
+  })
+}
+
+function meetupAuth(req, res) {
+  Request({
+    method: 'post',
+    url: 'https://secure.meetup.com/oauth2/access',
+    form: {
+      code: req.body.code,
+      client_id: config.auth.meetup.clientId,
+      client_secret: config.auth.meetup.clientSecret,
+      redirect_uri: req.body.redirectUri,
+      grant_type: 'authorization_code'
+    },
+    headers: {
+      'content-type': 'application/x-www-form-urlencoded'
+    }
+  }, function (err, response, body) {
+    try {
+      if (!err && response.statusCode === 200) {
+        console.log("resp", response)
+        const responseJson = JSON.parse(body)
+        res.json(responseJson)
+      } else {
+        console.log(response)
+        res.status(response.statusCode).json(err)
+      }
+    } catch (e) {
+      console.log("err", e)
       res.status(500).json(err || e)
     }
   })
@@ -283,8 +331,8 @@ function twitterAuth(req, res) {
       if (error) {
         res.status(500).json(error)
       } else {
-        var verifyCredentialsUrl = 'https://api.twitter.com/1.1/account/verify_credentials.json'
-        var parameters = {
+        const verifyCredentialsUrl = 'https://api.twitter.com/1.1/account/verify_credentials.json'
+        const parameters = {
           oauth_consumer_key: config.auth.twitter.clientId,
           oauth_token: oauthAccessToken,
           oauth_nonce: ('vueauth-' + new Date().getTime()),
@@ -293,7 +341,7 @@ function twitterAuth(req, res) {
           oauth_version: '1.0'
         }
 
-        var signature = oauthSignature.generate('GET', verifyCredentialsUrl, parameters, config.auth.twitter.clientSecret, oauthAccessTokenSecret)
+        const signature = oauthSignature.generate('GET', verifyCredentialsUrl, parameters, config.auth.twitter.clientSecret, oauthAccessTokenSecret)
 
         Axios.get('https://api.twitter.com/1.1/account/verify_credentials.json', { 
           headers: {
@@ -314,7 +362,6 @@ function twitterAuth(req, res) {
             profile: response.data
           })
         }).catch(function (err) {
-          console.log(err.response.data.errors)
           res.status(500).json(err.response.data.errors)
         })
       }

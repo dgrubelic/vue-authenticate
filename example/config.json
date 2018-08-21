@@ -31,6 +31,11 @@
     "live": {
       "clientId": "",
       "clientSecret": ""
+    },
+    "meetup": {
+      "apiUrl": "https://api.meetup.com",
+      "clientId": "eteah9ikfmpv72vo6o3p6j7gl6",
+      "clientSecret": "ull42v14727uabqeumehc9vl4g"
     }
   }
 }

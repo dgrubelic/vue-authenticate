@@ -244,3 +244,18 @@ export function formatCookie(key, value, options) {
     formatOptions(options)
   ].join('');
 };
+
+export function makeRequestOptions(requestOptions, options, urlName, user) {
+  requestOptions = requestOptions || {}
+  requestOptions.url = requestOptions.url ? requestOptions.url : joinUrl(options.baseUrl, options[urlName])
+  requestOptions[options.requestDataKey] = user || requestOptions[options.requestDataKey]
+  requestOptions.method = requestOptions.method || 'POST'
+  requestOptions.withCredentials = requestOptions.withCredentials || options.withCredentials
+   return requestOptions
+}
+
+export function parseJWT(token) {
+  const base64Url = token.split('.')[1];
+  const base64 = base64Url.replace('-', '+').replace('_', '/');
+  return JSON.parse(window.atob(base64));
+}

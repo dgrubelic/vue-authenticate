@@ -20,3 +20,5 @@ yarn-error.log*
 .vscode
 settings.json
 jsconfig.json
+
+example/config.json

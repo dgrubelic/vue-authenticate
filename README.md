@@ -1,12 +1,6 @@
-[**WARNING**]: README file is currently in process of rewrite and will be released soon.
-
 # vue-authenticate
 
-[![Join the chat at https://gitter.im/vuejs-auth/vue-authenticate](https://badges.gitter.im/vue-authenticate/Lobby.svg)](https://gitter.im/vuejs-auth/vue-authenticate?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
-
 **vue-authenticate** is easily configurable solution for [Vue.js](https://vuejs.org/) that provides local login/registration as well as Social login using Github, Facebook, Google and other OAuth providers.
-
-
 
 The best part about this library is that it is not strictly coupled to one request handling library like [vue-axios](https://github.com/imcvampire/vue-axios). You will be able to use it with different libraries. 
 
@@ -18,18 +12,19 @@ This library was inspired by well known authentication library for Angular calle
 
 ## Supported OAuth providers and configurations
 
-1. Facebook (https://github.com/dgrubelic/vue-authenticate/blob/master/src/options.js#L21)
-2. Google (https://github.com/dgrubelic/vue-authenticate/blob/master/src/options.js#L34)
-3. Github (https://github.com/dgrubelic/vue-authenticate/blob/master/src/options.js#L49)
-4. Instagram (https://github.com/dgrubelic/vue-authenticate/blob/master/src/options.js#L61)
-5. Twitter (https://github.com/dgrubelic/vue-authenticate/blob/master/src/options.js#L72)
-6. Bitbucket (https://github.com/dgrubelic/vue-authenticate/blob/master/src/options.js#L81)
-7. LinkedIn (https://github.com/dgrubelic/vue-authenticate/blob/master/src/options.js#L93)
-8. Microsoft Live (https://github.com/dgrubelic/vue-authenticate/blob/master/src/options.js#L106)
+1. Facebook (https://github.com/jzarca01/vue-authenticate/blob/master/src/options.js#L106)
+2. Google (https://github.com/jzarca01/vue-authenticate/blob/master/src/options.js#L120)
+3. Github (https://github.com/jzarca01/vue-authenticate/blob/master/src/options.js#L135)
+4. Instagram (https://github.com/jzarca01/vue-authenticate/blob/master/src/options.js#L146)
+5. Meetup (https://github.com/jzarca01/vue-authenticate/blob/master/src/options.js#L158)
+6. Twitter (https://github.com/jzarca01/vue-authenticate/blob/master/src/options.js#L177)
+7. Bitbucket (https://github.com/jzarca01/vue-authenticate/blob/master/src/options.js#L186)
+8. LinkedIn (https://github.com/jzarca01/vue-authenticate/blob/master/src/options.js#L198)
+9. Microsoft Live (https://github.com/jzarca01/vue-authenticate/blob/master/src/options.js#L211)
 
 ## Installation
 ```bash
-npm install vue-authenticate
+npm install --save jzarca01/vue-authenticate
 ```
 
 ## Usage
@@ -41,8 +36,8 @@ import axios from 'axios';
 
 Vue.use(VueAxios, axios)
 Vue.use(VueAuthenticate, {
-  baseUrl: 'http://localhost:3000', // Your API domain
-  
+  baseUrl: 'http://localhost:4000', // Your API domain
+
   providers: {
     github: {
       clientId: '',
