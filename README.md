@@ -1,12 +1,6 @@
-[**WARNING**]: README file is currently in process of rewrite and will be released soon.
-
 # vue-authenticate
 
-[![Join the chat at https://gitter.im/vuejs-auth/vue-authenticate](https://badges.gitter.im/vue-authenticate/Lobby.svg)](https://gitter.im/vuejs-auth/vue-authenticate?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
-
 **vue-authenticate** is easily configurable solution for [Vue.js](https://vuejs.org/) that provides local login/registration as well as Social login using Github, Facebook, Google and other OAuth providers.
-
-
 
 The best part about this library is that it is not strictly coupled to one request handling library like [vue-axios](https://github.com/imcvampire/vue-axios). You will be able to use it with different libraries. 
 
@@ -30,7 +24,7 @@ This library was inspired by well known authentication library for Angular calle
 
 ## Installation
 ```bash
-npm install vue-authenticate
+npm install --save jzarca01/vue-authenticate
 ```
 
 ## Usage
