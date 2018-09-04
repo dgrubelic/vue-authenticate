@@ -9,6 +9,10 @@
     "dev": "parallelshell \"node-dev ./example/server.js\" \"gulp dev\"",
     "build": "node build/build.js && cp ./dist/vue-authenticate.js ./example/"
   },
+  "typings": "types/index.d.ts",
+  "files": [
+    "types/*.d.ts"
+  ],
   "keywords": [
     "vue",
     "vuejs",
