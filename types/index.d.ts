@@ -18,6 +18,7 @@ export interface AuthenticateOptions {
   cookieStorage?: CookieStorageOptions,
   requestDataKey?: string;
   responseDataKey?: string;
+  withCredentials?: boolean;
   bindRequestInterceptor?: ($auth: VueAuthenticate) => void;
   providers: { [key: string]: ProviderOptions };
 }
