@@ -56,6 +56,7 @@ export interface ProviderOptions {
 }
 
 export declare class VueAuthenticate {
+  public constructor($http: AxiosInstance, overrideOptions?: AuthenticateOptions);
   public login(user: Object): Promise<AxiosResponse>;
   public login(user: Object, requestOptions: AxiosRequestConfig): Promise<AxiosResponse>;
   public isAuthenticated(): boolean;
