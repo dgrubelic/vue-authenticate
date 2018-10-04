@@ -21,7 +21,8 @@ const defaultProviderConfig = {
   responseParams: {
     code: 'code',
     clientId: 'clientId',
-    redirectUri: 'redirectUri'
+    redirectUri: 'redirectUri',
+    grantType: 'grantType'
   },
   oauthType: '2.0',
   popupOptions: {}
@@ -81,6 +82,9 @@ export default class OAuth2 {
       let value = this.providerConfig.responseParams[key]
 
       switch(key) {
+        case 'grantType':
+            payload[value] = 'authorization_code'
+            break
         case 'clientId':
           payload[value] = this.providerConfig.clientId
           break
