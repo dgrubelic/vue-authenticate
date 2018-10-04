@@ -1018,6 +1018,7 @@ var defaultProviderConfig$1 = {
   name: null,
   url: null,
   clientId: null,
+  clientSecret: null,
   authorizationEndpoint: null,
   redirectUri: null,
   scope: null,
@@ -1034,7 +1035,8 @@ var defaultProviderConfig$1 = {
     grantType: 'grantType'
   },
   oauthType: '2.0',
-  popupOptions: {}
+  popupOptions: {},
+  confidentialClient: false,
 };
 
 var OAuth2 = function OAuth2($http, storage, providerConfig, options) {
@@ -1122,9 +1124,18 @@ OAuth2.prototype.exchangeForToken = function exchangeForToken (oauth, userData) 
     exchangeTokenUrl = this.providerConfig.url;
   }
 
-  return this.$http.post(exchangeTokenUrl, payload, {
-    withCredentials: this.options.withCredentials
-  })
+  var config = {
+      withCredentials: this.options.withCredentials
+  };
+
+  if (this.providerConfig.confidentialClient === true) {
+    config.auth = {
+      username: this.providerConfig.clientId,
+      password: this.providerConfig.clientSecret
+    };
+  }
+
+  return this.$http.post(exchangeTokenUrl, payload, config)
 };
 
 /**
