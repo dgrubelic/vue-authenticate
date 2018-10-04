@@ -9,6 +9,7 @@ const defaultProviderConfig = {
   name: null,
   url: null,
   clientId: null,
+  clientSecret: null,
   authorizationEndpoint: null,
   redirectUri: null,
   scope: null,
@@ -21,10 +22,12 @@ const defaultProviderConfig = {
   responseParams: {
     code: 'code',
     clientId: 'clientId',
-    redirectUri: 'redirectUri'
+    redirectUri: 'redirectUri',
+    grantType: 'grantType'
   },
   oauthType: '2.0',
-  popupOptions: {}
+  popupOptions: {},
+  confidentialClient: false,
 }
 
 export default class OAuth2 {
@@ -78,20 +81,23 @@ export default class OAuth2 {
     let payload = objectExtend({}, userData)
 
     for (let key in defaultProviderConfig.responseParams) {
-      let value = defaultProviderConfig[key]
+      let value = defaultProviderConfig.responseParams[key]
 
       switch(key) {
+        case 'grantType':
+            payload[value] = 'authorization_code'
+            break
         case 'code':
-          payload[key] = oauth.code
-          break
+            payload[value] = oauth.code
+            break
         case 'clientId':
-          payload[key] = this.providerConfig.clientId
+          payload[value] = this.providerConfig.clientId
           break
         case 'redirectUri':
-          payload[key] = this.providerConfig.redirectUri
+          payload[value] = this.providerConfig.redirectUri
           break
         default:
-          payload[key] = oauth[key]
+          payload[value] = oauth[key]
       }
     }
 
@@ -106,9 +112,18 @@ export default class OAuth2 {
       exchangeTokenUrl = this.providerConfig.url
     }
 
-    return this.$http.post(exchangeTokenUrl, payload, {
-      withCredentials: this.options.withCredentials
-    })
+    let config = {
+        withCredentials: this.options.withCredentials
+    };
+
+    if (this.providerConfig.confidentialClient === true) {
+      config.auth = {
+        username: this.providerConfig.clientId,
+        password: this.providerConfig.clientSecret
+      }
+    }
+
+    return this.$http.post(exchangeTokenUrl, payload, config)
   }
 
   /**

@@ -1018,6 +1018,7 @@ var defaultProviderConfig$1 = {
   name: null,
   url: null,
   clientId: null,
+  clientSecret: null,
   authorizationEndpoint: null,
   redirectUri: null,
   scope: null,
@@ -1030,10 +1031,12 @@ var defaultProviderConfig$1 = {
   responseParams: {
     code: 'code',
     clientId: 'clientId',
-    redirectUri: 'redirectUri'
+    redirectUri: 'redirectUri',
+    grantType: 'grantType'
   },
   oauthType: '2.0',
-  popupOptions: {}
+  popupOptions: {},
+  confidentialClient: false,
 };
 
 var OAuth2 = function OAuth2($http, storage, providerConfig, options) {
@@ -1090,20 +1093,23 @@ OAuth2.prototype.exchangeForToken = function exchangeForToken (oauth, userData) 
   var payload = objectExtend({}, userData);
 
   for (var key in defaultProviderConfig$1.responseParams) {
-    var value = defaultProviderConfig$1[key];
+    var value = defaultProviderConfig$1.responseParams[key];
 
     switch(key) {
+      case 'grantType':
+          payload[value] = 'authorization_code';
+          break
       case 'code':
-        payload[key] = oauth.code;
-        break
+          payload[value] = oauth.code;
+          break
       case 'clientId':
-        payload[key] = this$1.providerConfig.clientId;
+        payload[value] = this$1.providerConfig.clientId;
         break
       case 'redirectUri':
-        payload[key] = this$1.providerConfig.redirectUri;
+        payload[value] = this$1.providerConfig.redirectUri;
         break
       default:
-        payload[key] = oauth[key];
+        payload[value] = oauth[key];
     }
   }
 
@@ -1118,9 +1124,18 @@ OAuth2.prototype.exchangeForToken = function exchangeForToken (oauth, userData) 
     exchangeTokenUrl = this.providerConfig.url;
   }
 
-  return this.$http.post(exchangeTokenUrl, payload, {
-    withCredentials: this.options.withCredentials
-  })
+  var config = {
+      withCredentials: this.options.withCredentials
+  };
+
+  if (this.providerConfig.confidentialClient === true) {
+    config.auth = {
+      username: this.providerConfig.clientId,
+      password: this.providerConfig.clientSecret
+    };
+  }
+
+  return this.$http.post(exchangeTokenUrl, payload, config)
 };
 
 /**
