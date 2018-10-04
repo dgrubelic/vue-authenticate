@@ -9,6 +9,7 @@ const defaultProviderConfig = {
   name: null,
   url: null,
   clientId: null,
+  clientSecret: null,
   authorizationEndpoint: null,
   redirectUri: null,
   scope: null,
@@ -25,7 +26,8 @@ const defaultProviderConfig = {
     grantType: 'grantType'
   },
   oauthType: '2.0',
-  popupOptions: {}
+  popupOptions: {},
+  confidentialClient: false,
 }
 
 export default class OAuth2 {
@@ -110,9 +112,18 @@ export default class OAuth2 {
       exchangeTokenUrl = this.providerConfig.url
     }
 
-    return this.$http.post(exchangeTokenUrl, payload, {
-      withCredentials: this.options.withCredentials
-    })
+    let config = {
+        withCredentials: this.options.withCredentials
+    };
+
+    if (this.providerConfig.confidentialClient === true) {
+      config.auth = {
+        username: this.providerConfig.clientId,
+        password: this.providerConfig.clientSecret
+      }
+    }
+
+    return this.$http.post(exchangeTokenUrl, payload, config)
   }
 
   /**
