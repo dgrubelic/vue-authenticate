@@ -1089,21 +1089,18 @@ OAuth2.prototype.exchangeForToken = function exchangeForToken (oauth, userData) 
 
   var payload = objectExtend({}, userData);
 
-  for (var key in defaultProviderConfig$1.responseParams) {
-    var value = defaultProviderConfig$1[key];
+  for (var key in this$1.providerConfig.responseParams) {
+    var value = this$1.providerConfig.responseParams[key];
 
     switch(key) {
-      case 'code':
-        payload[key] = oauth.code;
-        break
       case 'clientId':
-        payload[key] = this$1.providerConfig.clientId;
+        payload[value] = this$1.providerConfig.clientId;
         break
       case 'redirectUri':
-        payload[key] = this$1.providerConfig.redirectUri;
+        payload[value] = this$1.providerConfig.redirectUri;
         break
       default:
-        payload[key] = oauth[key];
+        payload[value] = oauth[key];
     }
   }
 
