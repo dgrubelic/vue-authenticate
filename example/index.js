@@ -6,9 +6,7 @@ Vue.use(VueAuthenticate, {
   baseUrl: 'http://localhost:4000',
   storageType: 'cookieStorage',
   providers: {
-    /**
-     * Add example provider section
-     */
+    // Define OAuth providers config, github for example
     github: {
       clientId: '',
       redirectUri: 'http://localhost:4000/auth/callback'  // Your client app URL
@@ -92,7 +90,7 @@ var router = new VueRouter({
             })
           },
 
-          authLogout: function() {
+          authLogout: function () {
             this.$auth.logout().then(() => {
               if (!this.$auth.isAuthenticated()) {
                 this.response = null
@@ -100,7 +98,7 @@ var router = new VueRouter({
             })
           },
 
-          auth: function(provider) {
+          auth: function (provider) {
             if (this.$auth.isAuthenticated()) {
               this.$auth.logout()
             }
@@ -115,7 +113,7 @@ var router = new VueRouter({
                 })
               } else if (provider === 'facebook') {
                 this_.$http.get('https://graph.facebook.com/v2.5/me', {
-                  params: { access_token: this_.$auth.getToken() }
+                  params: {access_token: this_.$auth.getToken()}
                 }).then(function (response) {
                   this_.response = response
                 })

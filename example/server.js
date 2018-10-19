@@ -7,7 +7,6 @@ var config = require('./config.json')
 var OAuth = require('oauth')
 var timestamp = require('unix-timestamp')
 var oauthSignature = require('oauth-signature')
-var path = require("path");
 var app = express()
 
 app.use(express.static(__dirname));
