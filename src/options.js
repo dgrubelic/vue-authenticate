@@ -189,6 +189,20 @@ export default {
         clientId: 'clientId',
         redirectUri: 'redirectUri'
       }
-    }
+    },
+
+    vk: {
+      name: 'vk',
+      url: '/auth/vk',
+      authorizationEndpoint: 'https://oauth.vk.com/authorize',
+      redirectUri: getRedirectUri(),
+      optionalUrlParams: ['scope'],
+      display: 'popup',
+      response_type: 'code',
+      v: '5.85',
+      scopeDelimiter: ' ',
+      oauthType: '2.0',
+      popupOptions: { width: 1020, height: 618 }
+    },
   }
 }

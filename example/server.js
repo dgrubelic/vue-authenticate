@@ -46,6 +46,8 @@ app.post('/auth/:provider', function (req, res) {
     case 'register':
       registerAuth(req, res)
       break
+    case 'vk':
+      vkAuth(req, res)
   }
 });
 
@@ -261,6 +263,26 @@ oauthService = new OAuth.OAuth(
   null,
   'HMAC-SHA1'
 )
+
+function vkAuth(req, res) {
+  Axios.post('https://oauth.vk.com/access_token', {
+    client_id: config.auth.vk.clientId,
+    client_secret: config.auth.vk.clientSecret,
+    code: req.body.code,
+    redirect_uri: req.body.redirectUri,
+    state: req.body.state,
+    grant_type: 'authorization_code'
+  }, {'Content-Type': 'application/json'}).then(function (response) {
+    var responseJson = parseQueryString(response.data)
+    if (responseJson.error) {
+      res.status(500).json({error: responseJson.error})
+    } else {
+      res.json(responseJson)
+    }
+  }).catch(function (err) {
+    res.status(500).json(err)
+  })
+}
 
 function twitterAuth(req, res) {
   if (!req.body.oauth_token) {

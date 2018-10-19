@@ -10,6 +10,10 @@ Vue.use(VueAuthenticate, {
     github: {
       clientId: '',
       redirectUri: 'http://localhost:4000/auth/callback'  // Your client app URL
+    },
+    vk: {
+      clientId: '',
+      redirectUri: 'http://localhost:4000/auth/callback'  // Your client app URL
     }
   }
 })
