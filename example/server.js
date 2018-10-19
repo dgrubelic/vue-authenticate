@@ -7,18 +7,16 @@ var config = require('./config.json')
 var OAuth = require('oauth')
 var timestamp = require('unix-timestamp')
 var oauthSignature = require('oauth-signature')
-
+var path = require("path");
 var app = express()
+
+app.use(express.static(__dirname));
 app.use(cors())
 app.use(bodyParser.json())
 // app.use(allowCrossDomain);
 
-app.get('/', function (req, res) {
-  res.send('vue-authenticate')
-})
-
-app.post('/auth/:provider', function(req, res){
-  switch(req.params.provider) {
+app.post('/auth/:provider', function (req, res) {
+  switch (req.params.provider) {
     case 'github':
       githubAuth(req, res)
       break
@@ -89,10 +87,10 @@ function githubAuth(req, res) {
     redirect_uri: req.body.redirectUri,
     state: req.body.state,
     grant_type: 'authorization_code'
-  }, { 'Content-Type': 'application/json' }).then(function (response) {
+  }, {'Content-Type': 'application/json'}).then(function (response) {
     var responseJson = parseQueryString(response.data)
     if (responseJson.error) {
-      res.status(500).json({ error: responseJson.error })
+      res.status(500).json({error: responseJson.error})
     } else {
       res.json(responseJson)
     }
@@ -107,7 +105,7 @@ function facebookAuth(req, res) {
     client_secret: config.auth.facebook.clientSecret,
     code: req.body.code,
     redirect_uri: req.body.redirectUri
-  }, { 'Content-Type': 'application/json' }).then(function (response) {
+  }, {'Content-Type': 'application/json'}).then(function (response) {
     var responseJson = response.data
     res.json(responseJson)
   }).catch(function (err) {
@@ -267,7 +265,7 @@ oauthService = new OAuth.OAuth(
 
 function twitterAuth(req, res) {
   if (!req.body.oauth_token) {
-    oauthService.getOAuthRequestToken({ oauth_callback: req.body.redirectUri }, function (error, oauthToken, oauthTokenSecret, results) {
+    oauthService.getOAuthRequestToken({oauth_callback: req.body.redirectUri}, function (error, oauthToken, oauthTokenSecret, results) {
       if (error) {
         res.status(500).json(error)
       } else {
@@ -295,16 +293,16 @@ function twitterAuth(req, res) {
 
         var signature = oauthSignature.generate('GET', verifyCredentialsUrl, parameters, config.auth.twitter.clientSecret, oauthAccessTokenSecret)
 
-        Axios.get('https://api.twitter.com/1.1/account/verify_credentials.json', { 
+        Axios.get('https://api.twitter.com/1.1/account/verify_credentials.json', {
           headers: {
-            Authorization:  'OAuth ' +
-              'oauth_consumer_key="' + config.auth.twitter.clientId + '",' +
-              'oauth_token="' + oauthAccessToken + '",' +
-              'oauth_nonce="' + parameters.oauth_nonce + '",' +
-              'oauth_timestamp="' + parameters.oauth_timestamp + '",' +
-              'oauth_signature_method="HMAC-SHA1",'+
-              'oauth_version="1.0",' +
-              'oauth_signature="' + signature + '"'
+            Authorization: 'OAuth ' +
+            'oauth_consumer_key="' + config.auth.twitter.clientId + '",' +
+            'oauth_token="' + oauthAccessToken + '",' +
+            'oauth_nonce="' + parameters.oauth_nonce + '",' +
+            'oauth_timestamp="' + parameters.oauth_timestamp + '",' +
+            'oauth_signature_method="HMAC-SHA1",' +
+            'oauth_version="1.0",' +
+            'oauth_signature="' + signature + '"'
           }
         }).then(function (response) {
           res.json({

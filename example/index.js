@@ -6,14 +6,20 @@ Vue.use(VueAuthenticate, {
   baseUrl: 'http://localhost:4000',
   storageType: 'cookieStorage',
   providers: {
-    // Define OAuth providers config
+    /**
+     * Add example provider section
+     */
+    github: {
+      clientId: '',
+      redirectUri: 'http://localhost:4000/auth/callback'  // Your client app URL
+    }
   }
 })
 
 var router = new VueRouter({
   mode: 'history',
   routes: [
-    { 
+    {
       path: '/',
       name: 'index',
       component: {
@@ -56,12 +62,12 @@ var router = new VueRouter({
           authLogin: function () {
             var this_ = this;
             let user = {
-              email: 'john.doe@domain.com', 
+              email: 'john.doe@domain.com',
               password: 'pass123456'
             };
 
             if (this.$auth.isAuthenticated()) {
-              this.$auth.logout()  
+              this.$auth.logout()
             }
 
             this.$auth.login(user).then(function (response) {
@@ -73,14 +79,14 @@ var router = new VueRouter({
             var this_ = this;
             let user = {
               name: 'John Doe',
-              email: 'john.doe@domain.com', 
+              email: 'john.doe@domain.com',
               password: 'pass123456'
             };
 
             if (this.$auth.isAuthenticated()) {
-              this.$auth.logout()  
+              this.$auth.logout()
             }
-            
+
             this.$auth.register(user).then(function (response) {
               this_.response = response
             })
@@ -135,12 +141,25 @@ var router = new VueRouter({
             })
           }
         }
-      } 
+      }
     },
-
     {
       path: '/auth/callback',
+      name: "callback",
       component: {
+        data: function () {
+          return new Promise(function (resolve, reject) {
+            axios.post('/auth/github', {
+              code: this.$route.query.code, // code from oauth provider
+            }).then(function (response) {
+              console.log(response);
+              resolve(response);
+            }).catch(function (error) {
+              console.error(error);
+              reject(error)
+            });
+          });
+        },
         template: '<div class="auth-component"></div>'
       }
     }
