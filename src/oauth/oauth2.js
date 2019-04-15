@@ -77,8 +77,8 @@ export default class OAuth2 {
   exchangeForToken(oauth, userData) {
     let payload = objectExtend({}, userData)
 
-    for (let key in defaultProviderConfig.responseParams) {
-      let value = defaultProviderConfig[key]
+    for (let key in this.providerConfig.responseParams) {
+      let value = this.providerConfig.responseParams[key]
 
       switch(key) {
         case 'code':

@@ -1,12 +1,12 @@
 {
   "name": "vue-authenticate",
-  "version": "1.3.5-beta.1",
+  "version": "1.3.5-beta.2",
   "description": "Authentication library for Vue.js",
   "main": "dist/vue-authenticate.js",
   "module": "dist/vue-authenticate.es2015.js",
   "unpkg": "dist/vue-authenticate.js",
   "scripts": {
-    "dev": "parallelshell \"node-dev ./example/server.js\" \"gulp dev\"",
+    "dev": "concurrently --kill-others \"node-dev ./example/server.js\" \"gulp dev\"",
     "build": "node build/build.js && cp ./dist/vue-authenticate.js ./example/"
   },
   "keywords": [
@@ -25,23 +25,22 @@
   },
   "license": "MIT",
   "devDependencies": {
-    "axios": "^0.17.1",
-    "babel-core": "^6.24.0",
-    "babel-loader": "^6.4.1",
-    "babel-plugin-external-helpers": "^6.22.0",
+    "@babel/core": "^7.4.3",
+    "@babel/preset-env": "^7.4.3",
+    "babel-loader": "^8.0.5",
     "babel-preset-es2015": "^6.24.1",
     "babel-preset-es2015-rollup": "^3.0.0",
     "body-parser": "^1.17.1",
-    "connect-history-api-fallback": "^1.3.0",
-    "cors": "^2.8.1",
-    "express": "^4.15.2",
-    "gulp": "^3.9.1",
-    "gulp-connect": "^5.0.0",
+    "concurrently": "^4.1.0",
+    "connect-history-api-fallback": "^1.6.0",
+    "cors": "^2.8.5",
+    "express": "^4.16.4",
+    "gulp": "3.9.1",
+    "gulp-connect": "^5.7.0",
     "gulp-webpack": "^1.5.0",
     "node-dev": "^3.1.3",
     "oauth": "^0.9.15",
     "oauth-signature": "^1.3.1",
-    "parallelshell": "^2.0.0",
     "request": "^2.81.0",
     "rollup": "^0.41.6",
     "rollup-plugin-babel": "^2.7.1",
@@ -53,11 +52,15 @@
     "uglify-js": "^2.8.22",
     "unix-timestamp": "^0.2.0",
     "vinyl-source-stream": "^1.1.0",
-    "vue-axios": "^2.0.2",
-    "vue-router": "^2.3.0",
-    "vuex": "^2.2.1",
-    "webpack": "^2.3.2",
-    "webpack-dev-server": "^2.4.2"
+    "vue-router": "^3.0.5",
+    "vuex": "^3.1.0",
+    "webpack": "^4.30.0",
+    "webpack-dev-server": "^3.3.1"
+  },
+  "peerDependencies": {
+    "acorn-dynamic-import": "^4.0.0",
+    "acorn": "^6.0.0",
+    "ajv": "^6.9.1"
   },
   "tags": [
     "auth",
@@ -75,5 +78,12 @@
     "oauth",
     "oauth 1.0",
     "oauth 2.0"
-  ]
+  ],
+  "dependencies": {
+    "acorn": "^6.1.1",
+    "ajv": "^6.10.0",
+    "axios": "^0.18.0",
+    "vue": "^2.6.10",
+    "vue-axios": "^2.1.4"
+  }
 }
