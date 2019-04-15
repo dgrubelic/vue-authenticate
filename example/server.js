@@ -52,7 +52,7 @@ app.post('/auth/:provider', function(req, res){
   }
 });
 
-app.listen(4000);
+app.listen(4000, 'localhost');
 
 function allowCrossDomain(req, res, next) {
   res.header('Access-Control-Allow-Origin', '*');
