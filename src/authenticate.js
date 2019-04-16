@@ -174,7 +174,7 @@ export default class VueAuthenticate {
 
     requestOptions = requestOptions || {}
 
-    if (requestOptions.url) {
+    if (requestOptions.url || this.options.logoutUrl) {
       requestOptions.url = requestOptions.url ? requestOptions.url : joinUrl(this.options.baseUrl, this.options.logoutUrl)
       requestOptions.method = requestOptions.method || 'POST'
       requestOptions[this.options.requestDataKey] = requestOptions[this.options.requestDataKey] || undefined
