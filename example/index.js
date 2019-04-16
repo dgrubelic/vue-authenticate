@@ -93,9 +93,10 @@ var router = new VueRouter({
             var this_ = this;
             this.$auth.logout().then(function () {
               if (!this_.$auth.isAuthenticated()) {
-                this_.isAuthenticated = this_.$auth.isAuthenticated();
                 this_.response = null
               }
+
+              this_.isAuthenticated = this_.$auth.isAuthenticated();
             })
           },
 
