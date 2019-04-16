@@ -209,7 +209,7 @@ export function decodeBase64(str) {
   );
 }
 
-export function parseCookies(str) {
+export function parseCookies(str = '') {
   if (str.length === 0) return {};
   const parsed = {};
   const pattern = new RegExp('\\s*;\\s*');

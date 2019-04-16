@@ -1,4 +1,5 @@
 import Promise from '../promise.js'
+import { $document, $window } from '../globals.js';
 import { objectExtend, parseQueryString, getFullUrlPath, isUndefined } from '../utils.js'
 
 /**
@@ -18,7 +19,7 @@ export default class OAuthPopup {
 
   open(redirectUri, skipPooling) {
     try {
-      this.popup = window.open(this.url, this.name, this._stringifyOptions())
+      this.popup = $window.open(this.url, this.name, this._stringifyOptions())
       if (this.popup && this.popup.focus) {
         this.popup.focus()
       }
@@ -35,7 +36,7 @@ export default class OAuthPopup {
 
   pooling(redirectUri) {
     return new Promise((resolve, reject) => {
-      const redirectUriParser = document.createElement('a')
+      const redirectUriParser = $document.createElement('a')
       redirectUriParser.href = redirectUri
       const redirectUriPath = getFullUrlPath(redirectUriParser)
 

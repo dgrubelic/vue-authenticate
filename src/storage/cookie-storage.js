@@ -1,12 +1,10 @@
+import { $document } from '../globals.js';
 import {
   objectExtend,
   formatCookie,
   parseCookies
 } from '../utils.js';
-
-import {
-  getCookieDomainUrl
-} from '../options.js';
+import { getCookieDomainUrl } from '../options.js';
 
 class CookieStorage {
   constructor(defaultOptions) {
@@ -41,9 +39,7 @@ class CookieStorage {
 
   _getCookie() {
     try {
-      return typeof document === 'undefined'
-        ? '' : typeof document.cookie === 'undefined'
-          ? '' : document.cookie;
+      return $document.cookie === 'undefined' ? '' : $document.cookie
     } catch (e) {}
     
     return '';
@@ -51,7 +47,7 @@ class CookieStorage {
 
   _setCookie(cookie) {
     try {
-      document.cookie = cookie;
+      $document.cookie = cookie;
     } catch (e) {}
   }
 }

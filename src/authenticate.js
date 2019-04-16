@@ -1,4 +1,5 @@
 import Promise from './promise.js'
+import { $window } from './globals.js';
 import { objectExtend, isString, isObject, isFunction, joinUrl, decodeBase64 } from './utils.js'
 import defaultOptions from './options.js'
 import StorageFactory from './storage.js'
@@ -63,7 +64,7 @@ export default class VueAuthenticate {
         try { // Could be a valid JWT or an access token with the same format
           const base64Url = token.split('.')[1];
           const base64 = base64Url.replace('-', '+').replace('_', '/');
-          const exp = JSON.parse(window.atob(base64)).exp;
+          const exp = JSON.parse($window.atob(base64)).exp;
           if (typeof exp === 'number') {  // JWT with an optonal expiration claims
             return Math.round(new Date().getTime() / 1000) < exp;
           }

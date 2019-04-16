@@ -1,8 +1,9 @@
 import { isUndefined } from './utils';
+import { $window } from './globals';
 
 export function getCookieDomainUrl() {
   try {
-    return window.location.hostname
+    return $window.location.hostname
   } catch (e) {}
 
   return '';
@@ -11,8 +12,8 @@ export function getCookieDomainUrl() {
 export function getRedirectUri(uri) {
   try {
     return (!isUndefined(uri))
-      ? `${window.location.origin}${uri}`
-      : window.location.origin
+      ? `${$window.location.origin}${uri}`
+      : $window.location.origin
   } catch (e) {}
 
   return uri || null;

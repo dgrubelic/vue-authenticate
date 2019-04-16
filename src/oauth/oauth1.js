@@ -1,4 +1,5 @@
 import OAuthPopup from './popup.js'
+import { $window } from '../globals.js';
 import { objectExtend, isString, isObject, isFunction, joinUrl } from '../utils.js'
 
 const defaultProviderConfig = {
@@ -32,7 +33,7 @@ export default class OAuth {
   init(userData) {
     this.oauthPopup = new OAuthPopup('about:blank', this.providerConfig.name, this.providerConfig.popupOptions)
 
-    if (window && !window['cordova']) {
+    if (!$window['cordova']) {
       this.oauthPopup.open(this.providerConfig.redirectUri, true)
     }
 
@@ -70,7 +71,7 @@ export default class OAuth {
     const url = [this.providerConfig.authorizationEndpoint, this.buildQueryString(response[this.options.responseDataKey])].join('?');
 
     this.oauthPopup.popup.location = url
-    if (window && window['cordova']) {
+    if ($window['cordova']) {
       return this.oauthPopup.open(this.providerConfig.redirectUri)
     } else {
       return this.oauthPopup.pooling(this.providerConfig.redirectUri)
