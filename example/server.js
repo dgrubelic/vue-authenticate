@@ -49,6 +49,9 @@ app.post('/auth/:provider', function(req, res){
     case 'register':
       registerAuth(req, res)
       break
+    case 'logout':
+      logoutAuth(req, res)
+      break
   }
 });
 
@@ -79,6 +82,10 @@ function registerAuth(req, res) {
     created_at: new Date(),
     access_token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NSIsIm5hbWUiOiJKb2huIFJlZ2lzdGVyIERvZSIsImFkbWluIjp0cnVlfQ.zTR57xocFkGp2UdFwBLk1cZUeqgSujvTqVAFagBlU4I'
   })
+}
+
+function logoutAuth(req, res) {
+  res.json({ success: true });
 }
 
 function githubAuth(req, res) {

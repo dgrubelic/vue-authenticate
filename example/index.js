@@ -19,13 +19,14 @@ var router = new VueRouter({
       component: {
         data: function () {
           return {
+            isAuthenticated: this.$auth.isAuthenticated(),
             access_token: null,
             response: null
           }
         },
         template: `
           <div class="index-component">
-            <div class="authentication-status" v-if="$auth.isAuthenticated()">
+            <div class="authentication-status" v-if="isAuthenticated">
               You are successfully authenticated
               <div class="authentication-status__token">{{$auth.getToken()}}</div>
             </div>
@@ -61,10 +62,11 @@ var router = new VueRouter({
             };
 
             if (this.$auth.isAuthenticated()) {
-              this.$auth.logout()  
+              this.$auth.logout()
             }
 
             this.$auth.login(user).then(function (response) {
+              this_.isAuthenticated = this_.$auth.isAuthenticated();
               this_.response = response
             })
           },
@@ -82,14 +84,17 @@ var router = new VueRouter({
             }
             
             this.$auth.register(user).then(function (response) {
+              this_.isAuthenticated = this_.$auth.isAuthenticated();
               this_.response = response
             })
           },
 
-          authLogout: function() {
-            this.$auth.logout().then(() => {
-              if (!this.$auth.isAuthenticated()) {
-                this.response = null
+          authLogout: function () {
+            var this_ = this;
+            this.$auth.logout().then(function () {
+              if (!this_.$auth.isAuthenticated()) {
+                this_.isAuthenticated = this_.$auth.isAuthenticated();
+                this_.response = null
               }
             })
           },
@@ -103,6 +108,8 @@ var router = new VueRouter({
 
             var this_ = this;
             this.$auth.authenticate(provider).then(function (authResponse) {
+              this_.isAuthenticated = this_.$auth.isAuthenticated();
+
               if (provider === 'github') {
                 this_.$http.get('https://api.github.com/user').then(function (response) {
                   this_.response = response
@@ -131,6 +138,7 @@ var router = new VueRouter({
                 this_.response = authResponse
               }
             }).catch(function (err) {
+              this_.isAuthenticated = this_.$auth.isAuthenticated()
               this_.response = err
             })
           }
