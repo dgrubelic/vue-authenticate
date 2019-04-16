@@ -1,5 +1,5 @@
 /*!
- * vue-authenticate v1.3.5-beta.1
+ * vue-authenticate v1.3.5-beta.2
  * https://github.com/dgrubelic/vue-authenticate
  * Released under the MIT License.
  */
@@ -216,6 +216,8 @@ function decodeBase64(str) {
 }
 
 function parseCookies(str) {
+  if ( str === void 0 ) str = '';
+
   if (str.length === 0) { return {}; }
   var parsed = {};
   var pattern = new RegExp('\\s*;\\s*');
@@ -480,9 +482,37 @@ Promise$1._setUnhandledRejectionFn = function _setUnhandledRejectionFn(fn) {
   Promise$1._unhandledRejectionFn = fn;
 };
 
+var fakeDocument = {
+  createElement: function createElement() { },
+};
+
+var fakeWindow = {
+  atob: function atob() { },
+  open: function open() { },
+  location: {},
+  localStorage: {
+    setItem: function setItem() { },
+    getItem: function getItem() { },
+    removeItem: function removeItem() { },
+  },
+  sessionStorage: {
+    setItem: function setItem() { },
+    getItem: function getItem() { },
+    removeItem: function removeItem() { },
+  },
+};
+
+var $document = (typeof document !== undefined)
+  ? document
+  : fakeDocument;
+
+var $window = (typeof window !== undefined)
+  ? window
+  : fakeWindow;
+
 function getCookieDomainUrl() {
   try {
-    return window.location.hostname
+    return $window.location.hostname
   } catch (e) {}
 
   return '';
@@ -491,8 +521,8 @@ function getCookieDomainUrl() {
 function getRedirectUri(uri) {
   try {
     return (!isUndefined(uri))
-      ? ("" + (window.location.origin) + uri)
-      : window.location.origin
+      ? ("" + ($window.location.origin) + uri)
+      : $window.location.origin
   } catch (e) {}
 
   return uri || null;
@@ -705,9 +735,7 @@ CookieStorage.prototype.removeItem = function removeItem (key) {
 
 CookieStorage.prototype._getCookie = function _getCookie () {
   try {
-    return typeof document === 'undefined'
-      ? '' : typeof document.cookie === 'undefined'
-        ? '' : document.cookie;
+    return $document.cookie === 'undefined' ? '' : $document.cookie
   } catch (e) {}
     
   return '';
@@ -715,27 +743,27 @@ CookieStorage.prototype._getCookie = function _getCookie () {
 
 CookieStorage.prototype._setCookie = function _setCookie (cookie) {
   try {
-    document.cookie = cookie;
+    $document.cookie = cookie;
   } catch (e) {}
 };
 
-var LocalStorage = function LocalStorage(namespace) {
+var LocalStorage$1 = function LocalStorage(namespace) {
   this.namespace = namespace || null;
 };
 
-LocalStorage.prototype.setItem = function setItem (key, value) {
-  window.localStorage.setItem(this._getStorageKey(key), value);
+LocalStorage$1.prototype.setItem = function setItem (key, value) {
+  $window.localStorage.setItem(this._getStorageKey(key), value);
 };
 
-LocalStorage.prototype.getItem = function getItem (key) {
-  return window.localStorage.getItem(this._getStorageKey(key))
+LocalStorage$1.prototype.getItem = function getItem (key) {
+  return $window.localStorage.getItem(this._getStorageKey(key))
 };
 
-LocalStorage.prototype.removeItem = function removeItem (key) {
-  window.localStorage.removeItem(this._getStorageKey(key));
+LocalStorage$1.prototype.removeItem = function removeItem (key) {
+  $window.localStorage.removeItem(this._getStorageKey(key));
 };
 
-LocalStorage.prototype._getStorageKey = function _getStorageKey (key) {
+LocalStorage$1.prototype._getStorageKey = function _getStorageKey (key) {
   if (this.namespace) {
     return [this.namespace, key].join('.')
   }
@@ -766,23 +794,23 @@ MemoryStorage.prototype._getStorageKey = function _getStorageKey (key) {
   return key;
 };
 
-var LocalStorage$2 = function LocalStorage(namespace) {
+var SessionStorage = function SessionStorage(namespace) {
   this.namespace = namespace || null;
 };
 
-LocalStorage$2.prototype.setItem = function setItem (key, value) {
-  window.sessionStorage.setItem(this._getStorageKey(key), value);
+SessionStorage.prototype.setItem = function setItem (key, value) {
+  $window.sessionStorage.setItem(this._getStorageKey(key), value);
 };
 
-LocalStorage$2.prototype.getItem = function getItem (key) {
-  return window.sessionStorage.getItem(this._getStorageKey(key))
+SessionStorage.prototype.getItem = function getItem (key) {
+  return $window.sessionStorage.getItem(this._getStorageKey(key))
 };
 
-LocalStorage$2.prototype.removeItem = function removeItem (key) {
-  window.sessionStorage.removeItem(this._getStorageKey(key));
+SessionStorage.prototype.removeItem = function removeItem (key) {
+  $window.sessionStorage.removeItem(this._getStorageKey(key));
 };
 
-LocalStorage$2.prototype._getStorageKey = function _getStorageKey (key) {
+SessionStorage.prototype._getStorageKey = function _getStorageKey (key) {
   if (this.namespace) {
     return [this.namespace, key].join('.')
   }
@@ -793,16 +821,16 @@ function StorageFactory(options) {
   switch (options.storageType) {
     case 'localStorage':
       try {
-        window.localStorage.setItem('testKey', 'test');
-        window.localStorage.removeItem('testKey');
-        return new LocalStorage(options.storageNamespace)
+        $window.localStorage.setItem('testKey', 'test');
+        $window.localStorage.removeItem('testKey');
+        return new LocalStorage$1(options.storageNamespace)
       } catch(e) {}
 
     case 'sessionStorage':
       try {
-        window.sessionStorage.setItem('testKey', 'test');
-        window.sessionStorage.removeItem('testKey');
-        return new LocalStorage$2(options.storageNamespace)
+        $window.sessionStorage.setItem('testKey', 'test');
+        $window.sessionStorage.removeItem('testKey');
+        return new LocalStorage(options.storageNamespace)
       } catch (e) {}
       
     case 'cookieStorage':
@@ -831,7 +859,7 @@ var OAuthPopup = function OAuthPopup(url, name, popupOptions) {
 
 OAuthPopup.prototype.open = function open (redirectUri, skipPooling) {
   try {
-    this.popup = window.open(this.url, this.name, this._stringifyOptions());
+    this.popup = $window.open(this.url, this.name, this._stringifyOptions());
     if (this.popup && this.popup.focus) {
       this.popup.focus();
     }
@@ -850,7 +878,7 @@ OAuthPopup.prototype.pooling = function pooling (redirectUri) {
     var this$1 = this;
 
   return new Promise$1(function (resolve, reject) {
-    var redirectUriParser = document.createElement('a');
+    var redirectUriParser = $document.createElement('a');
     redirectUriParser.href = redirectUri;
     var redirectUriPath = getFullUrlPath(redirectUriParser);
 
@@ -935,7 +963,7 @@ OAuth.prototype.init = function init (userData) {
 
   this.oauthPopup = new OAuthPopup('about:blank', this.providerConfig.name, this.providerConfig.popupOptions);
 
-  if (window && !window['cordova']) {
+  if (!$window['cordova']) {
     this.oauthPopup.open(this.providerConfig.redirectUri, true);
   }
 
@@ -973,7 +1001,7 @@ OAuth.prototype.openPopup = function openPopup (response) {
   var url = [this.providerConfig.authorizationEndpoint, this.buildQueryString(response[this.options.responseDataKey])].join('?');
 
   this.oauthPopup.popup.location = url;
-  if (window && window['cordova']) {
+  if ($window['cordova']) {
     return this.oauthPopup.open(this.providerConfig.redirectUri)
   } else {
     return this.oauthPopup.pooling(this.providerConfig.redirectUri)
@@ -1223,7 +1251,7 @@ VueAuthenticate.prototype.isAuthenticated = function isAuthenticated () {
       try { // Could be a valid JWT or an access token with the same format
         var base64Url = token.split('.')[1];
         var base64 = base64Url.replace('-', '+').replace('_', '/');
-        var exp = JSON.parse(window.atob(base64)).exp;
+        var exp = JSON.parse($window.atob(base64)).exp;
         if (typeof exp === 'number') {// JWT with an optonal expiration claims
           return Math.round(new Date().getTime() / 1000) < exp;
         }
