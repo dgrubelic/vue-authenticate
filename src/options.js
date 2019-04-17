@@ -24,6 +24,7 @@ export function getRedirectUri(uri) {
  */
 export default {
   baseUrl: null,
+  tokenPath: 'access_token',
   tokenName: 'token',
   tokenPrefix: 'vueauth',
   tokenHeader: 'Authorization',

@@ -244,3 +244,22 @@ export function formatCookie(key, value, options) {
     formatOptions(options)
   ].join('');
 };
+
+export function getObjectProperty(objectRef, propertyName) {
+  let value = undefined;
+  let valueRef = objectRef;
+  const propNames = propertyName.split('.');
+
+  for (var i = 0; i < propNames.length; i++) {
+    const key = propNames[i];
+    value = valueRef[key];
+
+    if (isObject(value)) {
+      valueRef = valueRef[key];
+    } else {
+      break;
+    }
+  }
+
+  return value;
+}

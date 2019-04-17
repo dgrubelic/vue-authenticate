@@ -258,6 +258,25 @@ function formatCookie(key, value, options) {
   ].join('');
 }
 
+function getObjectProperty(objectRef, propertyName) {
+  var value = undefined;
+  var valueRef = objectRef;
+  var propNames = propertyName.split('.');
+
+  for (var i = 0; i < propNames.length; i++) {
+    var key = propNames[i];
+    value = valueRef[key];
+
+    if (isObject(value)) {
+      valueRef = valueRef[key];
+    } else {
+      break;
+    }
+  }
+
+  return value;
+}
+
 // Store setTimeout reference so promise-polyfill will be unaffected by
 // other code modifying setTimeout (like sinon.useFakeTimers())
 var setTimeoutFunc = setTimeout;
@@ -533,6 +552,7 @@ function getRedirectUri(uri) {
  */
 var defaultOptions = {
   baseUrl: null,
+  tokenPath: 'access_token',
   tokenName: 'token',
   tokenPrefix: 'vueauth',
   tokenHeader: 'Authorization',
@@ -1226,7 +1246,7 @@ var VueAuthenticate = function VueAuthenticate($http, overrideOptions) {
           return this.options.tokenName
         }
       }
-    }
+    },
   });
 
   // Setup request interceptors
@@ -1276,23 +1296,13 @@ VueAuthenticate.prototype.getToken = function getToken () {
  * Set new authentication token
  * @param {String|Object} token
  */
-VueAuthenticate.prototype.setToken = function setToken (response) {
+VueAuthenticate.prototype.setToken = function setToken (response, tokenPath) {
   if (response[this.options.responseDataKey]) {
     response = response[this.options.responseDataKey];
   }
     
-  var token;
-  if (response.access_token) {
-    if (isObject(response.access_token) && isObject(response.access_token[this.options.responseDataKey])) {
-      response = response.access_token;
-    } else if (isString(response.access_token)) {
-      token = response.access_token;
-    }
-  }
-
-  if (!token && response) {
-    token = response[this.options.tokenName];
-  }
+  var responseTokenPath = tokenPath || this.options.tokenPath;
+  var token = getObjectProperty(response, responseTokenPath);
 
   if (token) {
     this.storage.setItem(this.tokenName, token);
@@ -1413,7 +1423,7 @@ VueAuthenticate.prototype.authenticate = function authenticate (provider, userDa
     }
 
     return providerInstance.init(userData).then(function (response) {
-      this$1.setToken(response);
+      this$1.setToken(response, providerConfig.tokenPath);
 
       if (this$1.isAuthenticated()) {
         return resolve(response)

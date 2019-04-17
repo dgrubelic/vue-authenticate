@@ -1,6 +1,10 @@
 import Promise from './promise.js'
 import { $window } from './globals.js';
-import { objectExtend, isString, isObject, isFunction, joinUrl, decodeBase64 } from './utils.js'
+import {
+  objectExtend,
+  isString, isObject, isFunction,
+  joinUrl, decodeBase64, getObjectProperty,
+} from './utils.js'
 import defaultOptions from './options.js'
 import StorageFactory from './storage.js'
 import OAuth1 from './oauth/oauth1.js'
@@ -39,7 +43,7 @@ export default class VueAuthenticate {
             return this.options.tokenName
           }
         }
-      }
+      },
     })
 
     // Setup request interceptors
@@ -89,23 +93,13 @@ export default class VueAuthenticate {
    * Set new authentication token
    * @param {String|Object} token
    */
-  setToken(response) {
+  setToken(response, tokenPath) {
     if (response[this.options.responseDataKey]) {
-      response = response[this.options.responseDataKey];
+      response = response[this.options.responseDataKey]
     }
     
-    let token;
-    if (response.access_token) {
-      if (isObject(response.access_token) && isObject(response.access_token[this.options.responseDataKey])) {
-        response = response.access_token
-      } else if (isString(response.access_token)) {
-        token = response.access_token
-      }
-    }
-
-    if (!token && response) {
-      token = response[this.options.tokenName]
-    }
+    const responseTokenPath = tokenPath || this.options.tokenPath
+    const token = getObjectProperty(response, responseTokenPath)
 
     if (token) {
       this.storage.setItem(this.tokenName, token)
@@ -113,12 +107,12 @@ export default class VueAuthenticate {
   }
 
   getPayload() {
-    const token = this.storage.getItem(this.tokenName);
+    const token = this.storage.getItem(this.tokenName)
 
     if (token && token.split('.').length === 3) {
       try {
         const base64Url = token.split('.')[1];
-        const base64 = base64Url.replace('-', '+').replace('_', '/');
+        const base64 = base64Url.replace('-', '+').replace('_', '/')
         return JSON.parse(decodeBase64(base64));
       } catch (e) {}
     }
@@ -197,7 +191,7 @@ export default class VueAuthenticate {
    * @param  {Object} requestOptions Request options
    * @return {Promise}               Request promise
    */
-  authenticate(provider, userData, requestOptions) {
+  authenticate(provider, userData) {
     return new Promise((resolve, reject) => {
       var providerConfig = this.options.providers[provider]
       if (!providerConfig) {
@@ -214,11 +208,10 @@ export default class VueAuthenticate {
           break
         default:
           return reject(new Error('Invalid OAuth type'))
-          break
       }
 
       return providerInstance.init(userData).then((response) => {
-        this.setToken(response)
+        this.setToken(response, providerConfig.tokenPath)
 
         if (this.isAuthenticated()) {
           return resolve(response)
