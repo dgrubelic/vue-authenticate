@@ -1,5 +1,5 @@
 /*!
- * vue-authenticate v1.3.5
+ * vue-authenticate v1.4.0
  * https://github.com/dgrubelic/vue-authenticate
  * Released under the MIT License.
  */
