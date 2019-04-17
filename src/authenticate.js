@@ -188,7 +188,6 @@ export default class VueAuthenticate {
    * 
    * @param  {String} provider       Provider name
    * @param  {Object} userData       User data
-   * @param  {Object} requestOptions Request options
    * @return {Promise}               Request promise
    */
   authenticate(provider, userData) {
@@ -219,6 +218,42 @@ export default class VueAuthenticate {
           return reject(new Error('Authentication failed'))
         }
       }).catch(err => reject(err))
+    })
+  }
+
+  /**
+  * Link user using authentication provider without login
+  *
+  * @param  {String} provider       Provider name
+  * @param  {Object} userData       User data
+  * @return {Promise}               Request promise
+  */
+  link(provider, userData) {
+    return new Promise((resolve, reject) => {
+      var providerConfig = this.options.providers[provider]
+      if (!providerConfig) {
+        return reject(new Error('Unknown provider'))
+      }
+
+      let providerInstance;
+      switch (providerConfig.oauthType) {
+        case '1.0':
+          providerInstance = new OAuth1(this.$http, this.storage, providerConfig, this.options)
+          break
+        case '2.0':
+          providerInstance = new OAuth2(this.$http, this.storage, providerConfig, this.options)
+          break
+        default:
+          return reject(new Error('Invalid OAuth type'))
+      }
+
+      return providerInstance.init(userData).then(response => {
+        if (response[this.options.responseDataKey]) {
+          response = response[this.options.responseDataKey];
+        }
+
+        resolve(response);
+      }).catch(reject);
     })
   }
 }

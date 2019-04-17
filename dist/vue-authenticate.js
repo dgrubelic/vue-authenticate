@@ -1401,10 +1401,9 @@ VueAuthenticate.prototype.logout = function logout (requestOptions) {
  * 
  * @param{String} provider     Provider name
  * @param{Object} userData     User data
- * @param{Object} requestOptions Request options
  * @return {Promise}             Request promise
  */
-VueAuthenticate.prototype.authenticate = function authenticate (provider, userData, requestOptions) {
+VueAuthenticate.prototype.authenticate = function authenticate (provider, userData) {
     var this$1 = this;
 
   return new Promise$1(function (resolve, reject) {
@@ -1423,7 +1422,6 @@ VueAuthenticate.prototype.authenticate = function authenticate (provider, userDa
         break
       default:
         return reject(new Error('Invalid OAuth type'))
-        break
     }
 
     return providerInstance.init(userData).then(function (response) {
@@ -1435,6 +1433,44 @@ VueAuthenticate.prototype.authenticate = function authenticate (provider, userDa
         return reject(new Error('Authentication failed'))
       }
     }).catch(function (err) { return reject(err); })
+  })
+};
+
+/**
+* Link user using authentication provider without login
+*
+* @param{String} provider     Provider name
+* @param{Object} userData     User data
+* @return {Promise}             Request promise
+*/
+VueAuthenticate.prototype.link = function link (provider, userData) {
+    var this$1 = this;
+
+  return new Promise$1(function (resolve, reject) {
+    var providerConfig = this$1.options.providers[provider];
+    if (!providerConfig) {
+      return reject(new Error('Unknown provider'))
+    }
+
+    var providerInstance;
+    switch (providerConfig.oauthType) {
+      case '1.0':
+        providerInstance = new OAuth(this$1.$http, this$1.storage, providerConfig, this$1.options);
+        break
+      case '2.0':
+        providerInstance = new OAuth2(this$1.$http, this$1.storage, providerConfig, this$1.options);
+        break
+      default:
+        return reject(new Error('Invalid OAuth type'))
+    }
+
+    return providerInstance.init(userData).then(function (response) {
+      if (response[this$1.options.responseDataKey]) {
+        response = response[this$1.options.responseDataKey];
+      }
+
+      resolve(response);
+    }).catch(reject);
   })
 };
 
