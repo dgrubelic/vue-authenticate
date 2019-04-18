@@ -1,19 +1,15 @@
 {
   "name": "vue-authenticate",
-  "version": "1.4.0",
+  "version": "1.4.1",
   "description": "Authentication library for Vue.js",
-  "main": "dist/vue-authenticate.js",
+  "main": "dist/vue-authenticate.min.js",
   "module": "dist/vue-authenticate.es2015.js",
   "unpkg": "dist/vue-authenticate.js",
   "scripts": {
     "dev": "concurrently --kill-others \"node-dev ./example/server.js\" \"gulp dev\"",
     "build": "node build/build.js && cp ./dist/vue-authenticate.js ./example/"
   },
-  "keywords": [
-    "vue",
-    "vuejs",
-    "auth"
-  ],
+  "keywords": ["vue", "vue.js", "vuejs", "json", "jwt", "token", "auth", "authentication", "oauth", "oauth1", "oauth2"],
   "author": {
     "name": "Davor Grubelic",
     "email": "davor.grubelic@gmail.com",
