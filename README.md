@@ -18,14 +18,16 @@ This library was inspired by well known authentication library for Angular calle
 
 ## Supported OAuth providers and configurations
 
-1. Facebook (https://github.com/dgrubelic/vue-authenticate/blob/master/src/options.js#L21)
-2. Google (https://github.com/dgrubelic/vue-authenticate/blob/master/src/options.js#L34)
-3. Github (https://github.com/dgrubelic/vue-authenticate/blob/master/src/options.js#L49)
-4. Instagram (https://github.com/dgrubelic/vue-authenticate/blob/master/src/options.js#L61)
-5. Twitter (https://github.com/dgrubelic/vue-authenticate/blob/master/src/options.js#L72)
-6. Bitbucket (https://github.com/dgrubelic/vue-authenticate/blob/master/src/options.js#L81)
-7. LinkedIn (https://github.com/dgrubelic/vue-authenticate/blob/master/src/options.js#L93)
-8. Microsoft Live (https://github.com/dgrubelic/vue-authenticate/blob/master/src/options.js#L106)
+1. [**Facebook**](https://github.com/dgrubelic/vue-authenticate/blob/master/src/options.js#L65)
+2. [**Google**](https://github.com/dgrubelic/vue-authenticate/blob/master/src/options.js#L78)
+3. [**Github**](https://github.com/dgrubelic/vue-authenticate/blob/master/src/options.js#L93)
+4. [**Instagram**](https://github.com/dgrubelic/vue-authenticate/blob/master/src/options.js#L105)
+5. [**Twitter**](https://github.com/dgrubelic/vue-authenticate/blob/master/src/options.js#L117)
+6. [**Bitbucket**](https://github.com/dgrubelic/vue-authenticate/blob/master/src/options.js#L126)
+7. [**LinkedIn**](https://github.com/dgrubelic/vue-authenticate/blob/master/src/options.js#L138)
+8. [**Microsoft Live**](https://github.com/dgrubelic/vue-authenticate/blob/master/src/options.js#L151)
+9. [**OAuth v1**](https://github.com/dgrubelic/vue-authenticate/blob/master/src/options.js#L164)
+10. [**OAuth v2**](https://github.com/dgrubelic/vue-authenticate/blob/master/src/options.js#L173)
 
 ## Installation
 ```bash
