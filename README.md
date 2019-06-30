@@ -233,6 +233,86 @@ Vue.use(VueAuthenticate, {
 
 ```
 
+### SSR Support
+
+You can use this library on the server side without problems by following the steps below.
+
+1. You must configure the storage as 'cookieStorage', adding to your VueAuthenticate configuration `storageType:' cookieStorage'`.
+2. You have to stop using Vue.use(VueAuthenticate) globally, instead, you have to use `VueAuthenticate.factory()`
+3. On the server you have to build your own storage (cookie storage will not work) or use the StorageMemory.
+4. You have to consider having an instance of axios for each of the requests.
+
+Here an example with plugins of [!UVue](https://github.com/universal-vue/uvue)
+
+Axios Plugin:
+
+```javascript
+import axios from 'axios';
+
+import cookies from 'js-cookie'; // only browser
+
+/**
+ * This plugin create an axios HTTP client to do request.
+ */
+
+export default {
+  async beforeCreate(context, inject) {
+    // Create axios client
+    const httpClient = axios.create({ 
+      // Change API url: depends on server side or client side
+      baseURL: '/api/v1',
+    });
+
+    // Inject httpClient eveywhere
+    inject('http', httpClient);
+    inject('axios', httpClient);
+
+    // You can use it everywhere in your app:
+    // - In UVue context: `context.$http.get(...)`
+    // - In your components: `this.$http.get(...)`
+    // - In your store actions: `this.$http.get(...)`
+  },
+};
+
+```
+
+VueAuthenticate Plugin
+
+```javascript
+import VueAuthenticate from 'vue-authenticate/dist/vue-authenticate';
+
+const vueAuthenticateConfig = {
+  // ... 
+  tokenPrefix: undefined,
+  tokenName: 'token',
+  storageType: 'cookieStorage', // Important.
+  // ...
+};
+
+export default {
+  async beforeCreate(context, inject) {
+    let vueAuthInstance;
+    if (process.client) { // browser
+      vueAuthInstance = VueAuthenticate.factory(context.$http, vueAuthenticateConfig);
+    } else { // server
+      const vueConfig = { ...vueAuthenticateConfig, storageType: 'memoryStorage' }; // Override with memory storage
+      const { tokenName } = vueConfig; // get the token name
+      const accessToken = context.req.cookies[tokenName]; // Get the access token from request
+
+      vueAuthInstance = VueAuthenticate.factory(context.$http, vueConfig);
+      vueAuthInstance.storage.setItem(tokenName, accessToken); // set the current access token 
+    }
+
+    inject('auth', vueAuthInstance); // Inject auth eveywhere
+
+    // You can use it everywhere in your app:
+    // - In UVue context: `context.$auth.isAuthenticated(...)`
+    // - In your components: `this.$auth.isAuthenticated(...)`
+    // - In your store actions: `this.$auth.isAuthenticated(...)`
+  },
+};
+```
+
 ## License
 
 The MIT License (MIT)

@@ -18,10 +18,10 @@ const fakeWindow = {
   },
 };
 
-export const $document = (typeof document !== undefined)
+export const $document = (typeof document !== 'undefined')
   ? document
   : fakeDocument;
 
-export const $window = (typeof window !== undefined)
+export const $window = (typeof window !== 'undefined')
   ? window
   : fakeWindow;
