@@ -525,11 +525,11 @@ var fakeWindow = {
   },
 };
 
-var $document = (typeof document !== undefined)
+var $document = (typeof document !== 'undefined')
   ? document
   : fakeDocument;
 
-var $window = (typeof window !== undefined)
+var $window = (typeof window !== 'undefined')
   ? window
   : fakeWindow;
 
