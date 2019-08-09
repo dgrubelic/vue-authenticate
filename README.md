@@ -221,9 +221,6 @@ Vue.use(VueAuthenticate, {
       }
       return config
     })
-  },
-
-  bindResponseInterceptor: function () {
     this.$http.interceptors.response.use((response) => {
       this.setToken(response)
       return response
