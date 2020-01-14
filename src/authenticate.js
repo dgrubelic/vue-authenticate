@@ -176,6 +176,7 @@ export default class VueAuthenticate {
 
       return this.$http(requestOptions).then((response) => {
         this.storage.removeItem(this.tokenName)
+        return response
       })
     } else {
       this.storage.removeItem(this.tokenName)
