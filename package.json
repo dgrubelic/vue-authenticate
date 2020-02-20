@@ -19,8 +19,8 @@
     "type": "git",
     "url": "https://github.com/dgrubelic/vue-authenticate.git"
   },
-  "files": ["dist"],
-  "types": "types/index.d.ts",
+  "files": ["dist", "types"],
+  "typings": "types/index.d.ts",
   "license": "MIT",
   "devDependencies": {
     "@babel/core": "^7.4.3",

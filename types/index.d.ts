@@ -1,5 +1,4 @@
-import Vue from "vue";
-import {
+import Vue, {
   ComponentOptions,
   PluginFunction,
   AsyncComponent,
@@ -41,7 +40,7 @@ export interface ProviderOptions {
     height: number;
   };
 }
-export interface VueAuthenticate {
+export declare class VueAuthenticate {
   login(user: Object): Promise<AxiosResponse>;
   login(
     user: Object,
@@ -80,7 +79,7 @@ export interface AuthenticateOptions {
 }
 
 declare module "vue/types/vue" {
-  export interface Vue {
+  interface Vue {
     $auth: VueAuthenticate;
   }
 }
