@@ -82,16 +82,16 @@ export default class OAuth2 {
 
       switch(key) {
         case 'code':
-          payload[key] = oauth.code
+          payload[value] = oauth.code
           break
         case 'clientId':
-          payload[key] = this.providerConfig.clientId
+          payload[value] = this.providerConfig.clientId
           break
         case 'redirectUri':
-          payload[key] = this.providerConfig.redirectUri
+          payload[value] = this.providerConfig.redirectUri
           break
         default:
-          payload[key] = oauth[key]
+          payload[value] = oauth[key]
       }
     }
 
