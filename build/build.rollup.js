@@ -14,11 +14,14 @@ var banner =
   'Released under the MIT License.\n';
 
 function buildSource(inputOptions, outputOptions) {
-  rollup.rollup(inputOptions).then(function (bundle) {
-    return bundle.generate(outputOptions).then(function (output) {
-      bundle.write(outputOptions);
-    });
-  });
+  rollup
+    .rollup(inputOptions)
+    .then(function (bundle) {
+      return bundle.generate(outputOptions).then(function (output) {
+        bundle.write(outputOptions);
+      });
+    })
+    .catch(logError);
 }
 
 buildSource(
@@ -67,53 +70,12 @@ buildSource(
   }
 );
 
-// rollup.rollup({
-//   input: 'src/index.js',
-//   plugins: [buble()]
-// })
-//   .then(function (bundle) {
-//     return bundle.write('dist/vue-authenticate.js', bundle.generate({
-//       format: 'umd',
-//       banner: banner,
-//       name: 'VueAuthenticate'
-//     }).code, bundle);
-//   })
-//   .then(function (bundle) {
-//     return bundle.write('dist/vue-authenticate.min.js',
-//       banner + '\n' + uglify.minify('dist/vue-authenticate.js').code,
-//       bundle);
-//   })
-//   .then(function (bundle) {
-//     return bundle.write('dist/vue-authenticate.es2015.js', bundle.generate({
-//       format: 'es',
-//       banner: banner,
-//       footer: 'export { VueAuthenticate };'
-//     }).code, bundle);
-//   })
-//   .then(function (bundle) {
-//     return bundle.write('dist/vue-authenticate.common.js', bundle.generate({
-//       format: 'cjs',
-//       banner: banner
-//     }).code, bundle);
-//   })
-//   .catch(logError);
-
-function write(dest, code, bundle) {
-  return new Promise(function (resolve, reject) {
-    fs.writeFile(dest, code, function (err) {
-      if (err) return reject(err);
-      console.log(blue(dest) + ' ' + getSize(code));
-      resolve(bundle);
-    });
-  });
+function logError(e) {
+  console.log(e);
 }
 
 function getSize(code) {
   return (((code && code.length) || 0) / 1024).toFixed(2) + 'kb';
-}
-
-function logError(e) {
-  console.log(e);
 }
 
 function blue(str) {
