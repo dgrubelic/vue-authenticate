@@ -29,7 +29,7 @@ This library was inspired by well known authentication library for Angular calle
 
 ## Installation
 ```bash
-npm install vue-authenticate
+npm install --save vue-authenticate
 ```
 
 ## Usage
