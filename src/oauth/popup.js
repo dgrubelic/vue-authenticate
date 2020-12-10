@@ -10,18 +10,23 @@ import { objectExtend, parseQueryString, getFullUrlPath, isUndefined } from '../
  * and adjusted to fit vue-authenticate library
  */
 export default class OAuthPopup {
-  constructor(url, name, popupOptions) {
+  constructor(url, name, display, popupOptions) {
     this.popup = null
     this.url = url
     this.name = name
     this.popupOptions = popupOptions
+    this.display = display
   }
 
   open(redirectUri, skipPooling) {
     try {
-      this.popup = $window.open(this.url, this.name, this._stringifyOptions())
-      if (this.popup && this.popup.focus) {
-        this.popup.focus()
+      if (this.display == 'page') {
+        this.popup = $window.open(this.url, '_self', this._stringifyOptions())
+      } else {
+        this.popup = $window.open(this.url, this.name, this._stringifyOptions())
+        if (this.popup && this.popup.focus) {
+          this.popup.focus()
+        }
       }
 
       if (skipPooling) {

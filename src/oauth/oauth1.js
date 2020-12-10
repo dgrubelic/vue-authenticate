@@ -31,7 +31,7 @@ export default class OAuth {
    * @return {Promise}
    */
   init(userData) {
-    this.oauthPopup = new OAuthPopup('about:blank', this.providerConfig.name, this.providerConfig.popupOptions)
+    this.oauthPopup = new OAuthPopup('about:blank', this.providerConfig.name, this.providerConfig.display, this.providerConfig.popupOptions)
 
     if (!$window['cordova']) {
       this.oauthPopup.open(this.providerConfig.redirectUri, true)
