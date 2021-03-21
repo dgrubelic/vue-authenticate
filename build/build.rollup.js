@@ -71,7 +71,7 @@ buildSource(
 );
 
 function logError(e) {
-  console.log(e);
+  console.error(e);
 }
 
 function getSize(code) {
