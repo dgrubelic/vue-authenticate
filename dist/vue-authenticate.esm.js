@@ -6,7 +6,7 @@
  */
 
 if (typeof Object.assign != 'function') {
-  Object.assign = function(target, varArgs) {
+  Object.assign = function (target, varArgs) {
     if (target == null) {
       throw new TypeError('Cannot convert undefined or null to object');
     }
@@ -16,7 +16,8 @@ if (typeof Object.assign != 'function') {
     for (var index = 1; index < arguments.length; index++) {
       var nextSource = arguments[index];
 
-      if (nextSource != null) { // Skip over if undefined or null
+      if (nextSource != null) {
+        // Skip over if undefined or null
         for (var nextKey in nextSource) {
           // Avoid bugs when hasOwnProperty is shadowed
           if (Object.prototype.hasOwnProperty.call(nextSource, nextKey)) {
@@ -30,29 +31,33 @@ if (typeof Object.assign != 'function') {
 }
 
 function camelCase(name) {
-  return name.replace(/([\:\-\_]+(.))/g, function (_, separator, letter, offset) {
+  return name.replace(/([\:\-\_]+(.))/g, function (
+    _,
+    separator,
+    letter,
+    offset
+  ) {
     return offset ? letter.toUpperCase() : letter;
   });
 }
 
 function isUndefined(value) {
-  return typeof value === 'undefined'
+  return typeof value === 'undefined';
 }
 
 function isObject(value) {
-  return value !== null && typeof value === 'object'
+  return value !== null && typeof value === 'object';
 }
 
 function isString(value) {
-  return typeof value === 'string'
+  return typeof value === 'string';
 }
 
 function isFunction(value) {
-  return typeof value === 'function'
+  return typeof value === 'function';
 }
 
 function objectExtend(a, b) {
-
   // Don't touch 'null' or 'undefined' objects.
   if (a == null || b == null) {
     return a;
@@ -72,12 +77,13 @@ function objectExtend(a, b) {
 
   return a;
 }
+
 /**
  * Assemble url from two segments
- * 
+ *
  * @author Sahat Yalkabov <https://github.com/sahat>
  * @copyright Method taken from https://github.com/sahat/satellizer
- * 
+ *
  * @param  {String} baseUrl Base url
  * @param  {String} url     URI
  * @return {String}
@@ -99,26 +105,33 @@ function joinUrl(baseUrl, url) {
 
 /**
  * Get full path based on current location
- * 
+ *
  * @author Sahat Yalkabov <https://github.com/sahat>
  * @copyright Method taken from https://github.com/sahat/satellizer
- * 
+ *
  * @param  {Location} location
  * @return {String}
  */
 function getFullUrlPath(location) {
   const isHttps = location.protocol === 'https:';
-  return location.protocol + '//' + location.hostname +
-    ':' + (location.port || (isHttps ? '443' : '80')) +
-    (/^\//.test(location.pathname) ? location.pathname : '/' + location.pathname);
+  return (
+    location.protocol +
+    '//' +
+    location.hostname +
+    ':' +
+    (location.port || (isHttps ? '443' : '80')) +
+    (/^\//.test(location.pathname)
+      ? location.pathname
+      : '/' + location.pathname)
+  );
 }
 
 /**
  * Parse query string variables
- * 
+ *
  * @author Sahat Yalkabov <https://github.com/sahat>
  * @copyright Method taken from https://github.com/sahat/satellizer
- * 
+ *
  * @param  {String} Query string
  * @return {String}
  */
@@ -126,11 +139,11 @@ function parseQueryString(str) {
   let obj = {};
   let key;
   let value;
-  (str || '').split('&').forEach((keyValue) => {
+  (str || '').split('&').forEach(keyValue => {
     if (keyValue) {
       value = keyValue.split('=');
       key = decodeURIComponent(value[0]);
-      obj[key] = (!!value[1]) ? decodeURIComponent(value[1]) : true;
+      obj[key] = !!value[1] ? decodeURIComponent(value[1]) : true;
     }
   });
   return obj;
@@ -140,7 +153,7 @@ function parseQueryString(str) {
  * Decode base64 string
  * @author Sahat Yalkabov <https://github.com/sahat>
  * @copyright Method taken from https://github.com/sahat/satellizer
- * 
+ *
  * @param  {String} str base64 encoded string
  * @return {Object}
  */
@@ -156,32 +169,37 @@ function decodeBase64(str) {
 
   let fromCharCode = String.fromCharCode;
 
-  let re_btou = new RegExp([
-    '[\xC0-\xDF][\x80-\xBF]',
-    '[\xE0-\xEF][\x80-\xBF]{2}',
-    '[\xF0-\xF7][\x80-\xBF]{3}'
-  ].join('|'), 'g');
+  let re_btou = new RegExp(
+    [
+      '[\xC0-\xDF][\x80-\xBF]',
+      '[\xE0-\xEF][\x80-\xBF]{2}',
+      '[\xF0-\xF7][\x80-\xBF]{3}',
+    ].join('|'),
+    'g'
+  );
 
   let cb_btou = function (cccc) {
     switch (cccc.length) {
       case 4:
-        let cp = ((0x07 & cccc.charCodeAt(0)) << 18)
-          | ((0x3f & cccc.charCodeAt(1)) << 12)
-          | ((0x3f & cccc.charCodeAt(2)) << 6)
-          | (0x3f & cccc.charCodeAt(3));
+        let cp =
+          ((0x07 & cccc.charCodeAt(0)) << 18) |
+          ((0x3f & cccc.charCodeAt(1)) << 12) |
+          ((0x3f & cccc.charCodeAt(2)) << 6) |
+          (0x3f & cccc.charCodeAt(3));
         let offset = cp - 0x10000;
-        return (fromCharCode((offset >>> 10) + 0xD800)
-        + fromCharCode((offset & 0x3FF) + 0xDC00));
+        return (
+          fromCharCode((offset >>> 10) + 0xd800) +
+          fromCharCode((offset & 0x3ff) + 0xdc00)
+        );
       case 3:
         return fromCharCode(
-          ((0x0f & cccc.charCodeAt(0)) << 12)
-          | ((0x3f & cccc.charCodeAt(1)) << 6)
-          | (0x3f & cccc.charCodeAt(2))
+          ((0x0f & cccc.charCodeAt(0)) << 12) |
+            ((0x3f & cccc.charCodeAt(1)) << 6) |
+            (0x3f & cccc.charCodeAt(2))
         );
       default:
         return fromCharCode(
-          ((0x1f & cccc.charCodeAt(0)) << 6)
-          | (0x3f & cccc.charCodeAt(1))
+          ((0x1f & cccc.charCodeAt(0)) << 6) | (0x3f & cccc.charCodeAt(1))
         );
     }
   };
@@ -190,18 +208,22 @@ function decodeBase64(str) {
     return b.replace(re_btou, cb_btou);
   };
 
-  let _decode = buffer ? function (a) {
-    return (a.constructor === buffer.constructor
-      ? a : new buffer(a, 'base64')).toString();
-  }
+  let _decode = buffer
+    ? function (a) {
+        return (a.constructor === buffer.constructor
+          ? a
+          : new buffer(a, 'base64')
+        ).toString();
+      }
     : function (a) {
-    return btou(atob(a));
-  };
+        return btou(atob(a));
+      };
 
   return _decode(
-    String(str).replace(/[-_]/g, function (m0) {
-      return m0 === '-' ? '+' : '/';
-    })
+    String(str)
+      .replace(/[-_]/g, function (m0) {
+        return m0 === '-' ? '+' : '/';
+      })
       .replace(/[^A-Za-z0-9\+\/]/g, '')
   );
 }
@@ -210,7 +232,7 @@ function parseCookies(str = '') {
   if (str.length === 0) return {};
   const parsed = {};
   const pattern = new RegExp('\\s*;\\s*');
-  str.split(pattern).forEach((i) => {
+  str.split(pattern).forEach(i => {
     const [encodedKey, encodedValue] = i.split('=');
     const key = decodeURIComponent(encodedKey);
     const value = decodeURIComponent(encodedValue);
@@ -218,27 +240,30 @@ function parseCookies(str = '') {
   });
   return parsed;
 }
+
 function formatOptions(options) {
   const { path, domain, expires, secure } = options;
   return [
-    typeof path === 'undefined' || path === null
-      ? '' : ';path=' + path,
-    typeof domain === 'undefined' || domain === null
-      ? '' : ';domain=' + domain,
+    typeof path === 'undefined' || path === null ? '' : ';path=' + path,
+    typeof domain === 'undefined' || domain === null ? '' : ';domain=' + domain,
     typeof expires === 'undefined' || expires === null
-      ? '' : ';expires=' + expires.toUTCString(),
+      ? ''
+      : ';expires=' + expires.toUTCString(),
     typeof secure === 'undefined' || secure === null || secure === false
-      ? '' : ';secure'
+      ? ''
+      : ';secure',
   ].join('');
 }
+
 function formatCookie(key, value, options) {
   return [
     encodeURIComponent(key),
     '=',
     encodeURIComponent(value),
-    formatOptions(options)
+    formatOptions(options),
   ].join('');
 }
+
 function getObjectProperty(objectRef, propertyName) {
   let value = undefined;
   let valueRef = objectRef;
@@ -272,7 +297,8 @@ function bind(fn, thisArg) {
 }
 
 function Promise$1(fn) {
-  if (typeof this !== 'object') throw new TypeError('Promises must be constructed via new');
+  if (typeof this !== 'object')
+    throw new TypeError('Promises must be constructed via new');
   if (typeof fn !== 'function') throw new TypeError('not a function');
   this._state = 0;
   this._handled = false;
@@ -311,8 +337,12 @@ function handle(self, deferred) {
 function resolve(self, newValue) {
   try {
     // Promise Resolution Procedure: https://github.com/promises-aplus/promises-spec#the-promise-resolution-procedure
-    if (newValue === self) throw new TypeError('A promise cannot be resolved with itself.');
-    if (newValue && (typeof newValue === 'object' || typeof newValue === 'function')) {
+    if (newValue === self)
+      throw new TypeError('A promise cannot be resolved with itself.');
+    if (
+      newValue &&
+      (typeof newValue === 'object' || typeof newValue === 'function')
+    ) {
       var then = newValue.then;
       if (newValue instanceof Promise$1) {
         self._state = 3;
@@ -340,7 +370,7 @@ function reject(self, newValue) {
 
 function finale(self) {
   if (self._state === 2 && self._deferreds.length === 0) {
-    Promise$1._immediateFn(function() {
+    Promise$1._immediateFn(function () {
       if (!self._handled) {
         Promise$1._unhandledRejectionFn(self._value);
       }
@@ -368,15 +398,18 @@ function Handler(onFulfilled, onRejected, promise) {
 function doResolve(fn, self) {
   var done = false;
   try {
-    fn(function (value) {
-      if (done) return;
-      done = true;
-      resolve(self, value);
-    }, function (reason) {
-      if (done) return;
-      done = true;
-      reject(self, reason);
-    });
+    fn(
+      function (value) {
+        if (done) return;
+        done = true;
+        resolve(self, value);
+      },
+      function (reason) {
+        if (done) return;
+        done = true;
+        reject(self, reason);
+      }
+    );
   } catch (ex) {
     if (done) return;
     done = true;
@@ -389,7 +422,7 @@ Promise$1.prototype['catch'] = function (onRejected) {
 };
 
 Promise$1.prototype.then = function (onFulfilled, onRejected) {
-  var prom = new (this.constructor)(noop);
+  var prom = new this.constructor(noop);
 
   handle(this, new Handler(onFulfilled, onRejected, prom));
   return prom;
@@ -407,9 +440,13 @@ Promise$1.all = function (arr) {
         if (val && (typeof val === 'object' || typeof val === 'function')) {
           var then = val.then;
           if (typeof then === 'function') {
-            then.call(val, function (val) {
-              res(i, val);
-            }, reject);
+            then.call(
+              val,
+              function (val) {
+                res(i, val);
+              },
+              reject
+            );
             return;
           }
         }
@@ -453,7 +490,11 @@ Promise$1.race = function (values) {
 };
 
 // Use polyfill for setImmediate for performance gains
-Promise$1._immediateFn = (typeof setImmediate === 'function' && function (fn) { setImmediate(fn); }) ||
+Promise$1._immediateFn =
+  (typeof setImmediate === 'function' &&
+    function (fn) {
+      setImmediate(fn);
+    }) ||
   function (fn) {
     setTimeoutFunc(fn, 0);
   };
@@ -512,18 +553,18 @@ const $window = (typeof window !== undefined)
 
 function getCookieDomainUrl() {
   try {
-    return $window.location.hostname
-  } catch (e) { }
+    return $window.location.hostname;
+  } catch (e) {}
 
   return '';
 }
 
 function getRedirectUri(uri) {
   try {
-    return (!isUndefined(uri))
+    return !isUndefined(uri)
       ? `${$window.location.origin}${uri}`
-      : $window.location.origin
-  } catch (e) { }
+      : $window.location.origin;
+  } catch (e) {}
 
   return uri || null;
 }
@@ -546,7 +587,7 @@ var defaultOptions = {
   cookieStorage: {
     domain: getCookieDomainUrl(),
     path: '/',
-    secure: false
+    secure: false,
   },
   requestDataKey: 'data',
   responseDataKey: 'data',
@@ -558,15 +599,16 @@ var defaultOptions = {
   bindRequestInterceptor: function ($auth) {
     const tokenHeader = $auth.options.tokenHeader;
 
-    $auth.$http.interceptors.request.use((config) => {
+    $auth.$http.interceptors.request.use(config => {
       if ($auth.isAuthenticated()) {
         config.headers[tokenHeader] = [
-          $auth.options.tokenType, $auth.getToken()
+          $auth.options.tokenType,
+          $auth.getToken(),
         ].join(' ');
       } else {
         delete config.headers[tokenHeader];
       }
-      return config
+      return config;
     });
   },
 
@@ -574,14 +616,14 @@ var defaultOptions = {
     facebook: {
       name: 'facebook',
       url: '/auth/facebook',
-      authorizationEndpoint: 'https://www.facebook.com/v2.5/dialog/oauth',
+      authorizationEndpoint: 'https://www.facebook.com/v8.0/dialog/oauth',
       redirectUri: getRedirectUri('/'),
       requiredUrlParams: ['display', 'scope'],
       scope: ['email'],
       scopeDelimiter: ',',
       display: 'popup',
       oauthType: '2.0',
-      popupOptions: { width: 580, height: 400 }
+      popupOptions: { width: 580, height: 400 },
     },
 
     google: {
@@ -596,7 +638,7 @@ var defaultOptions = {
       scopeDelimiter: ' ',
       display: 'popup',
       oauthType: '2.0',
-      popupOptions: { width: 452, height: 633 }
+      popupOptions: { width: 452, height: 633 },
     },
 
     github: {
@@ -608,7 +650,7 @@ var defaultOptions = {
       scope: ['user:email'],
       scopeDelimiter: ' ',
       oauthType: '2.0',
-      popupOptions: { width: 1020, height: 618 }
+      popupOptions: { width: 1020, height: 618 },
     },
 
     instagram: {
@@ -620,7 +662,7 @@ var defaultOptions = {
       scope: ['basic'],
       scopeDelimiter: '+',
       oauthType: '2.0',
-      popupOptions: { width: null, height: null }
+      popupOptions: { width: null, height: null },
     },
 
     twitter: {
@@ -629,7 +671,7 @@ var defaultOptions = {
       authorizationEndpoint: 'https://api.twitter.com/oauth/authenticate',
       redirectUri: getRedirectUri(),
       oauthType: '1.0',
-      popupOptions: { width: 495, height: 645 }
+      popupOptions: { width: 495, height: 645 },
     },
 
     bitbucket: {
@@ -641,7 +683,7 @@ var defaultOptions = {
       scope: ['email'],
       scopeDelimiter: ' ',
       oauthType: '2.0',
-      popupOptions: { width: 1020, height: 618 }
+      popupOptions: { width: 1020, height: 618 },
     },
 
     linkedin: {
@@ -654,7 +696,7 @@ var defaultOptions = {
       scopeDelimiter: ' ',
       state: 'STATE',
       oauthType: '2.0',
-      popupOptions: { width: 527, height: 582 }
+      popupOptions: { width: 527, height: 582 },
     },
 
     live: {
@@ -667,7 +709,7 @@ var defaultOptions = {
       scopeDelimiter: ' ',
       display: 'popup',
       oauthType: '2.0',
-      popupOptions: { width: 500, height: 560 }
+      popupOptions: { width: 500, height: 560 },
     },
 
     oauth1: {
@@ -676,7 +718,7 @@ var defaultOptions = {
       authorizationEndpoint: null,
       redirectUri: getRedirectUri(),
       oauthType: '1.0',
-      popupOptions: null
+      popupOptions: null,
     },
 
     oauth2: {
@@ -698,20 +740,23 @@ var defaultOptions = {
       responseParams: {
         code: 'code',
         clientId: 'clientId',
-        redirectUri: 'redirectUri'
-      }
-    }
-  }
+        redirectUri: 'redirectUri',
+      },
+    },
+  },
 };
 
 class CookieStorage {
   constructor(defaultOptions) {
-    this._defaultOptions = objectExtend({
-      domain: getCookieDomainUrl(),
-      expires: null,
-      path: '/',
-      secure: false
-    }, defaultOptions);
+    this._defaultOptions = objectExtend(
+      {
+        domain: getCookieDomainUrl(),
+        expires: null,
+        path: '/',
+        secure: false,
+      },
+      defaultOptions
+    );
   }
 
   setItem(key, value) {
@@ -729,7 +774,7 @@ class CookieStorage {
     const value = '';
     const defaultOptions = objectExtend({}, this._defaultOptions);
     const options = objectExtend(defaultOptions, {
-      expires: new Date(0)
+      expires: new Date(0),
     });
     const cookie = formatCookie(key, value, options);
     this._setCookie(cookie);
@@ -737,9 +782,9 @@ class CookieStorage {
 
   _getCookie() {
     try {
-      return $document.cookie === 'undefined' ? '' : $document.cookie
+      return $document.cookie === 'undefined' ? '' : $document.cookie;
     } catch (e) {}
-    
+
     return '';
   }
 
@@ -750,7 +795,7 @@ class CookieStorage {
   }
 }
 
-class LocalStorage$1 {
+class LocalStorage {
   constructor(namespace) {
     this.namespace = namespace || null;
   }
@@ -760,7 +805,7 @@ class LocalStorage$1 {
   }
 
   getItem(key) {
-    return $window.localStorage.getItem(this._getStorageKey(key))
+    return $window.localStorage.getItem(this._getStorageKey(key));
   }
 
   removeItem(key) {
@@ -769,7 +814,7 @@ class LocalStorage$1 {
 
   _getStorageKey(key) {
     if (this.namespace) {
-      return [this.namespace, key].join('.')
+      return [this.namespace, key].join('.');
     }
     return key;
   }
@@ -786,7 +831,7 @@ class MemoryStorage {
   }
 
   getItem(key) {
-    return this._storage[this._getStorageKey(key)]
+    return this._storage[this._getStorageKey(key)];
   }
 
   removeItem(key) {
@@ -795,7 +840,32 @@ class MemoryStorage {
 
   _getStorageKey(key) {
     if (this.namespace) {
-      return [this.namespace, key].join('.')
+      return [this.namespace, key].join('.');
+    }
+    return key;
+  }
+}
+
+class SessionStorage {
+  constructor(namespace) {
+    this.namespace = namespace || null;
+  }
+
+  setItem(key, value) {
+    $window.sessionStorage.setItem(this._getStorageKey(key), value);
+  }
+
+  getItem(key) {
+    return $window.sessionStorage.getItem(this._getStorageKey(key));
+  }
+
+  removeItem(key) {
+    $window.sessionStorage.removeItem(this._getStorageKey(key));
+  }
+
+  _getStorageKey(key) {
+    if (this.namespace) {
+      return [this.namespace, key].join('.');
     }
     return key;
   }
@@ -807,30 +877,30 @@ function StorageFactory(options) {
       try {
         $window.localStorage.setItem('testKey', 'test');
         $window.localStorage.removeItem('testKey');
-        return new LocalStorage$1(options.storageNamespace)
-      } catch(e) {}
+        return new LocalStorage(options.storageNamespace);
+      } catch (e) {}
 
     case 'sessionStorage':
       try {
         $window.sessionStorage.setItem('testKey', 'test');
         $window.sessionStorage.removeItem('testKey');
-        return new LocalStorage(options.storageNamespace)
+        return new SessionStorage(options.storageNamespace);
       } catch (e) {}
-      
+
     case 'cookieStorage':
       return new CookieStorage(options.cookieStorage);
 
-    case 'memoryStorage': 
+    case 'memoryStorage':
     default:
-      return new MemoryStorage(options.storageNamespace)
+      return new MemoryStorage(options.storageNamespace);
   }
 }
 
 /**
  * OAuth2 popup management class
- * 
+ *
  * @author Sahat Yalkabov <https://github.com/sahat>
- * @copyright Class mostly taken from https://github.com/sahat/satellizer 
+ * @copyright Class mostly taken from https://github.com/sahat/satellizer
  * and adjusted to fit vue-authenticate library
  */
 class OAuthPopup {
@@ -849,12 +919,12 @@ class OAuthPopup {
       }
 
       if (skipPooling) {
-        return Promise$1.resolve()
+        return Promise$1.resolve();
       } else {
-        return this.pooling(redirectUri)
+        return this.pooling(redirectUri);
       }
-    } catch(e) {
-      return Promise$1.reject(new Error('OAuth popup error occurred'))
+    } catch (e) {
+      return Promise$1.reject(new Error('OAuth popup error occurred'));
     }
   }
 
@@ -865,7 +935,11 @@ class OAuthPopup {
       const redirectUriPath = getFullUrlPath(redirectUriParser);
 
       let poolingInterval = setInterval(() => {
-        if (!this.popup || this.popup.closed || this.popup.closed === undefined) {
+        if (
+          !this.popup ||
+          this.popup.closed ||
+          this.popup.closed === undefined
+        ) {
           clearInterval(poolingInterval);
           poolingInterval = null;
           reject(new Error('Auth popup window closed'));
@@ -876,8 +950,12 @@ class OAuthPopup {
 
           if (popupWindowPath === redirectUriPath) {
             if (this.popup.location.search || this.popup.location.hash) {
-              const query = parseQueryString(this.popup.location.search.substring(1).replace(/\/$/, ''));
-              const hash = parseQueryString(this.popup.location.hash.substring(1).replace(/[\/$]/, ''));
+              const query = parseQueryString(
+                this.popup.location.search.substring(1).replace(/\/$/, '')
+              );
+              const hash = parseQueryString(
+                this.popup.location.hash.substring(1).replace(/[\/$]/, '')
+              );
               let params = objectExtend({}, query);
               params = objectExtend(params, hash);
 
@@ -887,18 +965,22 @@ class OAuthPopup {
                 resolve(params);
               }
             } else {
-              reject(new Error('OAuth redirect has occurred but no query or hash parameters were found.'));
+              reject(
+                new Error(
+                  'OAuth redirect has occurred but no query or hash parameters were found.'
+                )
+              );
             }
 
             clearInterval(poolingInterval);
             poolingInterval = null;
             this.popup.close();
           }
-        } catch(e) {
+        } catch (e) {
           // Ignore DOMException: Blocked a frame with origin from accessing a cross-origin frame.
         }
       }, 250);
-    })
+    });
   }
 
   _stringifyOptions() {
@@ -908,11 +990,11 @@ class OAuthPopup {
         options.push(`${optionKey}=${this.popupOptions[optionKey]}`);
       }
     }
-    return options.join(',')
+    return options.join(',');
   }
 }
 
-const defaultProviderConfig = {
+const defaultProviderConfig$1 = {
   name: null,
   url: null,
   authorizationEndpoint: null,
@@ -923,35 +1005,39 @@ const defaultProviderConfig = {
   requiredUrlParams: null,
   defaultUrlParams: null,
   oauthType: '1.0',
-  popupOptions: {}
+  popupOptions: {},
 };
 
 class OAuth {
   constructor($http, storage, providerConfig, options) {
     this.$http = $http;
     this.storage = storage;
-    this.providerConfig = objectExtend({}, defaultProviderConfig);
+    this.providerConfig = objectExtend({}, defaultProviderConfig$1);
     this.providerConfig = objectExtend(this.providerConfig, providerConfig);
     this.options = options;
   }
 
   /**
-   * Initialize OAuth1 process 
+   * Initialize OAuth1 process
    * @param  {Object} userData User data
    * @return {Promise}
    */
   init(userData) {
-    this.oauthPopup = new OAuthPopup('about:blank', this.providerConfig.name, this.providerConfig.popupOptions);
+    this.oauthPopup = new OAuthPopup(
+      'about:blank',
+      this.providerConfig.name,
+      this.providerConfig.popupOptions
+    );
 
     if (!$window['cordova']) {
       this.oauthPopup.open(this.providerConfig.redirectUri, true);
     }
 
-    return this.getRequestToken().then((response) => {
-      return this.openPopup(response).then((popupResponse) => {
-        return this.exchangeForToken(popupResponse, userData)
-      })
-    })
+    return this.getRequestToken().then(response => {
+      return this.openPopup(response).then(popupResponse => {
+        return this.exchangeForToken(popupResponse, userData);
+      });
+    });
   }
 
   /**
@@ -961,15 +1047,21 @@ class OAuth {
   getRequestToken() {
     let requestOptions = {};
     requestOptions.method = 'POST';
-    requestOptions[this.options.requestDataKey] = objectExtend({}, this.providerConfig);
+    requestOptions[this.options.requestDataKey] = objectExtend(
+      {},
+      this.providerConfig
+    );
     requestOptions.withCredentials = this.options.withCredentials;
     if (this.options.baseUrl) {
-      requestOptions.url = joinUrl(this.options.baseUrl, this.providerConfig.url);
+      requestOptions.url = joinUrl(
+        this.options.baseUrl,
+        this.providerConfig.url
+      );
     } else {
       requestOptions.url = this.providerConfig.url;
     }
 
-    return this.$http(requestOptions)
+    return this.$http(requestOptions);
   }
 
   /**
@@ -978,13 +1070,16 @@ class OAuth {
    * @return {Promise}
    */
   openPopup(response) {
-    const url = [this.providerConfig.authorizationEndpoint, this.buildQueryString(response[this.options.responseDataKey])].join('?');
+    const url = [
+      this.providerConfig.authorizationEndpoint,
+      this.buildQueryString(response[this.options.responseDataKey]),
+    ].join('?');
 
     this.oauthPopup.popup.location = url;
     if ($window['cordova']) {
-      return this.oauthPopup.open(this.providerConfig.redirectUri)
+      return this.oauthPopup.open(this.providerConfig.redirectUri);
     } else {
-      return this.oauthPopup.pooling(this.providerConfig.redirectUri)
+      return this.oauthPopup.pooling(this.providerConfig.redirectUri);
     }
   }
 
@@ -1002,18 +1097,23 @@ class OAuth {
     requestOptions[this.options.requestDataKey] = payload;
     requestOptions.withCredentials = this.options.withCredentials;
     if (this.options.baseUrl) {
-      requestOptions.url = joinUrl(this.options.baseUrl, this.providerConfig.url);
+      requestOptions.url = joinUrl(
+        this.options.baseUrl,
+        this.providerConfig.url
+      );
     } else {
       requestOptions.url = this.providerConfig.url;
     }
-    return this.$http(requestOptions)
+    return this.$http(requestOptions);
   }
 
   buildQueryString(params) {
     const parsedParams = [];
     for (var key in params) {
       let value = params[key];
-      parsedParams.push(encodeURIComponent(key) + '=' + encodeURIComponent(value));
+      parsedParams.push(
+        encodeURIComponent(key) + '=' + encodeURIComponent(value)
+      );
     }
     return parsedParams.join('&');
   }
@@ -1023,7 +1123,7 @@ class OAuth {
  * Default provider configuration
  * @type {Object}
  */
-const defaultProviderConfig$1 = {
+const defaultProviderConfig = {
   name: null,
   url: null,
   clientId: null,
@@ -1039,17 +1139,17 @@ const defaultProviderConfig$1 = {
   responseParams: {
     code: 'code',
     clientId: 'clientId',
-    redirectUri: 'redirectUri'
+    redirectUri: 'redirectUri',
   },
   oauthType: '2.0',
-  popupOptions: {}
+  popupOptions: {},
 };
 
 class OAuth2 {
   constructor($http, storage, providerConfig, options) {
     this.$http = $http;
     this.storage = storage;
-    this.providerConfig = objectExtend({}, defaultProviderConfig$1);
+    this.providerConfig = objectExtend({}, defaultProviderConfig);
     this.providerConfig = objectExtend(this.providerConfig, providerConfig);
     this.options = options;
   }
@@ -1062,32 +1162,52 @@ class OAuth2 {
       this.storage.setItem(stateName, this.providerConfig.state);
     }
 
-    let url = [this.providerConfig.authorizationEndpoint, this._stringifyRequestParams()].join('?');
+    let url = [
+      this.providerConfig.authorizationEndpoint,
+      this._stringifyRequestParams(),
+    ].join('?');
 
-    this.oauthPopup = new OAuthPopup(url, this.providerConfig.name, this.providerConfig.popupOptions);
-    
+    this.oauthPopup = new OAuthPopup(
+      url,
+      this.providerConfig.name,
+      this.providerConfig.popupOptions
+    );
+
     return new Promise((resolve, reject) => {
-      this.oauthPopup.open(this.providerConfig.redirectUri).then((response) => {
-        if (this.providerConfig.responseType === 'token' || !this.providerConfig.url) {
-          return resolve(response)
-        }
+      this.oauthPopup
+        .open(this.providerConfig.redirectUri)
+        .then(response => {
+          if (
+            this.providerConfig.responseType === 'token' ||
+            !this.providerConfig.url
+          ) {
+            return resolve(response);
+          }
 
-        if (response.state && response.state !== this.storage.getItem(stateName)) {
-          return reject(new Error('State parameter value does not match original OAuth request state value'))
-        }
+          if (
+            response.state &&
+            response.state !== this.storage.getItem(stateName)
+          ) {
+            return reject(
+              new Error(
+                'State parameter value does not match original OAuth request state value'
+              )
+            );
+          }
 
-        resolve(this.exchangeForToken(response, userData));
-      }).catch((err) => {
-        reject(err);
-      });
-    })
+          resolve(this.exchangeForToken(response, userData));
+        })
+        .catch(err => {
+          reject(err);
+        });
+    });
   }
 
   /**
    * Exchange temporary oauth data for access token
    * @author Sahat Yalkabov <https://github.com/sahat>
    * @copyright Method taken from https://github.com/sahat/satellizer
-   * 
+   *
    * @param  {[type]} oauth    [description]
    * @param  {[type]} userData [description]
    * @return {[type]}          [description]
@@ -1096,18 +1216,18 @@ class OAuth2 {
     let payload = objectExtend({}, userData);
 
     for (let key in this.providerConfig.responseParams) {
-      let value = this.providerConfig.responseParams[key];
+      this.providerConfig.responseParams[key];
 
-      switch(key) {
+      switch (key) {
         case 'code':
           payload[key] = oauth.code;
-          break
+          break;
         case 'clientId':
           payload[key] = this.providerConfig.clientId;
-          break
+          break;
         case 'redirectUri':
           payload[key] = this.providerConfig.redirectUri;
-          break
+          break;
         default:
           payload[key] = oauth[key];
       }
@@ -1125,30 +1245,36 @@ class OAuth2 {
     }
 
     return this.$http.post(exchangeTokenUrl, payload, {
-      withCredentials: this.options.withCredentials
-    })
+      withCredentials: this.options.withCredentials,
+    });
   }
 
   /**
    * Stringify oauth params
    * @author Sahat Yalkabov <https://github.com/sahat>
    * @copyright Method taken from https://github.com/sahat/satellizer
-   * 
+   *
    * @return {String}
    */
   _stringifyRequestParams() {
     let keyValuePairs = [];
-    let paramCategories = ['defaultUrlParams', 'requiredUrlParams', 'optionalUrlParams'];
+    let paramCategories = [
+      'defaultUrlParams',
+      'requiredUrlParams',
+      'optionalUrlParams',
+    ];
 
-    paramCategories.forEach((categoryName) => {
-      if (!this.providerConfig[categoryName]) return
-      if (!Array.isArray(this.providerConfig[categoryName])) return
+    paramCategories.forEach(categoryName => {
+      if (!this.providerConfig[categoryName]) return;
+      if (!Array.isArray(this.providerConfig[categoryName])) return;
 
-      this.providerConfig[categoryName].forEach((paramName) => {
+      this.providerConfig[categoryName].forEach(paramName => {
         let camelCaseParamName = camelCase(paramName);
-        let paramValue = isFunction(this.providerConfig[paramName]) ? this.providerConfig[paramName]() : this.providerConfig[camelCaseParamName];
+        let paramValue = isFunction(this.providerConfig[paramName])
+          ? this.providerConfig[paramName]()
+          : this.providerConfig[camelCaseParamName];
 
-        if (paramName === 'redirect_uri' && !paramValue) return
+        if (paramName === 'redirect_uri' && !paramValue) return;
 
         if (paramName === 'state') {
           let stateName = this.providerConfig.name + '_state';
@@ -1157,7 +1283,9 @@ class OAuth2 {
         if (paramName === 'scope' && Array.isArray(paramValue)) {
           paramValue = paramValue.join(this.providerConfig.scopeDelimiter);
           if (this.providerConfig.scopePrefix) {
-            paramValue = [this.providerConfig.scopePrefix, paramValue].join(this.providerConfig.scopeDelimiter);
+            paramValue = [this.providerConfig.scopePrefix, paramValue].join(
+              this.providerConfig.scopeDelimiter
+            );
           }
         }
 
@@ -1165,9 +1293,11 @@ class OAuth2 {
       });
     });
 
-    return keyValuePairs.map((param) => {
-      return param.join('=')
-    }).join('&')
+    return keyValuePairs
+      .map(param => {
+        return param.join('=');
+      })
+      .join('&');
   }
 }
 
@@ -1180,38 +1310,41 @@ class VueAuthenticate {
     Object.defineProperties(this, {
       $http: {
         get() {
-          return $http
-        }
+          return $http;
+        },
       },
 
       options: {
         get() {
-          return options
-        }
+          return options;
+        },
       },
 
       storage: {
         get() {
-          return storage
-        }
+          return storage;
+        },
       },
 
       tokenName: {
         get() {
           if (this.options.tokenPrefix) {
-            return [this.options.tokenPrefix, this.options.tokenName].join('_')
+            return [this.options.tokenPrefix, this.options.tokenName].join('_');
           } else {
-            return this.options.tokenName
+            return this.options.tokenName;
           }
-        }
+        },
       },
     });
 
     // Setup request interceptors
-    if (this.options.bindRequestInterceptor && isFunction(this.options.bindRequestInterceptor)) {
+    if (
+      this.options.bindRequestInterceptor &&
+      isFunction(this.options.bindRequestInterceptor)
+    ) {
       this.options.bindRequestInterceptor.call(this, this);
     } else {
-      throw new Error('Request interceptor must be functions')
+      throw new Error('Request interceptor must be functions');
     }
   }
 
@@ -1224,22 +1357,26 @@ class VueAuthenticate {
   isAuthenticated() {
     let token = this.storage.getItem(this.tokenName);
 
-    if (token) {  // Token is present
-      if (token.split('.').length === 3) {  // Token with a valid JWT format XXX.YYY.ZZZ
-        try { // Could be a valid JWT or an access token with the same format
+    if (token) {
+      // Token is present
+      if (token.split('.').length === 3) {
+        // Token with a valid JWT format XXX.YYY.ZZZ
+        try {
+          // Could be a valid JWT or an access token with the same format
           const base64Url = token.split('.')[1];
           const base64 = base64Url.replace('-', '+').replace('_', '/');
           const exp = JSON.parse($window.atob(base64)).exp;
-          if (typeof exp === 'number') {  // JWT with an optonal expiration claims
+          if (typeof exp === 'number') {
+            // JWT with an optonal expiration claims
             return Math.round(new Date().getTime() / 1000) < exp;
           }
         } catch (e) {
-          return true;  // Pass: Non-JWT token that looks like JWT
+          return true; // Pass: Non-JWT token that looks like JWT
         }
       }
-      return true;  // Pass: All other tokens
+      return true; // Pass: All other tokens
     }
-    return false
+    return false;
   }
 
   /**
@@ -1247,7 +1384,7 @@ class VueAuthenticate {
    * @return {String} Authentication token
    */
   getToken() {
-    return this.storage.getItem(this.tokenName)
+    return this.storage.getItem(this.tokenName);
   }
 
   /**
@@ -1275,7 +1412,7 @@ class VueAuthenticate {
         const base64Url = token.split('.')[1];
         const base64 = base64Url.replace('-', '+').replace('_', '/');
         return JSON.parse(decodeBase64(base64));
-      } catch (e) { }
+      } catch (e) {}
     }
   }
 
@@ -1287,15 +1424,19 @@ class VueAuthenticate {
    */
   login(user, requestOptions) {
     requestOptions = requestOptions || {};
-    requestOptions.url = requestOptions.url ? requestOptions.url : joinUrl(this.options.baseUrl, this.options.loginUrl);
-    requestOptions[this.options.requestDataKey] = user || requestOptions[this.options.requestDataKey];
+    requestOptions.url = requestOptions.url
+      ? requestOptions.url
+      : joinUrl(this.options.baseUrl, this.options.loginUrl);
+    requestOptions[this.options.requestDataKey] =
+      user || requestOptions[this.options.requestDataKey];
     requestOptions.method = requestOptions.method || 'POST';
-    requestOptions.withCredentials = requestOptions.withCredentials || this.options.withCredentials;
+    requestOptions.withCredentials =
+      requestOptions.withCredentials || this.options.withCredentials;
 
-    return this.$http(requestOptions).then((response) => {
+    return this.$http(requestOptions).then(response => {
       this.setToken(response);
-      return response
-    })
+      return response;
+    });
   }
 
   /**
@@ -1306,15 +1447,19 @@ class VueAuthenticate {
    */
   register(user, requestOptions) {
     requestOptions = requestOptions || {};
-    requestOptions.url = requestOptions.url ? requestOptions.url : joinUrl(this.options.baseUrl, this.options.registerUrl);
-    requestOptions[this.options.requestDataKey] = user || requestOptions[this.options.requestDataKey];
+    requestOptions.url = requestOptions.url
+      ? requestOptions.url
+      : joinUrl(this.options.baseUrl, this.options.registerUrl);
+    requestOptions[this.options.requestDataKey] =
+      user || requestOptions[this.options.requestDataKey];
     requestOptions.method = requestOptions.method || 'POST';
-    requestOptions.withCredentials = requestOptions.withCredentials || this.options.withCredentials;
+    requestOptions.withCredentials =
+      requestOptions.withCredentials || this.options.withCredentials;
 
-    return this.$http(requestOptions).then((response) => {
+    return this.$http(requestOptions).then(response => {
       this.setToken(response);
-      return response
-    })
+      return response;
+    });
   }
 
   /**
@@ -1324,21 +1469,27 @@ class VueAuthenticate {
    */
   logout(requestOptions) {
     if (!this.isAuthenticated()) {
-      return Promise$1.reject(new Error('There is no currently authenticated user'))
+      return Promise$1.reject(
+        new Error('There is no currently authenticated user')
+      );
     }
 
     requestOptions = requestOptions || {};
 
     if (requestOptions.url || this.options.logoutUrl) {
-      requestOptions.url = requestOptions.url ? requestOptions.url : joinUrl(this.options.baseUrl, this.options.logoutUrl);
+      requestOptions.url = requestOptions.url
+        ? requestOptions.url
+        : joinUrl(this.options.baseUrl, this.options.logoutUrl);
       requestOptions.method = requestOptions.method || 'POST';
-      requestOptions[this.options.requestDataKey] = requestOptions[this.options.requestDataKey] || undefined;
-      requestOptions.withCredentials = requestOptions.withCredentials || this.options.withCredentials;
+      requestOptions[this.options.requestDataKey] =
+        requestOptions[this.options.requestDataKey] || undefined;
+      requestOptions.withCredentials =
+        requestOptions.withCredentials || this.options.withCredentials;
 
-      return this.$http(requestOptions).then((response) => {
+      return this.$http(requestOptions).then(response => {
         this.storage.removeItem(this.tokenName);
-        return response
-      })
+        return response;
+      });
     } else {
       this.storage.removeItem(this.tokenName);
       return Promise$1.resolve();
@@ -1347,7 +1498,7 @@ class VueAuthenticate {
 
   /**
    * Authenticate user using authentication provider
-   * 
+   *
    * @param  {String} provider       Provider name
    * @param  {Object} userData       User data
    * @return {Promise}               Request promise
@@ -1356,67 +1507,93 @@ class VueAuthenticate {
     return new Promise$1((resolve, reject) => {
       var providerConfig = this.options.providers[provider];
       if (!providerConfig) {
-        return reject(new Error('Unknown provider'))
+        return reject(new Error('Unknown provider'));
       }
 
       let providerInstance;
       switch (providerConfig.oauthType) {
         case '1.0':
-          providerInstance = new OAuth(this.$http, this.storage, providerConfig, this.options);
-          break
+          providerInstance = new OAuth(
+            this.$http,
+            this.storage,
+            providerConfig,
+            this.options
+          );
+          break;
         case '2.0':
-          providerInstance = new OAuth2(this.$http, this.storage, providerConfig, this.options);
-          break
+          providerInstance = new OAuth2(
+            this.$http,
+            this.storage,
+            providerConfig,
+            this.options
+          );
+          break;
         default:
-          return reject(new Error('Invalid OAuth type'))
+          return reject(new Error('Invalid OAuth type'));
       }
 
-      return providerInstance.init(userData).then((response) => {
-        this.setToken(response, providerConfig.tokenPath);
+      return providerInstance
+        .init(userData)
+        .then(response => {
+          this.setToken(response, providerConfig.tokenPath);
 
-        if (this.isAuthenticated()) {
-          return resolve(response)
-        } else {
-          return reject(new Error('Authentication failed'))
-        }
-      }).catch(err => reject(err))
-    })
+          if (this.isAuthenticated()) {
+            return resolve(response);
+          } else {
+            return reject(new Error('Authentication failed'));
+          }
+        })
+        .catch(err => reject(err));
+    });
   }
 
   /**
-  * Link user using authentication provider without login
-  *
-  * @param  {String} provider       Provider name
-  * @param  {Object} userData       User data
-  * @return {Promise}               Request promise
-  */
+   * Link user using authentication provider without login
+   *
+   * @param  {String} provider       Provider name
+   * @param  {Object} userData       User data
+   * @return {Promise}               Request promise
+   */
   link(provider, userData) {
     return new Promise$1((resolve, reject) => {
       var providerConfig = this.options.providers[provider];
       if (!providerConfig) {
-        return reject(new Error('Unknown provider'))
+        return reject(new Error('Unknown provider'));
       }
 
       let providerInstance;
       switch (providerConfig.oauthType) {
         case '1.0':
-          providerInstance = new OAuth(this.$http, this.storage, providerConfig, this.options);
-          break
+          providerInstance = new OAuth(
+            this.$http,
+            this.storage,
+            providerConfig,
+            this.options
+          );
+          break;
         case '2.0':
-          providerInstance = new OAuth2(this.$http, this.storage, providerConfig, this.options);
-          break
+          providerInstance = new OAuth2(
+            this.$http,
+            this.storage,
+            providerConfig,
+            this.options
+          );
+          break;
         default:
-          return reject(new Error('Invalid OAuth type'))
+          return reject(new Error('Invalid OAuth type'));
       }
 
-      return providerInstance.init(userData).then(response => {
-        if (response[this.options.responseDataKey]) {
-          response = response[this.options.responseDataKey];
-        }
+      return providerInstance
+        .init(userData)
+        .then(response => {
+          if (response[this.options.responseDataKey]) {
+            response = response[this.options.responseDataKey];
+          }
 
-        resolve(response);
-      }).catch(reject);
-    })
+          resolve(response);
+        })
+        .catch(reject);
+    });
   }
 }
 
@@ -1445,8 +1622,8 @@ function plugin(Vue, options) {
           vueAuthInstance = new VueAuthenticate(this.$http, options);
         }
         return vueAuthInstance;
-      }
-    }
+      },
+    },
   });
 }
 
