@@ -25,4 +25,4 @@ class SessionStorage {
   }
 }
 
-export default LocalStorage;
+export default SessionStorage;
