@@ -1,6 +1,5 @@
-import './utils.js'
-import Promise from './promise.js'
-import VueAuthenticate from './authenticate.js'
+import './utils.js';
+import VueAuthenticate from './authenticate.js';
 
 /**
  * VueAuthenticate plugin
@@ -9,9 +8,10 @@ import VueAuthenticate from './authenticate.js'
  */
 function plugin(Vue, options) {
   if (plugin.installed) {
-    return
+    return;
   }
-  plugin.installed = true
+
+  plugin.installed = true;
 
   let vueAuthInstance = null;
   Object.defineProperties(Vue.prototype, {
@@ -20,15 +20,15 @@ function plugin(Vue, options) {
         if (!vueAuthInstance) {
           // Request handler library not found, throw error
           if (!this.$http) {
-            throw new Error('Request handler instance not found')
+            throw new Error('Request handler instance not found');
           }
 
-          vueAuthInstance = new VueAuthenticate(this.$http, options)
+          vueAuthInstance = new VueAuthenticate(this.$http, options);
         }
-        return vueAuthInstance
-      }
-    }
-  })
+        return vueAuthInstance;
+      },
+    },
+  });
 }
 
 /**
@@ -38,7 +38,7 @@ function plugin(Vue, options) {
  * @return {VueAuthenticate}  VueAuthenticate instance
  */
 plugin.factory = function ($http, options) {
-  return new VueAuthenticate($http, options)
-}
+  return new VueAuthenticate($http, options);
+};
 
-export default plugin
+export default plugin;

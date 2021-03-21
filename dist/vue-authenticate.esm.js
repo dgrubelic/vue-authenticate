@@ -5,8 +5,6 @@
  * 
  */
 
-'use strict';
-
 if (typeof Object.assign != 'function') {
   Object.assign = function (target, varArgs) {
     if (target == null) {
@@ -1639,4 +1637,4 @@ plugin.factory = function ($http, options) {
   return new VueAuthenticate($http, options);
 };
 
-module.exports = plugin;
+export default plugin;
