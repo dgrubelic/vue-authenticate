@@ -1,5 +1,5 @@
 /**
- * vue-authenticate v1.4.1
+ * vue-authenticate v1.5.0
  * https://github.com/dgrubelic/vue-authenticate
  * Released under the MIT License.
  * 
@@ -616,7 +616,7 @@ var defaultOptions = {
     facebook: {
       name: 'facebook',
       url: '/auth/facebook',
-      authorizationEndpoint: 'https://www.facebook.com/v8.0/dialog/oauth',
+      authorizationEndpoint: 'https://www.facebook.com/v10.0/dialog/oauth',
       redirectUri: getRedirectUri('/'),
       requiredUrlParams: ['display', 'scope'],
       scope: ['email'],
