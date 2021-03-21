@@ -616,7 +616,7 @@ var defaultOptions = {
     facebook: {
       name: 'facebook',
       url: '/auth/facebook',
-      authorizationEndpoint: 'https://www.facebook.com/v8.0/dialog/oauth',
+      authorizationEndpoint: 'https://www.facebook.com/v10.0/dialog/oauth',
       redirectUri: getRedirectUri('/'),
       requiredUrlParams: ['display', 'scope'],
       scope: ['email'],
