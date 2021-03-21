@@ -3,8 +3,9 @@ import CookieStorage from './storage/cookie-storage.js';
 import LocalStorage from './storage/local-storage.js';
 import MemoryStorage from './storage/memory-storage.js';
 import SessionStorage from './storage/session-storage.js';
+import { IStorage, IStorageOptions } from './storage/types';
 
-export default function StorageFactory(options) {
+export default function StorageFactory(options: IStorageOptions): IStorage {
   switch (options.storageType) {
     case 'localStorage':
       try {
@@ -26,6 +27,5 @@ export default function StorageFactory(options) {
     case 'memoryStorage':
     default:
       return new MemoryStorage(options.storageNamespace);
-      break;
   }
 }

@@ -1,9 +1,13 @@
 import { $document } from '../globals.js';
 import { objectExtend, formatCookie, parseCookies } from '../utils.js';
 import { getCookieDomainUrl } from '../options.js';
+import { IStorage, ICookieStorageOptions } from './types';
 
-class CookieStorage {
-  constructor(defaultOptions) {
+class CookieStorage implements IStorage {
+  namespace?: string;
+  _defaultOptions: ICookieStorageOptions;
+
+  constructor(defaultOptions?: ICookieStorageOptions) {
     this._defaultOptions = objectExtend(
       {
         domain: getCookieDomainUrl(),
@@ -15,18 +19,18 @@ class CookieStorage {
     );
   }
 
-  setItem(key, value) {
+  setItem(key: string, value: ICookieStorageOptions) {
     const options = objectExtend({}, this._defaultOptions);
     const cookie = formatCookie(key, value, options);
     this._setCookie(cookie);
   }
 
-  getItem(key) {
+  getItem(key: string): unknown {
     const cookies = parseCookies(this._getCookie());
     return cookies.hasOwnProperty(key) ? cookies[key] : null;
   }
 
-  removeItem(key) {
+  removeItem(key: string): void {
     const value = '';
     const defaultOptions = objectExtend({}, this._defaultOptions);
     const options = objectExtend(defaultOptions, {
@@ -36,7 +40,7 @@ class CookieStorage {
     this._setCookie(cookie);
   }
 
-  _getCookie() {
+  _getCookie(): string {
     try {
       return $document.cookie === 'undefined' ? '' : $document.cookie;
     } catch (e) {}
@@ -44,10 +48,14 @@ class CookieStorage {
     return '';
   }
 
-  _setCookie(cookie) {
+  _setCookie(cookie: string) {
     try {
       $document.cookie = cookie;
     } catch (e) {}
+  }
+
+  _getStorageKey() {
+    return null;
   }
 }
 

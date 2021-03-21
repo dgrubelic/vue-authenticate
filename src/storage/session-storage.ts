@@ -1,19 +1,22 @@
 import { $window } from '../globals.js';
+import { IStorage } from './types';
 
-class SessionStorage {
-  constructor(namespace) {
+class SessionStorage implements IStorage {
+  namespace?: string;
+
+  constructor(namespace?: string) {
     this.namespace = namespace || null;
   }
 
-  setItem(key, value) {
+  setItem(key: string, value: unknown): void {
     $window.sessionStorage.setItem(this._getStorageKey(key), value);
   }
 
-  getItem(key) {
+  getItem(key: string): unknown {
     return $window.sessionStorage.getItem(this._getStorageKey(key));
   }
 
-  removeItem(key) {
+  removeItem(key: string): void {
     $window.sessionStorage.removeItem(this._getStorageKey(key));
   }
 
