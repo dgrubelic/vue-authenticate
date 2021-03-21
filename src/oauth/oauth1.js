@@ -1,6 +1,12 @@
-import OAuthPopup from './popup.js'
+import OAuthPopup from './popup.js';
 import { $window } from '../globals.js';
-import { objectExtend, isString, isObject, isFunction, joinUrl } from '../utils.js'
+import {
+  objectExtend,
+  isString,
+  isObject,
+  isFunction,
+  joinUrl,
+} from '../utils.js';
 
 const defaultProviderConfig = {
   name: null,
@@ -13,35 +19,39 @@ const defaultProviderConfig = {
   requiredUrlParams: null,
   defaultUrlParams: null,
   oauthType: '1.0',
-  popupOptions: {}
-}
+  popupOptions: {},
+};
 
 export default class OAuth {
   constructor($http, storage, providerConfig, options) {
-    this.$http = $http
-    this.storage = storage
-    this.providerConfig = objectExtend({}, defaultProviderConfig)
-    this.providerConfig = objectExtend(this.providerConfig, providerConfig)
-    this.options = options
+    this.$http = $http;
+    this.storage = storage;
+    this.providerConfig = objectExtend({}, defaultProviderConfig);
+    this.providerConfig = objectExtend(this.providerConfig, providerConfig);
+    this.options = options;
   }
 
   /**
-   * Initialize OAuth1 process 
+   * Initialize OAuth1 process
    * @param  {Object} userData User data
    * @return {Promise}
    */
   init(userData) {
-    this.oauthPopup = new OAuthPopup('about:blank', this.providerConfig.name, this.providerConfig.popupOptions)
+    this.oauthPopup = new OAuthPopup(
+      'about:blank',
+      this.providerConfig.name,
+      this.providerConfig.popupOptions
+    );
 
     if (!$window['cordova']) {
-      this.oauthPopup.open(this.providerConfig.redirectUri, true)
+      this.oauthPopup.open(this.providerConfig.redirectUri, true);
     }
 
-    return this.getRequestToken().then((response) => {
-      return this.openPopup(response).then((popupResponse) => {
-        return this.exchangeForToken(popupResponse, userData)
-      })
-    })
+    return this.getRequestToken().then(response => {
+      return this.openPopup(response).then(popupResponse => {
+        return this.exchangeForToken(popupResponse, userData);
+      });
+    });
   }
 
   /**
@@ -49,17 +59,23 @@ export default class OAuth {
    * @return {Promise}
    */
   getRequestToken() {
-    let requestOptions = {}
-    requestOptions.method = 'POST'
-    requestOptions[this.options.requestDataKey] = objectExtend({}, this.providerConfig)
-    requestOptions.withCredentials = this.options.withCredentials
+    let requestOptions = {};
+    requestOptions.method = 'POST';
+    requestOptions[this.options.requestDataKey] = objectExtend(
+      {},
+      this.providerConfig
+    );
+    requestOptions.withCredentials = this.options.withCredentials;
     if (this.options.baseUrl) {
-      requestOptions.url = joinUrl(this.options.baseUrl, this.providerConfig.url)
+      requestOptions.url = joinUrl(
+        this.options.baseUrl,
+        this.providerConfig.url
+      );
     } else {
-      requestOptions.url = this.providerConfig.url
+      requestOptions.url = this.providerConfig.url;
     }
 
-    return this.$http(requestOptions)
+    return this.$http(requestOptions);
   }
 
   /**
@@ -68,13 +84,16 @@ export default class OAuth {
    * @return {Promise}
    */
   openPopup(response) {
-    const url = [this.providerConfig.authorizationEndpoint, this.buildQueryString(response[this.options.responseDataKey])].join('?');
+    const url = [
+      this.providerConfig.authorizationEndpoint,
+      this.buildQueryString(response[this.options.responseDataKey]),
+    ].join('?');
 
-    this.oauthPopup.popup.location = url
+    this.oauthPopup.popup.location = url;
     if ($window['cordova']) {
-      return this.oauthPopup.open(this.providerConfig.redirectUri)
+      return this.oauthPopup.open(this.providerConfig.redirectUri);
     } else {
-      return this.oauthPopup.pooling(this.providerConfig.redirectUri)
+      return this.oauthPopup.pooling(this.providerConfig.redirectUri);
     }
   }
 
@@ -85,25 +104,30 @@ export default class OAuth {
    * @return {Promise}
    */
   exchangeForToken(oauth, userData) {
-    let payload = objectExtend({}, userData)
-    payload = objectExtend(payload, oauth)
-    let requestOptions = {}
-    requestOptions.method = 'POST'
-    requestOptions[this.options.requestDataKey] = payload
-    requestOptions.withCredentials = this.options.withCredentials
+    let payload = objectExtend({}, userData);
+    payload = objectExtend(payload, oauth);
+    let requestOptions = {};
+    requestOptions.method = 'POST';
+    requestOptions[this.options.requestDataKey] = payload;
+    requestOptions.withCredentials = this.options.withCredentials;
     if (this.options.baseUrl) {
-      requestOptions.url = joinUrl(this.options.baseUrl, this.providerConfig.url)
+      requestOptions.url = joinUrl(
+        this.options.baseUrl,
+        this.providerConfig.url
+      );
     } else {
-      requestOptions.url = this.providerConfig.url
+      requestOptions.url = this.providerConfig.url;
     }
-    return this.$http(requestOptions)
+    return this.$http(requestOptions);
   }
 
   buildQueryString(params) {
     const parsedParams = [];
     for (var key in params) {
-      let value = params[key]
-      parsedParams.push(encodeURIComponent(key) + '=' + encodeURIComponent(value));
+      let value = params[key];
+      parsedParams.push(
+        encodeURIComponent(key) + '=' + encodeURIComponent(value)
+      );
     }
     return parsedParams.join('&');
   }

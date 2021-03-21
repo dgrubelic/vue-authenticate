@@ -12,7 +12,8 @@ function bind(fn, thisArg) {
 }
 
 function Promise(fn) {
-  if (typeof this !== 'object') throw new TypeError('Promises must be constructed via new');
+  if (typeof this !== 'object')
+    throw new TypeError('Promises must be constructed via new');
   if (typeof fn !== 'function') throw new TypeError('not a function');
   this._state = 0;
   this._handled = false;
@@ -51,8 +52,12 @@ function handle(self, deferred) {
 function resolve(self, newValue) {
   try {
     // Promise Resolution Procedure: https://github.com/promises-aplus/promises-spec#the-promise-resolution-procedure
-    if (newValue === self) throw new TypeError('A promise cannot be resolved with itself.');
-    if (newValue && (typeof newValue === 'object' || typeof newValue === 'function')) {
+    if (newValue === self)
+      throw new TypeError('A promise cannot be resolved with itself.');
+    if (
+      newValue &&
+      (typeof newValue === 'object' || typeof newValue === 'function')
+    ) {
       var then = newValue.then;
       if (newValue instanceof Promise) {
         self._state = 3;
@@ -80,7 +85,7 @@ function reject(self, newValue) {
 
 function finale(self) {
   if (self._state === 2 && self._deferreds.length === 0) {
-    Promise._immediateFn(function() {
+    Promise._immediateFn(function () {
       if (!self._handled) {
         Promise._unhandledRejectionFn(self._value);
       }
@@ -108,15 +113,18 @@ function Handler(onFulfilled, onRejected, promise) {
 function doResolve(fn, self) {
   var done = false;
   try {
-    fn(function (value) {
-      if (done) return;
-      done = true;
-      resolve(self, value);
-    }, function (reason) {
-      if (done) return;
-      done = true;
-      reject(self, reason);
-    });
+    fn(
+      function (value) {
+        if (done) return;
+        done = true;
+        resolve(self, value);
+      },
+      function (reason) {
+        if (done) return;
+        done = true;
+        reject(self, reason);
+      }
+    );
   } catch (ex) {
     if (done) return;
     done = true;
@@ -129,7 +137,7 @@ Promise.prototype['catch'] = function (onRejected) {
 };
 
 Promise.prototype.then = function (onFulfilled, onRejected) {
-  var prom = new (this.constructor)(noop);
+  var prom = new this.constructor(noop);
 
   handle(this, new Handler(onFulfilled, onRejected, prom));
   return prom;
@@ -147,9 +155,13 @@ Promise.all = function (arr) {
         if (val && (typeof val === 'object' || typeof val === 'function')) {
           var then = val.then;
           if (typeof then === 'function') {
-            then.call(val, function (val) {
-              res(i, val);
-            }, reject);
+            then.call(
+              val,
+              function (val) {
+                res(i, val);
+              },
+              reject
+            );
             return;
           }
         }
@@ -193,7 +205,11 @@ Promise.race = function (values) {
 };
 
 // Use polyfill for setImmediate for performance gains
-Promise._immediateFn = (typeof setImmediate === 'function' && function (fn) { setImmediate(fn); }) ||
+Promise._immediateFn =
+  (typeof setImmediate === 'function' &&
+    function (fn) {
+      setImmediate(fn);
+    }) ||
   function (fn) {
     setTimeoutFunc(fn, 0);
   };

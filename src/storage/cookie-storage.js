@@ -1,19 +1,18 @@
 import { $document } from '../globals.js';
-import {
-  objectExtend,
-  formatCookie,
-  parseCookies
-} from '../utils.js';
+import { objectExtend, formatCookie, parseCookies } from '../utils.js';
 import { getCookieDomainUrl } from '../options.js';
 
 class CookieStorage {
   constructor(defaultOptions) {
-    this._defaultOptions = objectExtend({
-      domain: getCookieDomainUrl(),
-      expires: null,
-      path: '/',
-      secure: false
-    }, defaultOptions);
+    this._defaultOptions = objectExtend(
+      {
+        domain: getCookieDomainUrl(),
+        expires: null,
+        path: '/',
+        secure: false,
+      },
+      defaultOptions
+    );
   }
 
   setItem(key, value) {
@@ -31,7 +30,7 @@ class CookieStorage {
     const value = '';
     const defaultOptions = objectExtend({}, this._defaultOptions);
     const options = objectExtend(defaultOptions, {
-      expires: new Date(0)
+      expires: new Date(0),
     });
     const cookie = formatCookie(key, value, options);
     this._setCookie(cookie);
@@ -39,9 +38,9 @@ class CookieStorage {
 
   _getCookie() {
     try {
-      return $document.cookie === 'undefined' ? '' : $document.cookie
+      return $document.cookie === 'undefined' ? '' : $document.cookie;
     } catch (e) {}
-    
+
     return '';
   }
 
@@ -52,4 +51,4 @@ class CookieStorage {
   }
 }
 
-export default CookieStorage
+export default CookieStorage;
