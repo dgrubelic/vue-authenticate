@@ -141,7 +141,7 @@ export default {
       url: '/auth/linkedin',
       authorizationEndpoint: 'https://www.linkedin.com/oauth/v2/authorization',
       redirectUri: getRedirectUri(),
-      requiredUrlParams: ['state'],
+      requiredUrlParams: ['state', 'scope'],
       scope: ['r_emailaddress'],
       scopeDelimiter: ' ',
       state: 'STATE',
