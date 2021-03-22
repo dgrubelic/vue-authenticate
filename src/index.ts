@@ -1,6 +1,7 @@
 import VueAuthenticate from './authenticate.js';
 import VueInterface from 'vue';
 import { AuthConfig } from './options.js';
+import { AuthHttp } from './network/types';
 
 declare module 'vue/types/vue' {
   interface Vue {
@@ -48,7 +49,7 @@ const plugin = {
    * @param  {Object} options   Configuration object
    * @return {VueAuthenticate}  VueAuthenticate instance
    */
-  factory($http: unknown, options: AuthConfig) {
+  factory($http: AuthHttp, options: AuthConfig) {
     return new VueAuthenticate($http, options);
   },
 };

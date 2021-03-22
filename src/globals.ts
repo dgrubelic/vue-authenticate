@@ -3,9 +3,12 @@ const fakeDocument = {
 };
 
 const fakeWindow = {
-  atob() { },
-  open() { },
-  location: {},
+  atob: (): string => '',
+  open: (): string => '',
+  location: {
+    hostname: '',
+    origin: '',
+  },
   localStorage: {
     setItem() { },
     getItem() { },

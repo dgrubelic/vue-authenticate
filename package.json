@@ -98,10 +98,12 @@
     "oauth 2.0"
   ],
   "dependencies": {
+    "@babel/runtime": "^7.9.2",
+    "@types/whatwg-fetch": "0.0.33",
     "axios": "^0.18.0",
     "typescript": "^4.2.3",
     "vue": "^2.6.10",
     "vue-axios": "^2.1.4",
-    "@babel/runtime": "^7.9.2"
+    "whatwg-fetch": "^3.6.2"
   }
 }

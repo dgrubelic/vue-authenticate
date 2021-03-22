@@ -5,6 +5,8 @@ import {
   joinUrl,
 } from '../utils';
 import { IStorage } from '../storage/types';
+import { AuthConfig, ProviderConfig } from '../options';
+import { AuthHttp, AuthResponse } from '../network/types';
 
 const defaultProviderConfig = {
   name: null,
@@ -21,9 +23,13 @@ const defaultProviderConfig = {
 };
 
 export default class OAuth {
+  $http: AuthHttp;
+  oauthPopup?: OAuthPopup;
+  options: AuthConfig;
+  providerConfig: ProviderConfig;
   storage: IStorage;
 
-  constructor($http: unknown, storage: IStorage, providerConfig, options) {
+  constructor($http: AuthHttp, storage: IStorage, providerConfig: ProviderConfig, options: AuthConfig) {
     this.$http = $http;
     this.storage = storage;
     this.providerConfig = objectExtend({}, defaultProviderConfig);
@@ -36,7 +42,7 @@ export default class OAuth {
    * @param  {Object} userData User data
    * @return {Promise}
    */
-  init(userData) {
+  init(data: Record<string, any>) {
     this.oauthPopup = new OAuthPopup(
       'about:blank',
       this.providerConfig.name,
@@ -48,8 +54,8 @@ export default class OAuth {
     }
 
     return this.getRequestToken().then(response => {
-      return this.openPopup(response).then(popupResponse => {
-        return this.exchangeForToken(popupResponse, userData);
+      return this.openPopup(response).then((popupResponse: AuthResponse) => {
+        return this.exchangeForToken(popupResponse, data);
       });
     });
   }
@@ -58,24 +64,18 @@ export default class OAuth {
    * Get OAuth1 request token
    * @return {Promise}
    */
-  getRequestToken() {
-    let requestOptions = {};
-    requestOptions.method = 'POST';
-    requestOptions[this.options.requestDataKey] = objectExtend(
-      {},
-      this.providerConfig
-    );
-    requestOptions.withCredentials = this.options.withCredentials;
-    if (this.options.baseUrl) {
-      requestOptions.url = joinUrl(
+  async getRequestToken(): Promise<AuthResponse> {
+    const requestUrl = this.options.baseUrl ? joinUrl(
         this.options.baseUrl,
         this.providerConfig.url
-      );
-    } else {
-      requestOptions.url = this.providerConfig.url;
-    }
+      ) : this.providerConfig.url;
 
-    return this.$http(requestOptions);
+    const requestOptions = {
+      method: 'POST',
+      credentials: this.options.credentials,
+    };
+
+    return this.$http(requestUrl, requestOptions);
   }
 
   /**
@@ -83,7 +83,7 @@ export default class OAuth {
    * @param  {Object} response Response object containing request token
    * @return {Promise}
    */
-  openPopup(response) {
+  openPopup(response: AuthResponse) {
     const url = [
       this.providerConfig.authorizationEndpoint,
       this.buildQueryString(response[this.options.responseDataKey]),
@@ -103,25 +103,25 @@ export default class OAuth {
    * @param  {Object} userData User data
    * @return {Promise}
    */
-  exchangeForToken(oauth, userData) {
-    let payload = objectExtend({}, userData);
-    payload = objectExtend(payload, oauth);
-    let requestOptions = {};
-    requestOptions.method = 'POST';
-    requestOptions[this.options.requestDataKey] = payload;
-    requestOptions.withCredentials = this.options.withCredentials;
-    if (this.options.baseUrl) {
-      requestOptions.url = joinUrl(
+  async exchangeForToken(oauthData: Record<string, any>, data: Record<string, any>): Promise<AuthResponse> {
+    let payload = objectExtend({}, data);
+    payload = objectExtend(payload, oauthData);
+
+    const requestUrl = this.options.baseUrl ? joinUrl(
         this.options.baseUrl,
         this.providerConfig.url
-      );
-    } else {
-      requestOptions.url = this.providerConfig.url;
-    }
-    return this.$http(requestOptions);
+      ) : this.providerConfig.url;
+
+    const requestOptions = {
+      method: 'POST',
+      body: JSON.stringify(payload),
+      credentials: this.options.credentials,
+    };
+
+    return this.$http(requestUrl, requestOptions);
   }
 
-  buildQueryString(params) {
+  buildQueryString(params: Record<string, any>) {
     const parsedParams = [];
     for (var key in params) {
       let value = params[key];
