@@ -1,5 +1,5 @@
 if (typeof Object.assign != 'function') {
-  Object.assign = function (target, varArgs) {
+  Object.assign = function (target: Record<string, unknown>, varArgs: Record<string, unknown>) {
     'use strict';
     if (target == null) {
       throw new TypeError('Cannot convert undefined or null to object');
@@ -24,7 +24,7 @@ if (typeof Object.assign != 'function') {
   };
 }
 
-export function camelCase(name) {
+export function camelCase(name: string): string {
   return name.replace(/([\:\-\_]+(.))/g, function (
     _,
     separator,
@@ -35,27 +35,27 @@ export function camelCase(name) {
   });
 }
 
-export function isUndefined(value) {
+export function isUndefined(value: unknown): boolean {
   return typeof value === 'undefined';
 }
 
-export function isDefined(value) {
+export function isDefined(value: unknown): boolean {
   return typeof value !== 'undefined';
 }
 
-export function isObject(value) {
+export function isObject(value: unknown): boolean {
   return value !== null && typeof value === 'object';
 }
 
-export function isString(value) {
+export function isString(value: unknown): boolean {
   return typeof value === 'string';
 }
 
-export function isNumber(value) {
+export function isNumber(value: unknown): boolean {
   return typeof value === 'number';
 }
 
-export function isFunction(value) {
+export function isFunction(value: unknown): boolean {
   return typeof value === 'function';
 }
 
@@ -90,12 +90,12 @@ export function objectExtend(a, b) {
  * @param  {String} url     URI
  * @return {String}
  */
-export function joinUrl(baseUrl, url) {
+export function joinUrl(baseUrl: string, url: string): string {
   if (/^(?:[a-z]+:)?\/\//i.test(url)) {
     return url;
   }
   let joined = [baseUrl, url].join('/');
-  let normalize = function (str) {
+  let normalize = function (str: string) {
     return str
       .replace(/[\/]+/g, '/')
       .replace(/\/\?/g, '?')

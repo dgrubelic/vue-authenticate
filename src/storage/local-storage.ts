@@ -5,14 +5,14 @@ class LocalStorage implements IStorage {
   namespace?: string;
 
   constructor(namespace?: string) {
-    this.namespace = namespace || null;
+    this.namespace = namespace;
   }
 
-  setItem(key: string, value: unknown): void {
+  setItem(key: string, value: string): void {
     $window.localStorage.setItem(this._getStorageKey(key), value);
   }
 
-  getItem(key: string): unknown {
+  getItem(key: string): string | void | null {
     return $window.localStorage.getItem(this._getStorageKey(key));
   }
 

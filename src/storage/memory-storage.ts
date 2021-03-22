@@ -1,19 +1,19 @@
 import { IStorage } from './types'; 
 
 class MemoryStorage implements IStorage {
-  namespace: string;
-  _storage: Record<string, unknown>;
+  namespace?: string;
+  _storage: Record<string, string | void | null>;
 
   constructor(namespace?: string) {
-    this.namespace = namespace || null;
+    this.namespace = namespace;
     this._storage = {};
   }
 
-  setItem(key: string, value: unknown): void {
+  setItem(key: string, value: string | void | null): void {
     this._storage[this._getStorageKey(key)] = value;
   }
 
-  getItem(key: string): unknown {
+  getItem(key: string): string | void | null {
     return this._storage[this._getStorageKey(key)];
   }
 

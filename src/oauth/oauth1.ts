@@ -1,12 +1,10 @@
-import OAuthPopup from './popup.js';
-import { $window } from '../globals.js';
+import OAuthPopup from './popup';
+import { $window } from '../globals';
 import {
   objectExtend,
-  isString,
-  isObject,
-  isFunction,
   joinUrl,
-} from '../utils.js';
+} from '../utils';
+import { IStorage } from '../storage/types';
 
 const defaultProviderConfig = {
   name: null,
@@ -23,7 +21,9 @@ const defaultProviderConfig = {
 };
 
 export default class OAuth {
-  constructor($http, storage, providerConfig, options) {
+  storage: IStorage;
+
+  constructor($http: unknown, storage: IStorage, providerConfig, options) {
     this.$http = $http;
     this.storage = storage;
     this.providerConfig = objectExtend({}, defaultProviderConfig);

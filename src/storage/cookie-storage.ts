@@ -19,14 +19,14 @@ class CookieStorage implements IStorage {
     );
   }
 
-  setItem(key: string, value: ICookieStorageOptions) {
+  setItem(key: string, value: unknown): void {
     const options = objectExtend({}, this._defaultOptions);
     const cookie = formatCookie(key, value, options);
     this._setCookie(cookie);
   }
 
-  getItem(key: string): unknown {
-    const cookies = parseCookies(this._getCookie());
+  getItem(key: string): string | void | null {
+    const cookies: Record<string, string> = parseCookies(this._getCookie());
     return cookies.hasOwnProperty(key) ? cookies[key] : null;
   }
 
@@ -54,8 +54,8 @@ class CookieStorage implements IStorage {
     } catch (e) {}
   }
 
-  _getStorageKey() {
-    return null;
+  _getStorageKey(): string {
+    throw new Error('not supported');
   }
 }
 

@@ -1,11 +1,11 @@
-import Promise from '../promise.js';
-import { $document, $window } from '../globals.js';
+import Promise from '../promise';
+import { $document, $window } from '../globals';
 import {
   objectExtend,
   parseQueryString,
   getFullUrlPath,
   isUndefined,
-} from '../utils.js';
+} from '../utils';
 
 /**
  * OAuth2 popup management class
@@ -15,7 +15,7 @@ import {
  * and adjusted to fit vue-authenticate library
  */
 export default class OAuthPopup {
-  constructor(url, name, popupOptions) {
+  constructor(url: string, name: string, popupOptions) {
     this.popup = null;
     this.url = url;
     this.name = name;

@@ -1,15 +1,15 @@
 import { isUndefined } from './utils';
 import { $window } from './globals';
 
-export function getCookieDomainUrl() {
+export function getCookieDomainUrl(): string {
   try {
-    return $window.location.hostname;
+    return $window?.location?.hostname;
   } catch (e) {}
 
   return '';
 }
 
-export function getRedirectUri(uri) {
+export function getRedirectUri(uri?: string): string | null {
   try {
     return !isUndefined(uri)
       ? `${$window.location.origin}${uri}`
@@ -17,6 +17,32 @@ export function getRedirectUri(uri) {
   } catch (e) {}
 
   return uri || null;
+}
+
+export type ProviderConfig = {
+
+}
+
+export type AuthConfig = {
+  baseUrl?: string;
+  tokenPath: string;
+  tokenName: string;
+  tokenPrefix: string;
+  tokenHeader: string;
+  tokenType: string;
+  loginUrl: string;
+  registerUrl: string;
+  logoutUrl: string;
+  requestDataKey: string;
+  responseDataKey: string;
+  storageType: string;
+  storageNamespace: string;
+  cookieStorage: {
+    domain?: string;
+    path?: string;
+    secure?: boolean;
+  },
+  providers: { [providerName: string]: ProviderConfig },
 }
 
 /**

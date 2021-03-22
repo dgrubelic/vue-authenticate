@@ -1,7 +1,7 @@
 export interface IStorage {
   namespace?: string;
-  getItem: (key: string) => unknown;
-  setItem: (key: string, value: unknown) => void;
+  getItem: (key: string) => string | void | null;
+  setItem: (key: string, value: string) => void;
   removeItem: (key: string) => void;
   _getStorageKey: (key: string) => string;
 }

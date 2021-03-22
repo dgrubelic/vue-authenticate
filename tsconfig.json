@@ -1,6 +1,11 @@
 {
-  "compileOnSave": true,
   "compilerOptions": {
-    "target": "ES5"
+    "baseUrl": "./",
+    "target": "es5",
+    "strict": true,
+    "module": "es2015",
+    "moduleResolution": "node",
+    "noImplicitAny": true,
+    "noImplicitThis": true
   }
 }
