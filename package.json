@@ -8,6 +8,10 @@
   "scripts": {
     "build": "node build/build.rollup.js"
   },
+  "typings": "types/index.d.ts",
+  "files": [
+    "types/*.d.ts"
+  ],
   "keywords": [
     "vue",
     "vue.js",
