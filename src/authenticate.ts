@@ -216,7 +216,7 @@ export default class VueAuthenticate {
    * @param  {Object} userData       User data
    * @return {Promise}               Request promise
    */
-  async authenticate(provider: string, userData: any): Promise<AuthResponse> {
+  async authenticate(provider: string, data: any): Promise<AuthResponse> {
     let providerInstance;
     var providerConfig: ProviderConfig = this.options.providers[provider];
 
@@ -250,15 +250,10 @@ export default class VueAuthenticate {
     }
 
     return providerInstance
-      .init(userData)
+      .init(data)
       .then((response: AuthResponse) => {
         this.setToken(response, providerConfig.tokenPath);
-
-        if (this.isAuthenticated()) {
-          return response
-        } else {
-          new Error('Authentication failed')
-        }
+        return response;
       });
   }
 

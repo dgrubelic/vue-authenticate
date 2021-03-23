@@ -162,11 +162,11 @@ export function parseQueryString(str: string) {
  * @return {Object}
  */
 export function decodeBase64(str: string) {
-  let buffer: Buffer;
+  let bufferClass: Buffer;
 
   if (typeof module !== 'undefined' && module.exports) {
     try {
-      buffer = require('buffer').Buffer;
+      bufferClass = require('buffer').Buffer;
     } catch (err) {
       // noop
     }
@@ -213,11 +213,11 @@ export function decodeBase64(str: string) {
     return b.replace(re_btou, cb_btou);
   };
 
-  let _decode = buffer
-    ? function (a) {
-        return (a.constructor === buffer.constructor
+  let _decode = bufferClass
+    ? function (a: string) {
+        return (a.constructor === bufferClass.constructor
           ? a
-          : new buffer(a, 'base64')
+          : Buffer.from(a, 'base64')
         ).toString();
       }
     : function (a: string) {
