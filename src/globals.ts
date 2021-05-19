@@ -5,6 +5,7 @@ const fakeDocument = {
 const fakeWindow = {
   atob: (): string => '',
   open: (): string => '',
+  cordova: null,
   location: {
     hostname: '',
     origin: '',

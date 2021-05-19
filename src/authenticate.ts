@@ -299,8 +299,8 @@ export default class VueAuthenticate {
 
     return providerInstance
       .init(data)
-      .then((response: AuthResponse) => {
-        return response;
+      .then((response) => {
+        return response as AuthResponse;
       });
   }
 }

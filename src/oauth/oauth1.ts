@@ -1,4 +1,5 @@
 import OAuthPopup from './popup';
+import { VueAuthenticationError } from '../errors';
 import { $window } from '../globals';
 import {
   objectExtend,
@@ -42,7 +43,7 @@ export default class OAuth {
    * @param  {Object} userData User data
    * @return {Promise}
    */
-  init(data: Record<string, any>) {
+  async init(data: Record<string, any>): Promise<AuthResponse> {
     this.oauthPopup = new OAuthPopup(
       'about:blank',
       this.providerConfig.name,
@@ -53,7 +54,11 @@ export default class OAuth {
       this.oauthPopup.open(this.providerConfig.redirectUri, true);
     }
 
-    return this.getRequestToken().then(response => {
+    const tokenResponse = await this.getRequestToken();
+    const popupResponse: Record<string, unknown> = await this.openPopup(tokenResponse);
+    return this.exchangeForToken(popupResponse, data);
+
+    .then(response => {
       return this.openPopup(response).then((popupResponse: AuthResponse) => {
         return this.exchangeForToken(popupResponse, data);
       });
@@ -83,11 +88,15 @@ export default class OAuth {
    * @param  {Object} response Response object containing request token
    * @return {Promise}
    */
-  openPopup(response: AuthResponse) {
+  openPopup(response: AuthResponse): Response {
     const url = [
       this.providerConfig.authorizationEndpoint,
       this.buildQueryString(response[this.options.responseDataKey]),
     ].join('?');
+
+    if (!this.oauthPopup) {
+      throw new Error(VueAuthenticationError.INVALID_POPUP_INSTANCE);
+    }
 
     this.oauthPopup.popup.location = url;
     if ($window['cordova']) {

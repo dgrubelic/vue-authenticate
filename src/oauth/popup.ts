@@ -1,4 +1,3 @@
-import Promise from '../promise';
 import { $document, $window } from '../globals';
 import {
   objectExtend,
@@ -15,16 +14,22 @@ import {
  * and adjusted to fit vue-authenticate library
  */
 export default class OAuthPopup {
-  constructor(url: string, name: string, popupOptions) {
+  popup: Window | null;
+  popupOptions: Record<string, any>;
+  url: string;
+  name: string;
+
+  constructor(url: string, name: string, popupOptions?: Record<string, any>) {
     this.popup = null;
     this.url = url;
     this.name = name;
-    this.popupOptions = popupOptions;
+    this.popupOptions = popupOptions || {};
   }
 
-  open(redirectUri, skipPooling) {
+  open(redirectUri: string, skipPooling?: boolean) {
     try {
-      this.popup = $window.open(this.url, this.name, this._stringifyOptions());
+      this.popup = ($window.open(this.url, this.name, this._stringifyOptions())) as Window;
+
       if (this.popup && this.popup.focus) {
         this.popup.focus();
       }
@@ -39,21 +44,34 @@ export default class OAuthPopup {
     }
   }
 
-  pooling(redirectUri) {
-    return new Promise((resolve, reject) => {
-      const redirectUriParser = $document.createElement('a');
+  async pooling(redirectUri: string) {
+      const redirectUriParser: HTMLAnchorElement = ($document.createElement('a')) as HTMLAnchorElement;
       redirectUriParser.href = redirectUri;
-      const redirectUriPath = getFullUrlPath(redirectUriParser);
 
-      let poolingInterval = setInterval(() => {
+      if (!redirectUriParser) {
+        return;
+      }
+
+      const redirectUriPath = getFullUrlPath({
+        hash: redirectUriParser.hash,
+        hostname: redirectUriParser.hostname,
+        pathname: redirectUriParser.pathname,
+        protocol: redirectUriParser.protocol,
+        port: redirectUriParser.port,
+      } as Location);
+
+      let poolingInterval: NodeJS.Timeout | null = setInterval(() => {
         if (
           !this.popup ||
           this.popup.closed ||
           this.popup.closed === undefined
         ) {
-          clearInterval(poolingInterval);
+          if (poolingInterval) {
+            clearInterval(poolingInterval);
+          }
+
           poolingInterval = null;
-          reject(new Error('Auth popup window closed'));
+          throw new Error('Auth popup window closed');
         }
 
         try {
@@ -71,31 +89,30 @@ export default class OAuthPopup {
               params = objectExtend(params, hash);
 
               if (params.error) {
-                reject(new Error(params.error));
+                throw new Error(params.error);
               } else {
-                resolve(params);
-              }
-            } else {
-              reject(
-                new Error(
-                  'OAuth redirect has occurred but no query or hash parameters were found.'
-                )
-              );
-            }
+                if (poolingInterval) {
+                  clearInterval(poolingInterval);
+                }
+                
+                poolingInterval = null;
+                this.popup.close();
 
-            clearInterval(poolingInterval);
-            poolingInterval = null;
-            this.popup.close();
+                return params;
+              }
+            }
           }
         } catch (e) {
-          // Ignore DOMException: Blocked a frame with origin from accessing a cross-origin frame.
+          if (!(e instanceof DOMException)) {
+            throw e;
+          }
         }
       }, 250);
-    });
   }
 
   _stringifyOptions() {
     let options = [];
+
     for (var optionKey in this.popupOptions) {
       if (!isUndefined(this.popupOptions[optionKey])) {
         options.push(`${optionKey}=${this.popupOptions[optionKey]}`);
