@@ -1,15 +1,15 @@
 import { isUndefined } from './utils';
 import { $window } from './globals';
 
-export function getCookieDomainUrl() {
+export function getCookieDomainUrl(): string {
   try {
-    return $window.location.hostname;
+    return $window?.location?.hostname;
   } catch (e) {}
 
   return '';
 }
 
-export function getRedirectUri(uri) {
+export function getRedirectUri(uri?: string): string | null {
   try {
     return !isUndefined(uri)
       ? `${$window.location.origin}${uri}`
@@ -19,11 +19,56 @@ export function getRedirectUri(uri) {
   return uri || null;
 }
 
+export type ProviderConfig = {
+  name: string;
+  url: string;
+  clientId: string;
+  authorizationEndpoint: string;
+  redirectUri: string;
+  requiredUrlParams?: string[];
+  optionalUrlParams?: string[];
+  scope?: string[];
+  tokenPath: string;
+  scopeDelimiter?: string;
+  oauthType: '1.0' | '2.0';
+  state?: string;
+  popupOptions?: Record<string, any>;
+  responseType?: string;
+  responseParams?: {
+    code: string;
+    clientId: string;
+    redirectUri: string;
+  };
+}
+
+export type AuthConfig = {
+  baseUrl?: string;
+  tokenPath: string;
+  tokenName: string;
+  tokenPrefix: string;
+  tokenHeader: string;
+  tokenType: string;
+  loginUrl: string;
+  registerUrl: string;
+  logoutUrl: string;
+  requestDataKey: string;
+  responseDataKey: string;
+  storageType: string;
+  storageNamespace: string;
+  cookieStorage: {
+    domain?: string;
+    path?: string;
+    secure?: boolean;
+  },
+  providers: { [providerName: string]: ProviderConfig },
+  credentials?: RequestCredentials;
+}
+
 /**
  * Default configuration
  */
 export default {
-  baseUrl: null,
+  baseUrl: '',
   tokenPath: 'access_token',
   tokenName: 'token',
   tokenPrefix: 'vueauth',
@@ -31,7 +76,7 @@ export default {
   tokenType: 'Bearer',
   loginUrl: '/auth/login',
   registerUrl: '/auth/register',
-  logoutUrl: null,
+  logoutUrl: undefined,
   storageType: 'localStorage',
   storageNamespace: 'vue-authenticate',
   cookieStorage: {
@@ -39,46 +84,28 @@ export default {
     path: '/',
     secure: false,
   },
-  requestDataKey: 'data',
-  responseDataKey: 'data',
-
-  /**
-   * Default request interceptor for Axios library
-   * @context {VueAuthenticate}
-   */
-  bindRequestInterceptor: function ($auth) {
-    const tokenHeader = $auth.options.tokenHeader;
-
-    $auth.$http.interceptors.request.use(config => {
-      if ($auth.isAuthenticated()) {
-        config.headers[tokenHeader] = [
-          $auth.options.tokenType,
-          $auth.getToken(),
-        ].join(' ');
-      } else {
-        delete config.headers[tokenHeader];
-      }
-      return config;
-    });
-  },
 
   providers: {
     facebook: {
       name: 'facebook',
       url: '/auth/facebook',
+      clientId: '',
       authorizationEndpoint: 'https://www.facebook.com/v10.0/dialog/oauth',
       redirectUri: getRedirectUri('/'),
       requiredUrlParams: ['display', 'scope'],
+      tokenPath: 'access_token',
       scope: ['email'],
       scopeDelimiter: ',',
       display: 'popup',
       oauthType: '2.0',
       popupOptions: { width: 580, height: 400 },
+      tokenPath: 'access_token',
     },
 
     google: {
       name: 'google',
       url: '/auth/google',
+      clientId: '',
       authorizationEndpoint: 'https://accounts.google.com/o/oauth2/auth',
       redirectUri: getRedirectUri(),
       requiredUrlParams: ['scope'],
@@ -89,11 +116,13 @@ export default {
       display: 'popup',
       oauthType: '2.0',
       popupOptions: { width: 452, height: 633 },
+      tokenPath: 'access_token',
     },
 
     github: {
       name: 'github',
       url: '/auth/github',
+      clientId: '',
       authorizationEndpoint: 'https://github.com/login/oauth/authorize',
       redirectUri: getRedirectUri(),
       optionalUrlParams: ['scope'],
@@ -101,11 +130,13 @@ export default {
       scopeDelimiter: ' ',
       oauthType: '2.0',
       popupOptions: { width: 1020, height: 618 },
+      tokenPath: 'access_token',
     },
 
     instagram: {
       name: 'instagram',
       url: '/auth/instagram',
+      clientId: '',
       authorizationEndpoint: 'https://api.instagram.com/oauth/authorize',
       redirectUri: getRedirectUri(),
       requiredUrlParams: ['scope'],
@@ -113,20 +144,24 @@ export default {
       scopeDelimiter: '+',
       oauthType: '2.0',
       popupOptions: { width: null, height: null },
+      tokenPath: 'access_token',
     },
 
     twitter: {
       name: 'twitter',
       url: '/auth/twitter',
+      clientId: '',
       authorizationEndpoint: 'https://api.twitter.com/oauth/authenticate',
       redirectUri: getRedirectUri(),
       oauthType: '1.0',
       popupOptions: { width: 495, height: 645 },
+      tokenPath: 'access_token',
     },
 
     bitbucket: {
       name: 'bitbucket',
       url: '/auth/bitbucket',
+      clientId: '',
       authorizationEndpoint: 'https://bitbucket.org/site/oauth2/authorize',
       redirectUri: getRedirectUri('/'),
       optionalUrlParams: ['scope'],
@@ -134,11 +169,13 @@ export default {
       scopeDelimiter: ' ',
       oauthType: '2.0',
       popupOptions: { width: 1020, height: 618 },
+      tokenPath: 'access_token',
     },
 
     linkedin: {
       name: 'linkedin',
       url: '/auth/linkedin',
+      clientId: '',
       authorizationEndpoint: 'https://www.linkedin.com/oauth/v2/authorization',
       redirectUri: getRedirectUri(),
       requiredUrlParams: ['state'],
@@ -147,11 +184,13 @@ export default {
       state: 'STATE',
       oauthType: '2.0',
       popupOptions: { width: 527, height: 582 },
+      tokenPath: 'access_token',
     },
 
     live: {
       name: 'live',
       url: '/auth/live',
+      clientId: '',
       authorizationEndpoint: 'https://login.live.com/oauth20_authorize.srf',
       redirectUri: getRedirectUri(),
       requiredUrlParams: ['display', 'scope'],
@@ -160,38 +199,42 @@ export default {
       display: 'popup',
       oauthType: '2.0',
       popupOptions: { width: 500, height: 560 },
+      tokenPath: 'access_token',
     },
 
     oauth1: {
-      name: null,
+      name: 'oauth1',
       url: '/auth/oauth1',
-      authorizationEndpoint: null,
+      clientId: '',
+      authorizationEndpoint: '',
       redirectUri: getRedirectUri(),
       oauthType: '1.0',
-      popupOptions: null,
+      popupOptions: {},
+      tokenPath: 'access_token',
     },
 
     oauth2: {
-      name: null,
+      name: 'oauth2',
       url: '/auth/oauth2',
-      clientId: null,
+      clientId: '',
       redirectUri: getRedirectUri(),
-      authorizationEndpoint: null,
+      authorizationEndpoint: '',
       defaultUrlParams: ['response_type', 'client_id', 'redirect_uri'],
-      requiredUrlParams: null,
-      optionalUrlParams: null,
-      scope: null,
-      scopePrefix: null,
-      scopeDelimiter: null,
-      state: null,
+      requiredUrlParams: undefined,
+      optionalUrlParams: undefined,
+      scope: undefined,
+      scopePrefix: undefined,
+      scopeDelimiter: undefined,
+      state: undefined,
       oauthType: '2.0',
-      popupOptions: null,
+      popupOptions: undefined,
       responseType: 'code',
       responseParams: {
         code: 'code',
         clientId: 'clientId',
         redirectUri: 'redirectUri',
       },
+      tokenPath: 'access_token',
     },
   },
-};
+} as Partial<AuthConfig>;

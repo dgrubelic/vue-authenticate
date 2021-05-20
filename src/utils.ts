@@ -1,5 +1,7 @@
+import { ICookieStorageOptions } from "./storage/types";
+
 if (typeof Object.assign != 'function') {
-  Object.assign = function (target, varArgs) {
+  Object.assign = function (target: Record<string, unknown>, varArgs: Record<string, unknown>) {
     'use strict';
     if (target == null) {
       throw new TypeError('Cannot convert undefined or null to object');
@@ -24,7 +26,7 @@ if (typeof Object.assign != 'function') {
   };
 }
 
-export function camelCase(name) {
+export function camelCase(name: string): string {
   return name.replace(/([\:\-\_]+(.))/g, function (
     _,
     separator,
@@ -35,27 +37,27 @@ export function camelCase(name) {
   });
 }
 
-export function isUndefined(value) {
+export function isUndefined(value: unknown): boolean {
   return typeof value === 'undefined';
 }
 
-export function isDefined(value) {
+export function isDefined(value: unknown): boolean {
   return typeof value !== 'undefined';
 }
 
-export function isObject(value) {
+export function isObject(value: unknown): boolean {
   return value !== null && typeof value === 'object';
 }
 
-export function isString(value) {
+export function isString(value: unknown): boolean {
   return typeof value === 'string';
 }
 
-export function isNumber(value) {
+export function isNumber(value: unknown): boolean {
   return typeof value === 'number';
 }
 
-export function isFunction(value) {
+export function isFunction(value: unknown): boolean {
   return typeof value === 'function';
 }
 
@@ -90,12 +92,12 @@ export function objectExtend(a, b) {
  * @param  {String} url     URI
  * @return {String}
  */
-export function joinUrl(baseUrl, url) {
+export function joinUrl(baseUrl: string, url: string): string {
   if (/^(?:[a-z]+:)?\/\//i.test(url)) {
     return url;
   }
   let joined = [baseUrl, url].join('/');
-  let normalize = function (str) {
+  let normalize = function (str: string) {
     return str
       .replace(/[\/]+/g, '/')
       .replace(/\/\?/g, '?')
@@ -114,7 +116,7 @@ export function joinUrl(baseUrl, url) {
  * @param  {Location} location
  * @return {String}
  */
-export function getFullUrlPath(location) {
+export function getFullUrlPath(location: Location) {
   const isHttps = location.protocol === 'https:';
   return (
     location.protocol +
@@ -137,8 +139,8 @@ export function getFullUrlPath(location) {
  * @param  {String} Query string
  * @return {String}
  */
-export function parseQueryString(str) {
-  let obj = {};
+export function parseQueryString(str: string) {
+  let obj: Record<string, any> = {};
   let key;
   let value;
   (str || '').split('&').forEach(keyValue => {
@@ -159,11 +161,12 @@ export function parseQueryString(str) {
  * @param  {String} str base64 encoded string
  * @return {Object}
  */
-export function decodeBase64(str) {
-  let buffer;
+export function decodeBase64(str: string) {
+  let bufferClass: Buffer;
+
   if (typeof module !== 'undefined' && module.exports) {
     try {
-      buffer = require('buffer').Buffer;
+      bufferClass = require('buffer').Buffer;
     } catch (err) {
       // noop
     }
@@ -180,7 +183,7 @@ export function decodeBase64(str) {
     'g'
   );
 
-  let cb_btou = function (cccc) {
+  let cb_btou = function (cccc: string) {
     switch (cccc.length) {
       case 4:
         let cp =
@@ -206,18 +209,18 @@ export function decodeBase64(str) {
     }
   };
 
-  let btou = function (b) {
+  let btou = function (b: string) {
     return b.replace(re_btou, cb_btou);
   };
 
-  let _decode = buffer
-    ? function (a) {
-        return (a.constructor === buffer.constructor
+  let _decode = bufferClass
+    ? function (a: string) {
+        return (a.constructor === bufferClass.constructor
           ? a
-          : new buffer(a, 'base64')
+          : Buffer.from(a, 'base64')
         ).toString();
       }
-    : function (a) {
+    : function (a: string) {
         return btou(atob(a));
       };
 
@@ -232,7 +235,7 @@ export function decodeBase64(str) {
 
 export function parseCookies(str = '') {
   if (str.length === 0) return {};
-  const parsed = {};
+  const parsed: Record<string, any> = {};
   const pattern = new RegExp('\\s*;\\s*');
   str.split(pattern).forEach(i => {
     const [encodedKey, encodedValue] = i.split('=');
@@ -243,7 +246,7 @@ export function parseCookies(str = '') {
   return parsed;
 }
 
-export function formatOptions(options) {
+export function formatOptions(options: ICookieStorageOptions) {
   const { path, domain, expires, secure } = options;
   return [
     typeof path === 'undefined' || path === null ? '' : ';path=' + path,
@@ -257,7 +260,7 @@ export function formatOptions(options) {
   ].join('');
 }
 
-export function formatCookie(key, value, options) {
+export function formatCookie(key: string, value: string, options: ICookieStorageOptions) {
   return [
     encodeURIComponent(key),
     '=',
@@ -266,7 +269,7 @@ export function formatCookie(key, value, options) {
   ].join('');
 }
 
-export function getObjectProperty(objectRef, propertyName) {
+export function getObjectProperty(objectRef: Record<string, any>, propertyName: string) {
   let value = undefined;
   let valueRef = objectRef;
   const propNames = propertyName.split('.');

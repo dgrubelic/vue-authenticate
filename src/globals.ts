@@ -3,9 +3,13 @@ const fakeDocument = {
 };
 
 const fakeWindow = {
-  atob() { },
-  open() { },
-  location: {},
+  atob: (): string => '',
+  open: (): string => '',
+  cordova: null,
+  location: {
+    hostname: '',
+    origin: '',
+  },
   localStorage: {
     setItem() { },
     getItem() { },

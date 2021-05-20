@@ -42,7 +42,7 @@ export default class OAuth2 {
     this.options = options;
   }
 
-  init(userData) {
+  init(userData: Record<string, unknown>) {
     let stateName = this.providerConfig.name + '_state';
     if (isFunction(this.providerConfig.state)) {
       this.storage.setItem(stateName, this.providerConfig.state());
