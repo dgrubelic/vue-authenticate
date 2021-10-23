@@ -8,7 +8,7 @@
 
 
 
-The best part about this library is that it is not strictly coupled to one request handling library like [vue-axios](https://github.com/imcvampire/vue-axios). You will be able to use it with different libraries. 
+The best part about this library is that it is not strictly coupled to one request handling library like [vue-axios](https://github.com/imcvampire/vue-axios). You will be able to use it with different libraries.
 
 For now it is tested to work with  [vue-resource](https://github.com/pagekit/vue-resource) and [axios](https://github.com/mzabriskie/axios) (using [vue-axios](https://github.com/imcvampire/vue-axios) wrapper).
 
@@ -18,14 +18,14 @@ This library was inspired by well known authentication library for Angular calle
 
 ## Supported OAuth providers and configurations
 
-1. Facebook (https://github.com/dgrubelic/vue-authenticate/blob/master/src/options.js#L21)
-2. Google (https://github.com/dgrubelic/vue-authenticate/blob/master/src/options.js#L34)
-3. Github (https://github.com/dgrubelic/vue-authenticate/blob/master/src/options.js#L49)
-4. Instagram (https://github.com/dgrubelic/vue-authenticate/blob/master/src/options.js#L61)
-5. Twitter (https://github.com/dgrubelic/vue-authenticate/blob/master/src/options.js#L72)
-6. Bitbucket (https://github.com/dgrubelic/vue-authenticate/blob/master/src/options.js#L81)
-7. LinkedIn (https://github.com/dgrubelic/vue-authenticate/blob/master/src/options.js#L93)
-8. Microsoft Live (https://github.com/dgrubelic/vue-authenticate/blob/master/src/options.js#L106)
+1. Facebook (https://github.com/dgrubelic/vue-authenticate/blob/master/src/options.js#L66)
+2. Google (https://github.com/dgrubelic/vue-authenticate/blob/master/src/options.js#L79)
+3. Github (https://github.com/dgrubelic/vue-authenticate/blob/master/src/options.js#L94)
+4. Instagram (https://github.com/dgrubelic/vue-authenticate/blob/master/src/options.js#L106)
+5. Twitter (https://github.com/dgrubelic/vue-authenticate/blob/master/src/options.js#L118)
+6. Bitbucket (https://github.com/dgrubelic/vue-authenticate/blob/master/src/options.js#L127)
+7. LinkedIn (https://github.com/dgrubelic/vue-authenticate/blob/master/src/options.js#L139)
+8. Microsoft Live (https://github.com/dgrubelic/vue-authenticate/blob/master/src/options.js#L152)
 
 ## Installation
 ```bash
