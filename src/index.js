@@ -10,16 +10,11 @@ const VueAuthenticatePlugin = {
     }
 
     if (!vueAuthInstance) {
-      let axios;
-      // if an axios instance is passed then use that,
-      // then try to see if there is a instance referenced via
-      // the $http instance property, otherwie fail
+      let axios = app.config.globalProperties.$http;
       if (options.axios) {
         axios = options.axios;
-      } else if (app.config.globalProperties.$http) {
-        axios = app.config.globalProperties.$http;
-      } else {
-        throw new Error('Request handler instance not found');
+      } else if (!axios) {
+        throw new Error('No axios instance found, as option or as vue global');
       }
 
       vueAuthInstance = new VueAuthenticate(axios, options);
