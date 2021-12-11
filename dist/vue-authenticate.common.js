@@ -1503,14 +1503,19 @@ class VueAuthenticate {
    *
    * @param  {String} provider       Provider name
    * @param  {Object} userData       User data
+   * @param  {Object} options        Options, to override provider config
    * @return {Promise}               Request promise
    */
-  authenticate(provider, userData) {
+  authenticate(provider, userData, options) {
     return new Promise$1((resolve, reject) => {
-      var providerConfig = this.options.providers[provider];
+      let providerConfig = this.options.providers[provider];
       if (!providerConfig) {
         return reject(new Error('Unknown provider'));
       }
+
+      // support any options passed in, but don't modify the upstream
+      // provider config
+      providerConfig = Object.assign({}, providerConfig, options);
 
       let providerInstance;
       switch (providerConfig.oauthType) {
@@ -1554,14 +1559,19 @@ class VueAuthenticate {
    *
    * @param  {String} provider       Provider name
    * @param  {Object} userData       User data
+   * @param  {Object} options        Options, to override provider config
    * @return {Promise}               Request promise
    */
-  link(provider, userData) {
+  link(provider, userData, options) {
     return new Promise$1((resolve, reject) => {
-      var providerConfig = this.options.providers[provider];
+      let providerConfig = this.options.providers[provider];
       if (!providerConfig) {
         return reject(new Error('Unknown provider'));
       }
+
+      // support any options passed in, but don't modify the upstream
+      // provider config
+      providerConfig = Object.assign({}, providerConfig, options);
 
       let providerInstance;
       switch (providerConfig.oauthType) {
