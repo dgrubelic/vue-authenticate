@@ -1,44 +1,31 @@
 import './utils.js';
 import VueAuthenticate from './authenticate.js';
 
-/**
- * VueAuthenticate plugin
- * @param {Object} Vue
- * @param {Object} options
- */
-function plugin(Vue, options) {
-  if (plugin.installed) {
-    return;
+let vueAuthInstance;
+
+const VueAuthenticatePlugin = {
+  install(app, options) {
+    if (!options) {
+      options = {};
+    }
+
+    if (!vueAuthInstance) {
+      let axios;
+      // if an axios instance is passed then use that,
+      // then try to see if there is a instance referenced via
+      // the $http instance property, otherwie fail
+      if (options.axios) {
+        axios = options.axios;
+      } else if (app.config.globalProperties.$http) {
+        axios = app.config.globalProperties.$http;
+      } else {
+        throw new Error('Request handler instance not found');
+      }
+
+      vueAuthInstance = new VueAuthenticate(axios, options);
+      app.config.globalProperties.$auth = vueAuthInstance;
+    }
   }
-
-  plugin.installed = true;
-
-  let vueAuthInstance = null;
-  Object.defineProperties(Vue.prototype, {
-    $auth: {
-      get() {
-        if (!vueAuthInstance) {
-          // Request handler library not found, throw error
-          if (!this.$http) {
-            throw new Error('Request handler instance not found');
-          }
-
-          vueAuthInstance = new VueAuthenticate(this.$http, options);
-        }
-        return vueAuthInstance;
-      },
-    },
-  });
-}
-
-/**
- * External factory helper for ES5 and CommonJS
- * @param  {Object} $http     Instance of request handling library
- * @param  {Object} options   Configuration object
- * @return {VueAuthenticate}  VueAuthenticate instance
- */
-plugin.factory = function ($http, options) {
-  return new VueAuthenticate($http, options);
 };
 
-export default plugin;
+export default VueAuthenticatePlugin;

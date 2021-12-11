@@ -45,7 +45,11 @@
     "rollup-plugin-uglify": "^6.0.4",
     "uglify-js": "^3.9.1"
   },
-  "peerDependencies": {},
+  "peerDependencies": {
+    "axios": "^0.18.0",
+    "vue": "^3.2.4",
+    "vue-axios": "^2.1.4"
+  },
   "tags": [
     "auth",
     "authentication",
@@ -64,8 +68,6 @@
     "oauth 2.0"
   ],
   "dependencies": {
-    "axios": "^0.18.0",
-    "vue": "^2.6.10",
-    "vue-axios": "^2.1.4"
+    "vue": "3.2.4"
   }
 }
