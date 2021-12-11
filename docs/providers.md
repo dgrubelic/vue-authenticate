@@ -1,4 +1,4 @@
-# Provider Configurations
+# OAuth Provider Configurations
 
 The vue-authenticate packages provides support for the following
 OAuth providers out of the box:
@@ -10,6 +10,7 @@ OAuth providers out of the box:
  - LinkedIn
  - Twitter
  - Instagram
+ - Microsoft Live
 
 For any other provider, it is simply a question of providing the right
 provider configuration in the options to your vue-authenticate instance.

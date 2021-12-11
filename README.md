@@ -8,7 +8,7 @@
 
 
 
-The best part about this library is that it is not strictly coupled to one request handling library like [vue-axios](https://github.com/imcvampire/vue-axios). You will be able to use it with different libraries. 
+The best part about this library is that it is not strictly coupled to one request handling library like [vue-axios](https://github.com/imcvampire/vue-axios). You will be able to use it with different libraries.
 
 For now it is tested to work with  [vue-resource](https://github.com/pagekit/vue-resource) and [axios](https://github.com/mzabriskie/axios) (using [vue-axios](https://github.com/imcvampire/vue-axios) wrapper).
 
@@ -16,16 +16,22 @@ For now it is tested to work with  [vue-resource](https://github.com/pagekit/vue
 
 This library was inspired by well known authentication library for Angular called [Satellizer](https://github.com/sahat/satellizer) developed by [Sahat Yalkabov](http://sahatyalkabov.com). They share almost identical configuration and API so you can easily switch from Angular to Vue.js project.
 
-## Supported OAuth providers and configurations
 
-1. Facebook (https://github.com/dgrubelic/vue-authenticate/blob/master/src/options.js#L21)
-2. Google (https://github.com/dgrubelic/vue-authenticate/blob/master/src/options.js#L34)
-3. Github (https://github.com/dgrubelic/vue-authenticate/blob/master/src/options.js#L49)
-4. Instagram (https://github.com/dgrubelic/vue-authenticate/blob/master/src/options.js#L61)
-5. Twitter (https://github.com/dgrubelic/vue-authenticate/blob/master/src/options.js#L72)
-6. Bitbucket (https://github.com/dgrubelic/vue-authenticate/blob/master/src/options.js#L81)
-7. LinkedIn (https://github.com/dgrubelic/vue-authenticate/blob/master/src/options.js#L93)
-8. Microsoft Live (https://github.com/dgrubelic/vue-authenticate/blob/master/src/options.js#L106)
+## OAuth Providers
+
+Support for the following OAuth providers are included out of the box:
+
+ - GitHub
+ - Facebook
+ - Google
+ - Bitbucket
+ - LinkedIn
+ - Twitter
+ - Instagram
+ - Microsoft Live
+
+For more on the configuration of existing providers and adding your
+own, see the documentation on [OAuth provider configurations](./docs/providers.md).
 
 ## Installation
 ```bash
@@ -42,7 +48,7 @@ import axios from 'axios';
 Vue.use(VueAxios, axios)
 Vue.use(VueAuthenticate, {
   baseUrl: 'http://localhost:3000', // Your API domain
-  
+
   providers: {
     github: {
       clientId: '',
@@ -138,7 +144,7 @@ Once you have created VueAuthenticate instance, you can use it in Vuex store lik
 
 ```javascript
 export default new Vuex.Store({
-  
+
   // You can use it as state property
   state: {
     isAuthenticated: false
