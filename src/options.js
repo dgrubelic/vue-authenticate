@@ -66,7 +66,7 @@ export default {
     facebook: {
       name: 'facebook',
       url: '/auth/facebook',
-      authorizationEndpoint: 'https://www.facebook.com/v10.0/dialog/oauth',
+      authorizationEndpoint: 'https://www.facebook.com/v12.0/dialog/oauth',
       redirectUri: getRedirectUri('/'),
       requiredUrlParams: ['display', 'scope'],
       scope: ['email'],
