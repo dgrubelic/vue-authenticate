@@ -1,27 +1,27 @@
 const fakeDocument = {
-  createElement() { },
+  createElement () { }
 };
 
 const fakeWindow = {
-  atob() { },
-  open() { },
+  atob () { },
+  open () { },
   location: {},
   localStorage: {
-    setItem() { },
-    getItem() { },
-    removeItem() { },
+    setItem () { },
+    getItem () { },
+    removeItem () { }
   },
   sessionStorage: {
-    setItem() { },
-    getItem() { },
-    removeItem() { },
-  },
+    setItem () { },
+    getItem () { },
+    removeItem () { }
+  }
 };
 
-export const $document = (typeof document !== undefined)
+export const $document = (typeof document !== 'undefined')
   ? document
   : fakeDocument;
 
-export const $window = (typeof window !== undefined)
+export const $window = (typeof window !== 'undefined')
   ? window
   : fakeWindow;

@@ -4,7 +4,7 @@ import {
   isFunction,
   joinUrl,
   decodeBase64,
-  getObjectProperty,
+  getObjectProperty
 } from './utils.js';
 import defaultOptions from './options.js';
 import StorageFactory from './storage.js';
@@ -12,39 +12,39 @@ import OAuth1 from './oauth/oauth1.js';
 import OAuth2 from './oauth/oauth2.js';
 
 export default class VueAuthenticate {
-  constructor($http, overrideOptions) {
+  constructor ($http, overrideOptions) {
     let options = objectExtend({}, defaultOptions);
     options = objectExtend(options, overrideOptions);
-    let storage = StorageFactory(options);
+    const storage = StorageFactory(options);
 
     Object.defineProperties(this, {
       $http: {
-        get() {
+        get () {
           return $http;
-        },
+        }
       },
 
       options: {
-        get() {
+        get () {
           return options;
-        },
+        }
       },
 
       storage: {
-        get() {
+        get () {
           return storage;
-        },
+        }
       },
 
       tokenName: {
-        get() {
+        get () {
           if (this.options.tokenPrefix) {
             return [this.options.tokenPrefix, this.options.tokenName].join('_');
           } else {
             return this.options.tokenName;
           }
-        },
-      },
+        }
+      }
     });
 
     // Setup request interceptors
@@ -64,8 +64,8 @@ export default class VueAuthenticate {
    * @copyright Method taken from https://github.com/sahat/satellizer
    * @return {Boolean}
    */
-  isAuthenticated() {
-    let token = this.storage.getItem(this.tokenName);
+  isAuthenticated () {
+    const token = this.storage.getItem(this.tokenName);
 
     if (token) {
       // Token is present
@@ -93,7 +93,7 @@ export default class VueAuthenticate {
    * Get token if user is authenticated
    * @return {String} Authentication token
    */
-  getToken() {
+  getToken () {
     return this.storage.getItem(this.tokenName);
   }
 
@@ -101,7 +101,7 @@ export default class VueAuthenticate {
    * Set new authentication token
    * @param {String|Object} token
    */
-  setToken(response, tokenPath) {
+  setToken (response, tokenPath) {
     if (response[this.options.responseDataKey]) {
       response = response[this.options.responseDataKey];
     }
@@ -114,7 +114,7 @@ export default class VueAuthenticate {
     }
   }
 
-  getPayload() {
+  getPayload () {
     const token = this.storage.getItem(this.tokenName);
 
     if (token && token.split('.').length === 3) {
@@ -132,7 +132,7 @@ export default class VueAuthenticate {
    * @param  {Object} requestOptions Request options
    * @return {Promise}               Request promise
    */
-  async login(user, requestOptions) {
+  async login (user, requestOptions) {
     requestOptions = requestOptions || {};
     requestOptions.url = requestOptions.url
       ? requestOptions.url
@@ -154,7 +154,7 @@ export default class VueAuthenticate {
    * @param  {Object} requestOptions Request options
    * @return {Promise}               Request promise
    */
-  async register(user, requestOptions) {
+  async register (user, requestOptions) {
     requestOptions = requestOptions || {};
     requestOptions.url = requestOptions.url
       ? requestOptions.url
@@ -175,7 +175,7 @@ export default class VueAuthenticate {
    * @param  {Object} requestOptions  Logout request options object
    * @return {Promise}                Request promise
    */
-  async logout(requestOptions) {
+  async logout (requestOptions) {
     if (!this.isAuthenticated()) {
       throw new Error('There is no currently authenticated user');
     }
@@ -208,7 +208,7 @@ export default class VueAuthenticate {
    * @param  {Object} options        Options, to override provider config
    * @return {Promise}               Request promise
    */
-  async authenticate(provider, userData, options) {
+  async authenticate (provider, userData, options) {
     let providerConfig = this.options.providers[provider];
     if (!providerConfig) {
       throw new Error('Unknown provider');
@@ -220,24 +220,24 @@ export default class VueAuthenticate {
 
     let providerInstance;
     switch (providerConfig.oauthType) {
-      case '1.0':
-        providerInstance = new OAuth1(
-          this.$http,
-          this.storage,
-          providerConfig,
-          this.options
-        );
-        break;
-      case '2.0':
-        providerInstance = new OAuth2(
-          this.$http,
-          this.storage,
-          providerConfig,
-          this.options
-        );
-        break;
-      default:
-        throw new Error('Invalid OAuth type');
+    case '1.0':
+      providerInstance = new OAuth1(
+        this.$http,
+        this.storage,
+        providerConfig,
+        this.options
+      );
+      break;
+    case '2.0':
+      providerInstance = new OAuth2(
+        this.$http,
+        this.storage,
+        providerConfig,
+        this.options
+      );
+      break;
+    default:
+      throw new Error('Invalid OAuth type');
     }
 
     const response = providerInstance.init(userData);
@@ -258,7 +258,7 @@ export default class VueAuthenticate {
    * @param  {Object} options        Options, to override provider config
    * @return {Promise}               Request promise
    */
-  async link(provider, userData, options) {
+  async link (provider, userData, options) {
     let providerConfig = this.options.providers[provider];
     if (!providerConfig) {
       throw new Error('Unknown provider');
@@ -270,27 +270,27 @@ export default class VueAuthenticate {
 
     let providerInstance;
     switch (providerConfig.oauthType) {
-      case '1.0':
-        providerInstance = new OAuth1(
-          this.$http,
-          this.storage,
-          providerConfig,
-          this.options
-        );
-        break;
-      case '2.0':
-        providerInstance = new OAuth2(
-          this.$http,
-          this.storage,
-          providerConfig,
-          this.options
-        );
-        break;
-      default:
-        throw new Error('Invalid OAuth type');
+    case '1.0':
+      providerInstance = new OAuth1(
+        this.$http,
+        this.storage,
+        providerConfig,
+        this.options
+      );
+      break;
+    case '2.0':
+      providerInstance = new OAuth2(
+        this.$http,
+        this.storage,
+        providerConfig,
+        this.options
+      );
+      break;
+    default:
+      throw new Error('Invalid OAuth type');
     }
 
-    const response = providerInstance.init(userData);
+    let response = providerInstance.init(userData);
     if (response[this.options.responseDataKey]) {
       response = response[this.options.responseDataKey];
     }

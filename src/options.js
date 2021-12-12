@@ -1,7 +1,7 @@
 import { isUndefined } from './utils';
 import { $window } from './globals';
 
-export function getCookieDomainUrl() {
+export function getCookieDomainUrl () {
   try {
     return $window.location.hostname;
   } catch (error) {}
@@ -9,7 +9,7 @@ export function getCookieDomainUrl() {
   return '';
 }
 
-export function getRedirectUri(uri) {
+export function getRedirectUri (uri) {
   try {
     return !isUndefined(uri)
       ? `${$window.location.origin}${uri}`
@@ -37,7 +37,7 @@ export default {
   cookieStorage: {
     domain: getCookieDomainUrl(),
     path: '/',
-    secure: false,
+    secure: false
   },
   requestDataKey: 'data',
   responseDataKey: 'data',
@@ -53,7 +53,7 @@ export default {
       if ($auth.isAuthenticated()) {
         config.headers[tokenHeader] = [
           $auth.options.tokenType,
-          $auth.getToken(),
+          $auth.getToken()
         ].join(' ');
       } else {
         delete config.headers[tokenHeader];
@@ -73,7 +73,7 @@ export default {
       scopeDelimiter: ',',
       display: 'popup',
       oauthType: '2.0',
-      popupOptions: { width: 580, height: 400 },
+      popupOptions: { width: 580, height: 400 }
     },
 
     google: {
@@ -88,7 +88,7 @@ export default {
       scopeDelimiter: ' ',
       display: 'popup',
       oauthType: '2.0',
-      popupOptions: { width: 452, height: 633 },
+      popupOptions: { width: 452, height: 633 }
     },
 
     github: {
@@ -100,7 +100,7 @@ export default {
       scope: ['user:email'],
       scopeDelimiter: ' ',
       oauthType: '2.0',
-      popupOptions: { width: 1020, height: 618 },
+      popupOptions: { width: 1020, height: 618 }
     },
 
     instagram: {
@@ -112,7 +112,7 @@ export default {
       scope: ['basic'],
       scopeDelimiter: '+',
       oauthType: '2.0',
-      popupOptions: { width: null, height: null },
+      popupOptions: { width: null, height: null }
     },
 
     twitter: {
@@ -121,7 +121,7 @@ export default {
       authorizationEndpoint: 'https://api.twitter.com/oauth/authenticate',
       redirectUri: getRedirectUri(),
       oauthType: '1.0',
-      popupOptions: { width: 495, height: 645 },
+      popupOptions: { width: 495, height: 645 }
     },
 
     bitbucket: {
@@ -133,7 +133,7 @@ export default {
       scope: ['email'],
       scopeDelimiter: ' ',
       oauthType: '2.0',
-      popupOptions: { width: 1020, height: 618 },
+      popupOptions: { width: 1020, height: 618 }
     },
 
     linkedin: {
@@ -146,7 +146,7 @@ export default {
       scopeDelimiter: ' ',
       state: 'STATE',
       oauthType: '2.0',
-      popupOptions: { width: 527, height: 582 },
+      popupOptions: { width: 527, height: 582 }
     },
 
     live: {
@@ -159,7 +159,7 @@ export default {
       scopeDelimiter: ' ',
       display: 'popup',
       oauthType: '2.0',
-      popupOptions: { width: 500, height: 560 },
+      popupOptions: { width: 500, height: 560 }
     },
 
     oauth1: {
@@ -168,7 +168,7 @@ export default {
       authorizationEndpoint: null,
       redirectUri: getRedirectUri(),
       oauthType: '1.0',
-      popupOptions: null,
+      popupOptions: null
     },
 
     oauth2: {
@@ -190,8 +190,8 @@ export default {
       responseParams: {
         code: 'code',
         clientId: 'clientId',
-        redirectUri: 'redirectUri',
-      },
-    },
-  },
+        redirectUri: 'redirectUri'
+      }
+    }
+  }
 };

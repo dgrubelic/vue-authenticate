@@ -3,7 +3,7 @@ import {
   objectExtend,
   parseQueryString,
   getFullUrlPath,
-  isUndefined,
+  isUndefined
 } from '../utils.js';
 
 /**
@@ -14,14 +14,14 @@ import {
  * and adjusted to fit vue-authenticate library
  */
 export default class OAuthPopup {
-  constructor(url, name, popupOptions) {
+  constructor (url, name, popupOptions) {
     this.popup = null;
     this.url = url;
     this.name = name;
     this.popupOptions = popupOptions;
   }
 
-  async open(redirectUri, skipPooling) {
+  async open (redirectUri, skipPooling) {
     try {
       this.popup = $window.open(this.url, this.name, this._stringifyOptions());
       if (this.popup && this.popup.focus) {
@@ -29,14 +29,14 @@ export default class OAuthPopup {
       }
 
       if (!skipPooling) {
-        return this.pooling(redirectUri)
+        return this.pooling(redirectUri);
       }
     } catch (error) {
       throw new Error('OAuth popup error occurred');
     }
   }
 
-  async pooling(redirectUri) {
+  async pooling (redirectUri) {
     // promise needed here to be able to return result of popup window,
     // from interval
     return new Promise((resolve, reject) => {
@@ -54,7 +54,6 @@ export default class OAuthPopup {
           poolingInterval = null;
           throw new Error('Auth popup window closed');
         }
-
 
         try {
           const popupWindowPath = getFullUrlPath(this.popup.location);
@@ -81,8 +80,8 @@ export default class OAuthPopup {
               this.popup.close();
             } else {
               reject(new Error(
-                  'OAuth redirect has occurred but no query or hash parameters were found.'
-                )
+                'OAuth redirect has occurred but no query or hash parameters were found.'
+              )
               );
             }
           }
@@ -93,9 +92,9 @@ export default class OAuthPopup {
     });
   }
 
-  _stringifyOptions() {
-    let options = [];
-    for (var optionKey in this.popupOptions) {
+  _stringifyOptions () {
+    const options = [];
+    for (const optionKey in this.popupOptions) {
       if (!isUndefined(this.popupOptions[optionKey])) {
         options.push(`${optionKey}=${this.popupOptions[optionKey]}`);
       }

@@ -4,7 +4,7 @@ import {
   isFunction,
   isString,
   objectExtend,
-  joinUrl,
+  joinUrl
 } from '../utils.js';
 
 /**
@@ -27,14 +27,14 @@ const defaultProviderConfig = {
   responseParams: {
     code: 'code',
     clientId: 'clientId',
-    redirectUri: 'redirectUri',
+    redirectUri: 'redirectUri'
   },
   oauthType: '2.0',
-  popupOptions: {},
+  popupOptions: {}
 };
 
 export default class OAuth2 {
-  constructor($http, storage, providerConfig, options) {
+  constructor ($http, storage, providerConfig, options) {
     this.$http = $http;
     this.storage = storage;
     this.providerConfig = objectExtend({}, defaultProviderConfig);
@@ -42,17 +42,17 @@ export default class OAuth2 {
     this.options = options;
   }
 
-  async init(userData) {
-    let stateName = this.providerConfig.name + '_state';
+  async init (userData) {
+    const stateName = this.providerConfig.name + '_state';
     if (isFunction(this.providerConfig.state)) {
       this.storage.setItem(stateName, this.providerConfig.state());
     } else if (isString(this.providerConfig.state)) {
       this.storage.setItem(stateName, this.providerConfig.state);
     }
 
-    let url = [
+    const url = [
       this.providerConfig.authorizationEndpoint,
-      this._stringifyRequestParams(),
+      this._stringifyRequestParams()
     ].join('?');
 
     const oauthPopup = new OAuthPopup(
@@ -74,8 +74,8 @@ export default class OAuth2 {
       response.state !== this.storage.getItem(stateName)
     ) {
       throw new Error(
-          'State parameter value does not match original OAuth request state value'
-        );
+        'State parameter value does not match original OAuth request state value'
+      );
     }
 
     return this.exchangeForToken(response, userData);
@@ -90,24 +90,22 @@ export default class OAuth2 {
    * @param  {[type]} userData [description]
    * @return {[type]}          [description]
    */
-  exchangeForToken(oauth, userData) {
-    let payload = objectExtend({}, userData);
+  exchangeForToken (oauth, userData) {
+    const payload = objectExtend({}, userData);
 
-    for (let key in this.providerConfig.responseParams) {
-      let value = this.providerConfig.responseParams[key];
-
+    for (const key in this.providerConfig.responseParams) {
       switch (key) {
-        case 'code':
-          payload[key] = oauth.code;
-          break;
-        case 'clientId':
-          payload[key] = this.providerConfig.clientId;
-          break;
-        case 'redirectUri':
-          payload[key] = this.providerConfig.redirectUri;
-          break;
-        default:
-          payload[key] = oauth[key];
+      case 'code':
+        payload[key] = oauth.code;
+        break;
+      case 'clientId':
+        payload[key] = this.providerConfig.clientId;
+        break;
+      case 'redirectUri':
+        payload[key] = this.providerConfig.redirectUri;
+        break;
+      default:
+        payload[key] = oauth[key];
       }
     }
 
@@ -123,7 +121,7 @@ export default class OAuth2 {
     }
 
     return this.$http.post(exchangeTokenUrl, payload, {
-      withCredentials: this.options.withCredentials,
+      withCredentials: this.options.withCredentials
     });
   }
 
@@ -134,12 +132,12 @@ export default class OAuth2 {
    *
    * @return {String}
    */
-  _stringifyRequestParams() {
-    let keyValuePairs = [];
-    let paramCategories = [
+  _stringifyRequestParams () {
+    const keyValuePairs = [];
+    const paramCategories = [
       'defaultUrlParams',
       'requiredUrlParams',
-      'optionalUrlParams',
+      'optionalUrlParams'
     ];
 
     paramCategories.forEach(categoryName => {
@@ -147,7 +145,7 @@ export default class OAuth2 {
       if (!Array.isArray(this.providerConfig[categoryName])) return;
 
       this.providerConfig[categoryName].forEach(paramName => {
-        let camelCaseParamName = camelCase(paramName);
+        const camelCaseParamName = camelCase(paramName);
         let paramValue = isFunction(this.providerConfig[paramName])
           ? this.providerConfig[paramName]()
           : this.providerConfig[camelCaseParamName];
@@ -155,7 +153,7 @@ export default class OAuth2 {
         if (paramName === 'redirect_uri' && !paramValue) return;
 
         if (paramName === 'state') {
-          let stateName = this.providerConfig.name + '_state';
+          const stateName = this.providerConfig.name + '_state';
           paramValue = encodeURIComponent(this.storage.getItem(stateName));
         }
         if (paramName === 'scope' && Array.isArray(paramValue)) {

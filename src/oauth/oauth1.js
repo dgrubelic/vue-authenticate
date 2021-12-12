@@ -2,10 +2,7 @@ import OAuthPopup from './popup.js';
 import { $window } from '../globals.js';
 import {
   objectExtend,
-  isString,
-  isObject,
-  isFunction,
-  joinUrl,
+  joinUrl
 } from '../utils.js';
 
 const defaultProviderConfig = {
@@ -19,11 +16,11 @@ const defaultProviderConfig = {
   requiredUrlParams: null,
   defaultUrlParams: null,
   oauthType: '1.0',
-  popupOptions: {},
+  popupOptions: {}
 };
 
 export default class OAuth {
-  constructor($http, storage, providerConfig, options) {
+  constructor ($http, storage, providerConfig, options) {
     this.$http = $http;
     this.storage = storage;
     this.providerConfig = objectExtend({}, defaultProviderConfig);
@@ -36,14 +33,14 @@ export default class OAuth {
    * @param  {Object} userData User data
    * @return {Promise}
    */
-  async init(userData) {
+  async init (userData) {
     this.oauthPopup = new OAuthPopup(
       'about:blank',
       this.providerConfig.name,
       this.providerConfig.popupOptions
     );
 
-    if (!$window['cordova']) {
+    if (!$window.cordova) {
       this.oauthPopup.open(this.providerConfig.redirectUri, true);
     }
 
@@ -56,8 +53,8 @@ export default class OAuth {
    * Get OAuth1 request token
    * @return {Promise}
    */
-  async getRequestToken() {
-    let requestOptions = {};
+  async getRequestToken () {
+    const requestOptions = {};
     requestOptions.method = 'POST';
     requestOptions[this.options.requestDataKey] = objectExtend(
       {},
@@ -81,14 +78,14 @@ export default class OAuth {
    * @param  {Object} response Response object containing request token
    * @return {Promise}
    */
-  async openPopup(response) {
+  async openPopup (response) {
     const url = [
       this.providerConfig.authorizationEndpoint,
-      this.buildQueryString(response[this.options.responseDataKey]),
+      this.buildQueryString(response[this.options.responseDataKey])
     ].join('?');
 
     this.oauthPopup.popup.location = url;
-    if ($window['cordova']) {
+    if ($window.cordova) {
       return this.oauthPopup.open(this.providerConfig.redirectUri);
     } else {
       return this.oauthPopup.pooling(this.providerConfig.redirectUri);
@@ -101,10 +98,10 @@ export default class OAuth {
    * @param  {Object} userData User data
    * @return {Promise}
    */
-  async exchangeForToken(oauth, userData) {
+  async exchangeForToken (oauth, userData) {
     let payload = objectExtend({}, userData);
     payload = objectExtend(payload, oauth);
-    let requestOptions = {};
+    const requestOptions = {};
     requestOptions.method = 'POST';
     requestOptions[this.options.requestDataKey] = payload;
     requestOptions.withCredentials = this.options.withCredentials;
@@ -119,10 +116,10 @@ export default class OAuth {
     return this.$http(requestOptions);
   }
 
-  buildQueryString(params) {
+  buildQueryString (params) {
     const parsedParams = [];
-    for (var key in params) {
-      let value = params[key];
+    for (const key in params) {
+      const value = params[key];
       parsedParams.push(
         encodeURIComponent(key) + '=' + encodeURIComponent(value)
       );

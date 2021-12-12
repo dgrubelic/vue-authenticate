@@ -1,23 +1,23 @@
 import { $window } from '../globals.js';
 
 class LocalStorage {
-  constructor(namespace) {
+  constructor (namespace) {
     this.namespace = namespace || null;
   }
 
-  setItem(key, value) {
+  setItem (key, value) {
     $window.localStorage.setItem(this._getStorageKey(key), value);
   }
 
-  getItem(key) {
+  getItem (key) {
     return $window.localStorage.getItem(this._getStorageKey(key));
   }
 
-  removeItem(key) {
+  removeItem (key) {
     $window.localStorage.removeItem(this._getStorageKey(key));
   }
 
-  _getStorageKey(key) {
+  _getStorageKey (key) {
     if (this.namespace) {
       return [this.namespace, key].join('.');
     }

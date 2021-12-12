@@ -4,7 +4,7 @@ import VueAuthenticate from './authenticate.js';
 let vueAuthInstance;
 
 const VueAuthenticatePlugin = {
-  install(app, options) {
+  install (app, options) {
     if (!options) {
       options = {};
     }
