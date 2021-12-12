@@ -1,4 +1,3 @@
-import Promise from '../promise.js';
 import { $document, $window } from '../globals.js';
 import {
   objectExtend,
@@ -22,24 +21,24 @@ export default class OAuthPopup {
     this.popupOptions = popupOptions;
   }
 
-  open(redirectUri, skipPooling) {
+  async open(redirectUri, skipPooling) {
     try {
       this.popup = $window.open(this.url, this.name, this._stringifyOptions());
       if (this.popup && this.popup.focus) {
         this.popup.focus();
       }
 
-      if (skipPooling) {
-        return Promise.resolve();
-      } else {
-        return this.pooling(redirectUri);
+      if (!skipPooling) {
+        return this.pooling(redirectUri)
       }
-    } catch (e) {
-      return Promise.reject(new Error('OAuth popup error occurred'));
+    } catch (error) {
+      throw new Error('OAuth popup error occurred');
     }
   }
 
-  pooling(redirectUri) {
+  async pooling(redirectUri) {
+    // promise needed here to be able to return result of popup window,
+    // from interval
     return new Promise((resolve, reject) => {
       const redirectUriParser = $document.createElement('a');
       redirectUriParser.href = redirectUri;
@@ -53,8 +52,9 @@ export default class OAuthPopup {
         ) {
           clearInterval(poolingInterval);
           poolingInterval = null;
-          reject(new Error('Auth popup window closed'));
+          throw new Error('Auth popup window closed');
         }
+
 
         try {
           const popupWindowPath = getFullUrlPath(this.popup.location);
@@ -75,19 +75,18 @@ export default class OAuthPopup {
               } else {
                 resolve(params);
               }
+
+              clearInterval(poolingInterval);
+              poolingInterval = null;
+              this.popup.close();
             } else {
-              reject(
-                new Error(
+              reject(new Error(
                   'OAuth redirect has occurred but no query or hash parameters were found.'
                 )
               );
             }
-
-            clearInterval(poolingInterval);
-            poolingInterval = null;
-            this.popup.close();
           }
-        } catch (e) {
+        } catch (error) {
           // Ignore DOMException: Blocked a frame with origin from accessing a cross-origin frame.
         }
       }, 250);

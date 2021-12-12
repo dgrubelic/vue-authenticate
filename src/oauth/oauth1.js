@@ -36,7 +36,7 @@ export default class OAuth {
    * @param  {Object} userData User data
    * @return {Promise}
    */
-  init(userData) {
+  async init(userData) {
     this.oauthPopup = new OAuthPopup(
       'about:blank',
       this.providerConfig.name,
@@ -47,18 +47,16 @@ export default class OAuth {
       this.oauthPopup.open(this.providerConfig.redirectUri, true);
     }
 
-    return this.getRequestToken().then(response => {
-      return this.openPopup(response).then(popupResponse => {
-        return this.exchangeForToken(popupResponse, userData);
-      });
-    });
+    const response = await this.getRequestToken();
+    const popupResponse = await this.openPopup(response);
+    return this.exchangeForToken(popupResponse, userData);
   }
 
   /**
    * Get OAuth1 request token
    * @return {Promise}
    */
-  getRequestToken() {
+  async getRequestToken() {
     let requestOptions = {};
     requestOptions.method = 'POST';
     requestOptions[this.options.requestDataKey] = objectExtend(
@@ -83,7 +81,7 @@ export default class OAuth {
    * @param  {Object} response Response object containing request token
    * @return {Promise}
    */
-  openPopup(response) {
+  async openPopup(response) {
     const url = [
       this.providerConfig.authorizationEndpoint,
       this.buildQueryString(response[this.options.responseDataKey]),
@@ -103,7 +101,7 @@ export default class OAuth {
    * @param  {Object} userData User data
    * @return {Promise}
    */
-  exchangeForToken(oauth, userData) {
+  async exchangeForToken(oauth, userData) {
     let payload = objectExtend({}, userData);
     payload = objectExtend(payload, oauth);
     let requestOptions = {};

@@ -2,11 +2,11 @@
   "name": "vue-authenticate",
   "version": "1.5.0",
   "description": "Authentication library for Vue.js",
-  "main": "dist/vue-authenticate.common.js",
-  "module": "dist/vue-authenticate.esm.js",
-  "unpkg": "dist/vue-authenticate.js",
+  "module": "dist/vue-authenticate.esm.min.js",
+  "browser": "dist/vue-authenticate.umd.min.js",
+  "main": "dist/vue-authenticate.esm.min.js",
   "scripts": {
-    "build": "node build/build.rollup.js"
+    "build": "rollup -c"
   },
   "keywords": [
     "vue",
@@ -39,16 +39,16 @@
     "@rollup/plugin-buble": "^0.21.3",
     "acorn": "^6.1.1",
     "ajv": "^6.10.0",
-    "rollup": "^2.6.1",
+    "rollup": "^2.61.1",
     "rollup-plugin-babel": "^4.4.0",
     "rollup-plugin-banner": "^0.2.1",
     "rollup-plugin-uglify": "^6.0.4",
     "uglify-js": "^3.9.1"
   },
   "peerDependencies": {
-    "axios": "^0.18.0",
+    "axios": "^0.24.0",
     "vue": "^3.2.4",
-    "vue-axios": "^2.1.4"
+    "vue-axios": "^3.4.0"
   },
   "tags": [
     "auth",
@@ -66,8 +66,5 @@
     "oauth",
     "oauth 1.0",
     "oauth 2.0"
-  ],
-  "dependencies": {
-    "vue": "3.2.4"
-  }
+  ]
 }

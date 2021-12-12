@@ -1,9 +1,6 @@
-import Promise from './promise.js';
 import { $window } from './globals.js';
 import {
   objectExtend,
-  isString,
-  isObject,
   isFunction,
   joinUrl,
   decodeBase64,
@@ -83,7 +80,7 @@ export default class VueAuthenticate {
             // JWT with an optonal expiration claims
             return Math.round(new Date().getTime() / 1000) < exp;
           }
-        } catch (e) {
+        } catch (error) {
           return true; // Pass: Non-JWT token that looks like JWT
         }
       }
@@ -125,7 +122,7 @@ export default class VueAuthenticate {
         const base64Url = token.split('.')[1];
         const base64 = base64Url.replace('-', '+').replace('_', '/');
         return JSON.parse(decodeBase64(base64));
-      } catch (e) {}
+      } catch (error) {}
     }
   }
 
@@ -135,7 +132,7 @@ export default class VueAuthenticate {
    * @param  {Object} requestOptions Request options
    * @return {Promise}               Request promise
    */
-  login(user, requestOptions) {
+  async login(user, requestOptions) {
     requestOptions = requestOptions || {};
     requestOptions.url = requestOptions.url
       ? requestOptions.url
@@ -146,10 +143,9 @@ export default class VueAuthenticate {
     requestOptions.withCredentials =
       requestOptions.withCredentials || this.options.withCredentials;
 
-    return this.$http(requestOptions).then(response => {
-      this.setToken(response);
-      return response;
-    });
+    const response = this.$http(requestOptions);
+    this.setToken(response);
+    return response;
   }
 
   /**
@@ -158,7 +154,7 @@ export default class VueAuthenticate {
    * @param  {Object} requestOptions Request options
    * @return {Promise}               Request promise
    */
-  register(user, requestOptions) {
+  async register(user, requestOptions) {
     requestOptions = requestOptions || {};
     requestOptions.url = requestOptions.url
       ? requestOptions.url
@@ -169,10 +165,9 @@ export default class VueAuthenticate {
     requestOptions.withCredentials =
       requestOptions.withCredentials || this.options.withCredentials;
 
-    return this.$http(requestOptions).then(response => {
-      this.setToken(response);
-      return response;
-    });
+    const response = this.$http(requestOptions);
+    this.setToken(response);
+    return response;
   }
 
   /**
@@ -180,11 +175,9 @@ export default class VueAuthenticate {
    * @param  {Object} requestOptions  Logout request options object
    * @return {Promise}                Request promise
    */
-  logout(requestOptions) {
+  async logout(requestOptions) {
     if (!this.isAuthenticated()) {
-      return Promise.reject(
-        new Error('There is no currently authenticated user')
-      );
+      throw new Error('There is no currently authenticated user');
     }
 
     requestOptions = requestOptions || {};
@@ -199,13 +192,11 @@ export default class VueAuthenticate {
       requestOptions.withCredentials =
         requestOptions.withCredentials || this.options.withCredentials;
 
-      return this.$http(requestOptions).then(response => {
-        this.storage.removeItem(this.tokenName);
-        return response;
-      });
+      const response = this.$http(requestOptions);
+      this.storage.removeItem(this.tokenName);
+      return response;
     } else {
       this.storage.removeItem(this.tokenName);
-      return Promise.resolve();
     }
   }
 
@@ -217,52 +208,46 @@ export default class VueAuthenticate {
    * @param  {Object} options        Options, to override provider config
    * @return {Promise}               Request promise
    */
-  authenticate(provider, userData, options) {
-    return new Promise((resolve, reject) => {
-      let providerConfig = this.options.providers[provider];
-      if (!providerConfig) {
-        return reject(new Error('Unknown provider'));
-      }
+  async authenticate(provider, userData, options) {
+    let providerConfig = this.options.providers[provider];
+    if (!providerConfig) {
+      throw new Error('Unknown provider');
+    }
 
-      // support any options passed in, but don't modify the upstream
-      // provider config
-      providerConfig = Object.assign({}, providerConfig, options);
+    // support any options passed in, but don't modify the upstream
+    // provider config
+    providerConfig = Object.assign({}, providerConfig, options);
 
-      let providerInstance;
-      switch (providerConfig.oauthType) {
-        case '1.0':
-          providerInstance = new OAuth1(
-            this.$http,
-            this.storage,
-            providerConfig,
-            this.options
-          );
-          break;
-        case '2.0':
-          providerInstance = new OAuth2(
-            this.$http,
-            this.storage,
-            providerConfig,
-            this.options
-          );
-          break;
-        default:
-          return reject(new Error('Invalid OAuth type'));
-      }
+    let providerInstance;
+    switch (providerConfig.oauthType) {
+      case '1.0':
+        providerInstance = new OAuth1(
+          this.$http,
+          this.storage,
+          providerConfig,
+          this.options
+        );
+        break;
+      case '2.0':
+        providerInstance = new OAuth2(
+          this.$http,
+          this.storage,
+          providerConfig,
+          this.options
+        );
+        break;
+      default:
+        throw new Error('Invalid OAuth type');
+    }
 
-      return providerInstance
-        .init(userData)
-        .then(response => {
-          this.setToken(response, providerConfig.tokenPath);
+    const response = providerInstance.init(userData);
+    this.setToken(response, providerConfig.tokenPath);
 
-          if (this.isAuthenticated()) {
-            return resolve(response);
-          } else {
-            return reject(new Error('Authentication failed'));
-          }
-        })
-        .catch(err => reject(err));
-    });
+    if (this.isAuthenticated()) {
+      return response;
+    } else {
+      throw new Error('Authentication failed');
+    }
   }
 
   /**
@@ -273,49 +258,42 @@ export default class VueAuthenticate {
    * @param  {Object} options        Options, to override provider config
    * @return {Promise}               Request promise
    */
-  link(provider, userData, options) {
-    return new Promise((resolve, reject) => {
-      let providerConfig = this.options.providers[provider];
-      if (!providerConfig) {
-        return reject(new Error('Unknown provider'));
-      }
+  async link(provider, userData, options) {
+    let providerConfig = this.options.providers[provider];
+    if (!providerConfig) {
+      throw new Error('Unknown provider');
+    }
 
-      // support any options passed in, but don't modify the upstream
-      // provider config
-      providerConfig = Object.assign({}, providerConfig, options);
+    // support any options passed in, but don't modify the upstream
+    // provider config
+    providerConfig = Object.assign({}, providerConfig, options);
 
-      let providerInstance;
-      switch (providerConfig.oauthType) {
-        case '1.0':
-          providerInstance = new OAuth1(
-            this.$http,
-            this.storage,
-            providerConfig,
-            this.options
-          );
-          break;
-        case '2.0':
-          providerInstance = new OAuth2(
-            this.$http,
-            this.storage,
-            providerConfig,
-            this.options
-          );
-          break;
-        default:
-          return reject(new Error('Invalid OAuth type'));
-      }
+    let providerInstance;
+    switch (providerConfig.oauthType) {
+      case '1.0':
+        providerInstance = new OAuth1(
+          this.$http,
+          this.storage,
+          providerConfig,
+          this.options
+        );
+        break;
+      case '2.0':
+        providerInstance = new OAuth2(
+          this.$http,
+          this.storage,
+          providerConfig,
+          this.options
+        );
+        break;
+      default:
+        throw new Error('Invalid OAuth type');
+    }
 
-      return providerInstance
-        .init(userData)
-        .then(response => {
-          if (response[this.options.responseDataKey]) {
-            response = response[this.options.responseDataKey];
-          }
-
-          resolve(response);
-        })
-        .catch(reject);
-    });
+    const response = providerInstance.init(userData);
+    if (response[this.options.responseDataKey]) {
+      response = response[this.options.responseDataKey];
+    }
+    return response;
   }
 }

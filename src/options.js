@@ -4,7 +4,7 @@ import { $window } from './globals';
 export function getCookieDomainUrl() {
   try {
     return $window.location.hostname;
-  } catch (e) {}
+  } catch (error) {}
 
   return '';
 }
@@ -14,7 +14,7 @@ export function getRedirectUri(uri) {
     return !isUndefined(uri)
       ? `${$window.location.origin}${uri}`
       : $window.location.origin;
-  } catch (e) {}
+  } catch (error) {}
 
   return uri || null;
 }

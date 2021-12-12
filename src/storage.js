@@ -11,14 +11,14 @@ export default function StorageFactory(options) {
         $window.localStorage.setItem('testKey', 'test');
         $window.localStorage.removeItem('testKey');
         return new LocalStorage(options.storageNamespace);
-      } catch (e) {}
+      } catch (error) {}
 
     case 'sessionStorage':
       try {
         $window.sessionStorage.setItem('testKey', 'test');
         $window.sessionStorage.removeItem('testKey');
         return new SessionStorage(options.storageNamespace);
-      } catch (e) {}
+      } catch (error) {}
 
     case 'cookieStorage':
       return new CookieStorage(options.cookieStorage);

@@ -39,7 +39,7 @@ class CookieStorage {
   _getCookie() {
     try {
       return $document.cookie === 'undefined' ? '' : $document.cookie;
-    } catch (e) {}
+    } catch (error) {}
 
     return '';
   }
@@ -47,7 +47,7 @@ class CookieStorage {
   _setCookie(cookie) {
     try {
       $document.cookie = cookie;
-    } catch (e) {}
+    } catch (error) {}
   }
 }
 
