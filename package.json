@@ -1,6 +1,6 @@
 {
-  "name": "vue-authenticate",
-  "version": "1.5.0",
+  "name": "vue-authenticate-2",
+  "version": "2.0.0-rc1",
   "description": "Authentication library for Vue.js",
   "module": "dist/vue-authenticate.esm.min.js",
   "browser": "dist/vue-authenticate.umd.min.js",
