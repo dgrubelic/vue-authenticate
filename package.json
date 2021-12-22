@@ -5,6 +5,8 @@
   "module": "dist/vue-authenticate.esm.min.js",
   "browser": "dist/vue-authenticate.umd.min.js",
   "main": "dist/vue-authenticate.esm.min.js",
+  "types": "types/index.d.ts",
+  "typings": "types/index.d.ts",
   "scripts": {
     "build": "rollup -c",
     "lint": "eslint src",
@@ -33,7 +35,7 @@
     "url": "https://github.com/ajmas/vue-authenticate.git"
   },
   "files": [
-    "dist"
+    "dist", "types/index.d.ts"
   ],
   "license": "MIT",
   "devDependencies": {
