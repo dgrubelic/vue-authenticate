@@ -6,16 +6,25 @@
 
 **vue-authenticate** is easily configurable solution for [Vue.js](https://vuejs.org/) that provides local login/registration as well as Social login using Github, Facebook, Google and other OAuth providers.
 
-
-
-The best part about this library is that it is not strictly coupled to one request handling library like [vue-axios](https://github.com/imcvampire/vue-axios). You will be able to use it with different libraries.
-
-For now it is tested to work with  [vue-resource](https://github.com/pagekit/vue-resource) and [axios](https://github.com/mzabriskie/axios) (using [vue-axios](https://github.com/imcvampire/vue-axios) wrapper).
-
-**WARNING:** From version 1.3.0 default request library is `axios` using `vue-axios` wrapper plugin.
-
 This library was inspired by well known authentication library for Angular called [Satellizer](https://github.com/sahat/satellizer) developed by [Sahat Yalkabov](http://sahatyalkabov.com). They share almost identical configuration and API so you can easily switch from Angular to Vue.js project.
 
+## Changes in vue-authenticate-2
+
+This is a fork of [dgrubelic/vue-authenticate](https://github.com/dgrubelic/vue-authenticate), mainly because I needed to use this with Vue3 and the
+upstream project was no longer getting any attention from the original
+developer. If anything changes I'd be happy to make the changes available
+to the upstream
+
+Note, this version drops support for commonJS, while adding support for
+Vue3. Additionally, this version also supports passing an axios instance
+as a configuration option, which means you can easily confugure your
+interceptors, for example. If you wish to choose an alternative to Axios,
+then make sure that it is compatible with the `axios.post()` function.
+
+Support for vuex-axios is likely to be dropped in a future. The main
+justification is to avoid duplication with a vue instance that may
+already be used, but if a global `$http` is available, then it will be
+used.
 
 ## OAuth Providers
 
@@ -39,39 +48,42 @@ npm install vue-authenticate
 ```
 
 ## Usage
+
 ```javascript
-import Vue from 'vue'
-import VueAxios from 'vue-axios'
-import VueAuthenticate from 'vue-authenticate'
+import { createApp } from 'vue';
+import VueAuthenticate from 'vue-authenticate';
 import axios from 'axios';
 
-Vue.use(VueAxios, axios)
-Vue.use(VueAuthenticate, {
-  baseUrl: 'http://localhost:3000', // Your API domain
+const app = createApp(Root);
 
+app.use(VueAuthenticate, {
+  baseUrl: 'http://localhost:3000', // Your API domain
+  axios: axios.create({}),
   providers: {
     github: {
       clientId: '',
       redirectUri: 'http://localhost:8080/auth/callback' // Your client app URL
     }
   }
-})
+});
+
+app.mount('#app');
 ```
 
 ### Email & password login and registration
+
 ```javascript
+// TODO This needs to be reviewed for Vue3
 new Vue({
   methods: {
-    login: function () {
-      this.$auth.login({ email, password }).then(function () {
-        // Execute application logic after successful login
-      })
+    async login () {
+      await this.$auth.login({ email, password });
+      // Execute application logic after successful login
     },
 
-    register: function () {
-      this.$auth.register({ name, email, password }).then(function () {
-        // Execute application logic after successful registration
-      })
+    async register () {
+      await this.$auth.register({ name, email, password });
+      // Execute application logic after successful registration
     }
   }
 })
@@ -87,10 +99,9 @@ new Vue({
 ```javascript
 new Vue({
   methods: {
-    authenticate: function (provider) {
-      this.$auth.authenticate(provider).then(function () {
-        // Execute application logic after successful social authentication
-      })
+    async authenticate (provider) {
+      await this.$auth.authenticate(provider);
+      // Execute application logic after successful social authentication
     }
   }
 })
@@ -109,33 +120,12 @@ new Vue({
 
 ```javascript
 // ES6 example
-import Vue from 'vue'
-import Vuex from 'vuex'
-import VueAxios from 'vue-axios'
-import { VueAuthenticate } from 'vue-authenticate'
+import { VueAuthenticate } from 'vue-authenticate/authenticate'
 import axios from 'axios';
 
-Vue.use(Vuex)
-Vue.use(VueAxios, axios)
+const axiosInstance = axios.create({});
 
-const vueAuth = new VueAuthenticate(Vue.prototype.$http, {
-  baseUrl: 'http://localhost:4000'
-})
-```
-
-```javascript
-// CommonJS example
-var Vue = require('vue')
-var Vuex = require('vuex')
-var VueAxios = require('vue-axios')
-var VueAuthenticate = require('vue-authenticate')
-var axios = require('axios');
-
-Vue.use(Vuex)
-Vue.use(VueAxios, axios)
-
-// ES5, CommonJS example
-var vueAuth = VueAuthenticate.factory(Vue.prototype.$http, {
+const vueAuth = new VueAuthenticate(axiosInstance, {
   baseUrl: 'http://localhost:4000'
 })
 ```
