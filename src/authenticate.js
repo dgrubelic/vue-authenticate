@@ -240,7 +240,7 @@ export default class VueAuthenticate {
       throw new Error('Invalid OAuth type');
     }
 
-    const response = providerInstance.init(userData);
+    const response = await providerInstance.init(userData);
     this.setToken(response, providerConfig.tokenPath);
 
     if (this.isAuthenticated()) {
