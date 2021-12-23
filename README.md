@@ -44,7 +44,7 @@ own, see the documentation on [OAuth provider configurations](./docs/providers.m
 
 ## Installation
 ```bash
-npm install vue-authenticate
+npm install vue-authenticate --save
 ```
 
 ## Usage
