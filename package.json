@@ -1,6 +1,6 @@
 {
   "name": "vue-authenticate-2",
-  "version": "2.0.0-rc2.0",
+  "version": "2.0.0-rc3.0",
   "description": "Authentication library for Vue.js",
   "module": "dist/vue-authenticate.esm.min.js",
   "browser": "dist/vue-authenticate.umd.min.js",
@@ -35,7 +35,8 @@
     "url": "https://github.com/ajmas/vue-authenticate.git"
   },
   "files": [
-    "dist", "types/index.d.ts"
+    "dist",
+    "types/index.d.ts"
   ],
   "license": "MIT",
   "devDependencies": {
