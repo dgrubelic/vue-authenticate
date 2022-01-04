@@ -1,3 +1,4 @@
+import { App } from '@vue/runtime-core';
 import { AxiosResponse, AxiosInstance, AxiosRequestConfig } from 'axios';
 
 export interface CookieStorageOptions {
@@ -52,7 +53,14 @@ export declare class VueAuthenticate {
     userData: any,
     requestOptions?: AxiosRequestConfig
   ): Promise<{}>;
+  link(
+    provider: string,
+    userData?: any,
+    requestOptions?: AxiosRequestConfig
+  ): Promise<{}>;
 }
+
+export const VueAuthenticatePlugin: (app: App, options?: AuthenticateOptions) => void;
 
 export interface AuthenticateOptions {
   baseUrl?: string;
@@ -73,8 +81,10 @@ export interface AuthenticateOptions {
   providers: { [key: string]: ProviderOptions };
 }
 
-declare module "vue/types/vue" {
-  interface Vue {
+export default VueAuthenticatePlugin;
+
+declare module '@vue/runtime-core' {
+  interface ComponentCustomProperties {
     $auth: VueAuthenticate;
   }
 }
