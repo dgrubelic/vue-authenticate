@@ -52,7 +52,7 @@ export default class OAuthPopup {
         ) {
           clearInterval(poolingInterval);
           poolingInterval = null;
-          throw new Error('Auth popup window closed');
+          reject(new Error('Auth popup window closed'));
         }
 
         try {
