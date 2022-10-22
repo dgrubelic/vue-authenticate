@@ -6,6 +6,10 @@
 
 This library was inspired by well known authentication library for Angular called [Satellizer](https://github.com/sahat/satellizer) developed by [Sahat Yalkabov](http://sahatyalkabov.com). They share almost identical configuration and API so you can easily switch from Angular to Vue.js project.
 
+## Targeted Node.js versions
+
+This has been tested to build with Node.js 14, 16 and 18.
+
 ## Changes in vue-authenticate-2
 
 This is a fork of [dgrubelic/vue-authenticate](https://github.com/dgrubelic/vue-authenticate), mainly because I needed to use this with Vue3 and the
