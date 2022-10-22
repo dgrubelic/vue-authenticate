@@ -1,7 +1,0 @@
-{
-  "name": "vue-authenticate",
-  "version": "1.5.0",
-  "main": "dist/vue-authenticate.js",
-  "homepage": "https://github.com/dgrubelic/vue-authenticate",
-  "ignore": []
-}

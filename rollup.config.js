@@ -1,9 +1,10 @@
-import pkg from './package.json';
+import { readFileSync } from 'node:fs';
+
+const pkg = JSON.parse(readFileSync(new URL('./package.json', import.meta.url)));
 
 export default {
     input: 'src/index.js',
-    plugins: [
-    ],
+    plugins: [],
     output: [
         {
             name: 'vue-authenticate',

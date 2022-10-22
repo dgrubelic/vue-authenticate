@@ -1,5 +1,3 @@
-[**WARNING**]: README file is currently in process of rewrite and will be released soon.
-
 # vue-authenticate-2
 
 [![Join the chat at https://gitter.im/vuejs-auth/vue-authenticate](https://badges.gitter.im/vue-authenticate/Lobby.svg)](https://gitter.im/vuejs-auth/vue-authenticate?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)

@@ -36,31 +36,28 @@
   },
   "files": [
     "dist",
-    "types/index.d.ts"
+    "types/index.d.ts",
+    "README.md"
   ],
   "license": "MIT",
   "devDependencies": {
-    "@babel/core": "^7.9.0",
-    "@rollup/plugin-buble": "^0.21.3",
-    "acorn": "^6.1.1",
+    "@babel/core": "^7.19.6",
+    "acorn": "^8.8.0",
     "ajv": "^6.10.0",
-    "eslint": "^7.32.0",
-    "eslint-config-standard": "^16.0.3",
-    "eslint-plugin-import": "^2.25.3",
+    "eslint": "^8.26.0",
+    "eslint-config-standard": "^17.0.0",
+    "eslint-plugin-import": "^2.26.0",
+    "eslint-plugin-n": "^15.3.0",
     "eslint-plugin-node": "^11.1.0",
-    "eslint-plugin-promise": "^5.2.0",
-    "eslint-plugin-vue": "^8.2.0",
-    "rollup": "^2.61.1",
-    "rollup-plugin-babel": "^4.4.0",
-    "rollup-plugin-banner": "^0.2.1",
-    "rollup-plugin-uglify": "^6.0.4",
-    "uglify-js": "^3.9.1"
+    "eslint-plugin-promise": "^6.1.1",
+    "eslint-plugin-vue": "^9.6.0",
+    "rollup": "^3.2.3"
   },
   "peerDependencies": {
-    "axios": "^0.24.0",
-    "vue": "^3.2.4",
-    "vue-axios": "^3.4.0"
+    "axios": "1.x",
+    "vue": "3.x"
   },
+  "type": "module",
   "tags": [
     "auth",
     "authentication",
